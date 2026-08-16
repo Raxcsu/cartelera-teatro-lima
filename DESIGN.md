@@ -3,8 +3,7 @@
 Sistema de diseño derivado de `/plan-design-review` el 2026-08-16.
 Maquetas de referencia: `~/.gstack/projects/teatro/designs/teatro-v1-20260816/`
 
-**El brief, en las palabras del usuario:** *"tonalidades pastel rosa para que ella pueda
-escoger. Estilo elegante y formal pero para una chica abogada con estilo."*
+**El brief:** rosa pastel, elegante y formal, con criterio profesional. Nada decorativo.
 
 Traducción a reglas: rosa que no sea infantil, serif de alto contraste, texto cálido en
 vez de negro, y restricción en todo lo demás. **Aquí la elegancia es cuánto quitas.**
@@ -50,7 +49,7 @@ como aviso. Por eso el acento es rosa vino y no dorado.
 ```
 
 Sin fuentes externas: no hay build, y una fuente por CDN es una petición de red que
-puede fallar justo cuando ella abre el link con mala señal.
+puede fallar justo cuando alguien abre el link con mala señal.
 
 El serif de alto contraste es lo que hace el trabajo de "formal y con estilo". **Los
 precios van en serif, no en sans**: `S/ 148` en Bodoni se lee como una cifra considerada

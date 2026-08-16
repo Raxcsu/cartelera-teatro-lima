@@ -42,7 +42,7 @@ cálculo vive ahí y se prueba sin navegador. **Si estás por poner lógica de n
 `vista.js`, va en `logica.js`.**
 
 `datos.js` es la costura para V2: hoy hace `fetch` a archivos estáticos; cuando llegue
-la votación de ella apuntará a un Cloudflare Worker y ningún otro módulo se entera.
+la votación apuntará a un Cloudflare Worker y ningún otro módulo se entera.
 
 **El tiempo se inyecta, no se lee.** Ninguna función de `logica.js` llama a `Date.now()`.
 Todas reciben `hoy` como parámetro, así se puede probar el paso del tiempo sin trucos.
@@ -95,9 +95,13 @@ Dos reglas que se rompen sin querer:
 
 ## Estado del proyecto
 
-Fase 0 terminada. `PLAN_teatro.md` está superado por el diseño en
-`~/.gstack/projects/teatro/`, que lleva las 14 tareas pendientes y el informe de las
-revisiones. `TODOS.md` tiene los tres diferidos con trabajo real detrás.
+Fases 0 y 1 terminadas: cimientos, cartelera real de Lima y capa de lugares.
+
+**Los documentos de planificación viven fuera del repo**, en `~/.gstack/projects/teatro/`:
+el diseño con las 14 tareas y el informe de revisiones, la bitácora de diferidos, el plan
+de pruebas y el plan original superado. El repo público es solo código y datos, a
+propósito. Si vas a trabajar en este proyecto, leelos primero: llevan el porqué de casi
+todas las decisiones que ves acá.
 
 **La Fase 1 es un candado**: antes de construir pantallas hay que demostrar que un fin de
 semana real produce 3 planes con precio conocido, dentro de presupuesto y con entradas
