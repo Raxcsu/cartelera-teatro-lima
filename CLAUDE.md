@@ -68,8 +68,15 @@ Todas reciben `hoy` como parámetro, así se puede probar el paso del tiempo sin
 
    **Excepción reglada: el gasto referencial.** Una estimación **con base documentada** sí se
    permite, y no es lo mismo que inventar. Lleva `gasto_referencial: true` (lugares) o
-   `precio_referencial: true` (funciones) **más la fuente de la estimación**, y la interfaz la
-   muestra con virgulilla y la palabra "estimada". Sin fuente, no es referencial: es inventado.
+   `precio_referencial: true` (funciones) **más la fuente de la estimación**. Sin fuente, no es
+   referencial: es inventado.
+
+   Ojo con cómo se muestra, porque son dos cosas distintas: en el desplegable de cena el total
+   lleva la palabra completa (`cena x2 estimada`, vía `costo.incluye`), pero **el precio grande
+   de la tarjeta solo lleva la virgulilla** (`~S/ 50`). Que el significado viaje en un solo
+   carácter de puntuación es débil y contradice el espíritu de la regla de accesibilidad de
+   `DESIGN.md` ("la confianza nunca depende de una sola señal"). Hoy no se nota porque ninguna
+   función tiene `precio_referencial: true`; cuando alguna lo tenga, conviene arreglarlo.
 2. **La fuente viaja con el dato.** Cada función lleva `fuente_url` y `verificado_el`.
    `validar_datos.py` rechaza un `confirmado` sin ambos.
 3. **La confianza se calcula, no se lee.** `confianzaEfectiva()` combina el nivel con

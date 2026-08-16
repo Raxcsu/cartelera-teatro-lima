@@ -27,13 +27,21 @@ que haya función todos los días. Si no encontraste el calendario publicado, no
 carga solo las funciones que viste publicadas.
 
 **Excepción reglada — la estimación con base documentada.** Una estimación sí se permite si
-lleva `precio_referencial: true` **más la fuente de la estimación** en `fuente_url`. La app la
-muestra con virgulilla y la palabra "estimada". Sin fuente no es referencial: es inventado.
+lleva `precio_referencial: true` **más la fuente de la estimación** en `fuente_url`. La app lo
+muestra con virgulilla: `~S/ 50`. Sin fuente no es referencial: es inventado.
 
 ### 2. La fuente viaja con el dato
 
-Cada registro lleva `fuente_url` y `verificado_el`. No es opcional para nada que digas
-`confirmado` — el validador lo rechaza.
+Cada registro lleva `fuente_url` y `verificado_el`.
+
+El validador **falla** si falta alguno en algo marcado `confirmado`. En `probable` y
+`sin_verificar` no falla, pero eso no es permiso para omitirlos: un dato sin origen no se
+puede volver a verificar, y esa es la única forma de que suba de nivel más adelante.
+
+**Todas las URLs tienen que empezar con `http://` o `https://`.** Vale para `fuente_url`,
+`url_entradas` y `web`. El validador rechaza cualquier otra cosa, y la app además descarta en
+el navegador todo link que no sea http(s) — así que un `mailto:`, un `www.` pelado o una ruta
+relativa no fallan silenciosamente: fallan.
 
 ### 3. La confianza se calcula, no se lee
 
@@ -134,8 +142,10 @@ referencia canónica; esto es la versión legible.
 - `tipo` — exactamente uno de: `comedia`, `drama`, `musical`, `danza`, `infantil`, `otro`.
   Si la fuente no publica el género, va `otro`. No lo deduzcas del título.
 - `idioma` — obligatorio. Importa de verdad: ICPNA y el Británico montan obras en inglés.
-- `duracion_min` — la app la usa para calcular a qué hora termina la función. Si la conseguís,
-  vale mucho; si no, `null`.
+- `duracion_min` — **tiene efecto real, no es un adorno.** La app calcula con ella a qué hora
+  termina la función y con eso decide qué restaurantes siguen con la cocina abierta. Si va
+  `null`, el código **asume 2 horas** y lo declara en pantalla ("suponiendo unas 2 h de
+  función"). Conseguirla reemplaza un supuesto por un dato: vale el clic extra.
 - `imagen_local` — ruta local o `null`. **Nunca una URL externa**, el validador la rechaza. Si
   ponés imagen, `imagen_credito` es obligatorio (es la mitigación de derechos de autor).
 

@@ -77,8 +77,11 @@ real en `data/overrides.json`, que sobrevive a todos los refrescos.
 
 ### De dónde vienen los datos
 
-- **Teatros:** coordenadas de [Nominatim](https://nominatim.openstreetmap.org/), verificadas
-  contra la dirección publicada.
+- **Teatros:** coordenadas de [Nominatim](https://nominatim.openstreetmap.org/), contrastadas
+  contra la dirección publicada. **Dos de los cinco todavía no están confirmadas** y lo dicen
+  en su propia nota dentro de `data/teatros.json`: el Británico tiene varias sedes en
+  Miraflores y no se sabe cuál tiene el auditorio, y del Teatro Julieta Nominatim resolvió el
+  pasaje pero no el número, así que la coordenada es el centro de la cuadra y no la puerta.
 - **Cartelera:** agregadores editoriales de Lima. Como no son la web oficial del teatro ni el
   checkout de la ticketera, **toda función está marcada `probable`**, no `confirmado`. Por eso
   la app dice "verificar antes de ir" en todas.
