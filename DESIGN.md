@@ -124,7 +124,8 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
 | Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
 | Estado de mes vacío | **Hecho y ALCANZABLE.** `.sin-resultados` se ve navegando a un mes sin funciones. Dejó de ser inalcanzable porque `rangoNavegable()` permite un mes más allá del rango cargado — exactamente para que este estado exista de verdad. Verificado en navegador. |
-| Mapa | **Hecho.** Banda de 168px arriba, pines etiquetados dibujados con CSS. Caída del CDN verificada en navegador: la banda se va a 0px y la lista queda entera. |
+| Mapa | **Hecho, con un límite geométrico conocido.** Banda de 260px, pines dibujados con CSS y nombre al pasar por encima. Caída del CDN verificada: la banda se va a 0px y la lista queda entera. **Los tres teatros de Miraflores quedan a 3px unos de otros** y no se pueden tocar por separado sin acercar el mapa: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m — una razón de 39 a 1 que ninguna altura de banda resuelve. La lista de abajo es la navegación real; el mapa contesta "¿está cerca?". |
+| Presupuesto vertical | **A revisar.** La cabecera (mapa 260 + barra 44 + calendario 319) suma **625px**. En un celular de 844px eso deja ver el encabezado del día y apenas el borde de la primera tarjeta. Es coherente con una app que es un calendario, pero conviene mirarlo con datos de un mes completo antes de darlo por bueno. |
 | Calendario del mes | **Hecho.** 42 celdas fijas, lunes primero, punto en los días con función. |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
 | Primera vez | **Pendiente.** Qué ve alguien que abre la app sin saber qué es. |
