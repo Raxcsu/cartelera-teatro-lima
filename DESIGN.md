@@ -66,21 +66,33 @@ y no como un dato de sistema.
 
 ## Reglas de composición
 
-1. **El plan #1 no se ve como los otros dos.** Lleva afiche grande, tarjeta con borde,
-   badge de orden y acciones propias. `puntuarFuncion` ordena en la lógica; **la pantalla
-   tiene que mostrar que ordenó**.
-2. **El ranking se explica.** Bajo el plan #1 va una línea que dice por qué ganó: *"es el
-   más cerca de casa y el único con precio confirmado hoy"*. Un orden sin motivo se lee
-   como arbitrario.
-3. **El precio es escaneable sin leer.** Debe poder compararse los tres precios de un
-   vistazo, porque la pregunta del producto es *"¿qué hacemos con S/ 150?"*.
-4. **Los afiches mandan.** Son el único activo visual del proyecto. Nunca por debajo de
-   56px de ancho, y en el plan #1 nunca por debajo de 118px.
-5. **Nada de emoji.** Renderizan distinto en cada celular y rompen la tipografía. Los
-   iconos se dibujan con CSS.
-6. **Los dos estados de vacío son visualmente distintos.** Filtro estrecho usa el rosa
-   normal y ofrece ampliar el filtro. Datos vencidos cambia a fondo cálido, marca ámbar y
-   ofrece actualizar. Si se parecieran, el modelo de confianza quedaría anulado.
+1. **El precio es escaneable sin leer.** Es la primera pregunta de cualquiera que mira una
+   cartelera. Va en serif grande y muestra el rango publicado tal cual: `S/ 30 – 50`,
+   `desde S/ 35`. Nunca multiplicado por dos, o deja de coincidir con Teleticket.
+2. **Los afiches mandan** cuando existan. Son el único activo visual del proyecto. Nunca
+   por debajo de 56px de ancho.
+3. **Nada de emoji.** Renderizan distinto en cada celular y rompen la tipografía. Los
+   iconos se dibujan con CSS — incluidos los pines del mapa (`.pin-teatro`).
+4. **Los tres estados de vacío son visualmente distintos.** Mes sin funciones usa el rosa
+   normal y manda a las flechas. Cartelera vencida cambia a fondo cálido y marca ámbar.
+   Fallo de carga tiene su propio fondo y marca roja. Si se parecieran, el modelo de
+   confianza quedaría anulado.
+5. **El mapa es opcional, no estructural.** Si Leaflet no carga, su banda desaparece entera
+   y la lista sube: nunca un rectángulo gris esperando. El mapa nunca lleva información que
+   no esté también en la lista.
+6. **La barra de mes es lo único pegajoso de nivel superior.** Al scrollear, mapa y grilla
+   salen y ella queda a 44px. Los encabezados de día se pegan debajo, a `top: var(--tap)`.
+
+### Decisión revisada: el mapa vuelve a la pantalla principal
+
+El diseño original lo tenía de protagonista; la revisión cruzada lo movió al detalle,
+argumentando que el mapa cobra geocodificación y Leaflet antes de probar lo difícil.
+**Ese peaje ya se pagó**: las coordenadas existen y están verificadas. Con el eje del producto
+movido de "3 planes" a "la cartelera del mes", el mapa contesta la pregunta que la lista no
+puede — *"¿está cerca?"* — sin que haya que abrir nada.
+
+Se conserva lo bueno de la decisión anterior: Leaflet sigue entrando por `import()` dinámico y
+su fallo no toca el resto de la pantalla.
 
 ## Accesibilidad, verificada no supuesta
 
@@ -111,8 +123,11 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Layout de escritorio | **Pendiente.** Solo se diseñó 390px. A 1440px hay que decidir qué pasa. |
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
 | Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
-| Estado "nada calza con estos filtros" | **Escrito, todavía inalcanzable.** La pantalla existe en `index.html` con su clase `.sin-resultados`, pero `proponerPlanes` se llama con criterios vacíos, así que nunca devuelve cero. Se activa sola cuando existan los filtros. Verificado por lógica (`presupuesto: 1` devuelve 0 planes), **no visualmente**. |
+| Estado de mes vacío | **Hecho y ALCANZABLE.** `.sin-resultados` se ve navegando a un mes sin funciones. Dejó de ser inalcanzable porque `rangoNavegable()` permite un mes más allá del rango cargado — exactamente para que este estado exista de verdad. Verificado en navegador. |
+| Mapa | **Hecho.** Banda de 168px arriba, pines etiquetados dibujados con CSS. Caída del CDN verificada en navegador: la banda se va a 0px y la lista queda entera. |
+| Calendario del mes | **Hecho.** 42 celdas fijas, lunes primero, punto en los días con función. |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
 | Primera vez | **Pendiente.** Qué ve alguien que abre la app sin saber qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
-| Filtros, detalle con mapa, tarjeta | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. La interfaz publicada es la lista mínima. |
+| Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 5 obras, así que la regla 2 de composición no tiene nada que gobernar todavía. |
+| Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. |

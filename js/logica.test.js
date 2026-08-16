@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   slug, idTeatro, idObra, idFuncion, idLugar,
   diasEntre, confianzaEfectiva, estadoCartelera,
-  formatearSoles, formatearDistancia,
-  distanciaMetros, sumarMinutos, cocinaAbierta,
-  filtrarFunciones, puntuarFuncion, calcularCostoTotal,
-  proponerPlanes, motivoDelPrimero,
+  formatearSoles, formatearDistancia, rangoPrecio, urlSegura,
+  nombreMes, etiquetaDia,
+  distanciaMetros, sumarMinutos, cocinaAbierta, lugaresCercanos, horaDeSalida,
+  filtrarFunciones, calcularCostoTotal,
+  agruparPorDia, diasDelMes, mesesConFunciones, desplazarMes, mesInicial, rangoNavegable,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -278,71 +279,271 @@ describe('calcularCostoTotal: invariantes, no gustos', () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-describe('puntuarFuncion: invariantes (los pesos son de Óscar)', () => {
-  it('siempre devuelve un número finito, nunca NaN', () => {
-    expect(Number.isFinite(puntuarFuncion(f(), {}))).toBe(true);
-    expect(Number.isFinite(puntuarFuncion(f({ precio_min: null }), { presupuesto: 150 }))).toBe(true);
-    expect(Number.isFinite(puntuarFuncion(f(), { distanciaM: null, confEfectiva: null }))).toBe(true);
+describe('rangoPrecio: el precio se muestra como lo publica la fuente', () => {
+  it('con mínimo y máximo muestra el rango', () => {
+    expect(rangoPrecio(f({ precio_min: 30, precio_max: 50 })).texto).toBe('S/ 30 – 50');
   });
 
-  it('nunca es negativo', () => {
-    expect(puntuarFuncion(f({ precio_min: 9999 }), { presupuesto: 10, distanciaM: 99999 })).toBeGreaterThanOrEqual(0);
-  });
-});
-
-// ─────────────────────────────────────────────────────────────
-describe('proponerPlanes', () => {
-  const ctx = { obras, teatros, lugares, hoy: HOY };
-
-  it('devuelve como máximo la cantidad pedida', () => {
-    const fs = [f({ id: 'a' }), f({ id: 'b' }), f({ id: 'c' }), f({ id: 'd' })];
-    expect(proponerPlanes(fs, {}, ctx, 3)).toHaveLength(3);
+  // 'Inmaduros' dice "desde 35 soles" y no publica techo. Inventarle uno
+  // sería exactamente lo que prohíbe la Regla 1.
+  it('sin máximo dice "desde", no un rango falso', () => {
+    expect(rangoPrecio(f({ precio_min: 35, precio_max: null })).texto).toBe('desde S/ 35');
   });
 
-  it('elige el lugar más cercano con la cocina abierta', () => {
-    const [p] = proponerPlanes([f()], {}, ctx, 1);
-    expect(p.lugar.id).toBe('cerca-abierto');   // 'cerca-cerrado' está más cerca pero cierra 21:00
-    expect(p.horaFin).toBe('21:35');
+  it('precio único no se muestra como rango de un solo valor', () => {
+    expect(rangoPrecio(f({ precio_min: 40, precio_max: 40 })).texto).toBe('S/ 40');
   });
 
-  it('sin ningún lugar a menos de 600 m el plan existe igual, sin cena', () => {
-    const [p] = proponerPlanes([f()], { radioM: 5 }, ctx, 1);
-    expect(p.lugar).toBeNull();
-    expect(p.costo.total).toBe(120);
+  it('sin precio nunca produce NaN', () => {
+    const r = rangoPrecio(f({ precio_min: null, precio_max: null }));
+    expect(r.texto).toBe('sin precio');
+    expect(r.texto).not.toMatch(/NaN/);
+    expect(r.min).toBeNull();
   });
 
-  it('el presupuesto se aplica al costo TOTAL, no a la entrada suelta', () => {
-    // 60x2 entradas + 25x2 cena = 170. Con presupuesto 150 no debe entrar.
-    expect(proponerPlanes([f()], { presupuesto: 150 }, ctx, 3)).toHaveLength(0);
-    expect(proponerPlanes([f()], { presupuesto: 200 }, ctx, 3)).toHaveLength(1);
+  it('el precio referencial se marca con virgulilla', () => {
+    const r = rangoPrecio(f({ precio_min: 50, precio_max: null, precio_referencial: true }));
+    expect(r.texto).toBe('desde ~S/ 50');
+    expect(r.estimado).toBe(true);
   });
 
-  it('el orden es estable ante empate de puntaje', () => {
-    const fs = [f({ id: 'zzz' }), f({ id: 'aaa' })];
-    const r = proponerPlanes(fs, {}, ctx, 2);
-    expect(r[0].funcion.id).toBe('aaa');
+  // Mismo criterio que calcularCostoTotal: no hay nada estimado si no hay número.
+  it('referencial sin precio no se marca como estimado', () => {
+    expect(rangoPrecio(f({ precio_min: null, precio_referencial: true })).estimado).toBe(false);
   });
 
-  it('sin funciones devuelve lista vacía, no revienta', () => {
-    expect(proponerPlanes([], {}, ctx, 3)).toEqual([]);
+  it('una función indefinida no rompe', () => {
+    expect(rangoPrecio(undefined).texto).toBe('sin precio');
   });
 });
 
 // ─────────────────────────────────────────────────────────────
-describe('motivoDelPrimero: un orden sin razón se lee como arbitrario', () => {
-  const ctx = { obras, teatros, lugares, hoy: HOY };
-
-  it('explica por qué ganó el primero', () => {
-    const planes = proponerPlanes(
-      [f({ id: 'a' }), f({ id: 'b', teatro_id: 'teatro-larco', confianza: 'probable' })],
-      {}, ctx, 2,
-    );
-    const motivo = motivoDelPrimero(planes[0], planes.slice(1));
-    expect(motivo).toBeTypeOf('string');
-    expect(motivo).toMatch(/^Es .+\.$/);
+describe('urlSegura: los links los llena una investigación externa', () => {
+  it('deja pasar http y https', () => {
+    expect(urlSegura('https://teleticket.com.pe/teatro')).toBe('https://teleticket.com.pe/teatro');
+    expect(urlSegura('http://ejemplo.pe')).toBe('http://ejemplo.pe');
   });
 
-  it('sin plan devuelve null en vez de romper', () => {
-    expect(motivoDelPrimero(null, [])).toBeNull();
+  // esc() no toca ni un carácter de esto: escapar no alcanza para un href.
+  it('bloquea javascript: y data:', () => {
+    expect(urlSegura('javascript:alert(1)')).toBeNull();
+    expect(urlSegura('JavaScript:alert(1)')).toBeNull();
+    expect(urlSegura('data:text/html,<script>alert(1)</script>')).toBeNull();
+    expect(urlSegura(' javascript:alert(1) ')).toBeNull();
+  });
+
+  it('null y vacío devuelven null, no la cadena "null"', () => {
+    expect(urlSegura(null)).toBeNull();
+    expect(urlSegura('')).toBeNull();
+    expect(urlSegura('   ')).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('agruparPorDia: la lista del mes', () => {
+  it('ordena los días y no inventa los vacíos', () => {
+    const r = agruparPorDia([
+      f({ id: 'b', fecha: '2026-08-25' }),
+      f({ id: 'a', fecha: '2026-08-22' }),
+    ]);
+    expect(r.map((d) => d.fecha)).toEqual(['2026-08-22', '2026-08-25']);
+  });
+
+  it('agrupa el mismo día y ordena por hora', () => {
+    const r = agruparPorDia([
+      f({ id: 'tarde', fecha: '2026-08-22', hora: '20:30' }),
+      f({ id: 'temprano', fecha: '2026-08-22', hora: '16:00' }),
+    ]);
+    expect(r).toHaveLength(1);
+    expect(r[0].funciones.map((x) => x.id)).toEqual(['temprano', 'tarde']);
+  });
+
+  it('descarta funciones sin fecha en vez de crear un día "undefined"', () => {
+    expect(agruparPorDia([f({ fecha: null })])).toEqual([]);
+  });
+
+  it('sin funciones devuelve lista vacía', () => {
+    expect(agruparPorDia([])).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('diasDelMes: la grilla del calendario', () => {
+  it('siempre 42 celdas, para que la grilla no cambie de alto entre meses', () => {
+    expect(diasDelMes('2026-08', [])).toHaveLength(42);
+    expect(diasDelMes('2026-02', [])).toHaveLength(42);
+  });
+
+  // Perú lee el calendario de lunes a domingo. El 1 de agosto de 2026 es sábado.
+  it('la semana empieza en lunes', () => {
+    const celdas = diasDelMes('2026-08', []);
+    expect(celdas.slice(0, 5).every((c) => c.fecha === null)).toBe(true);
+    expect(celdas[5].fecha).toBe('2026-08-01');
+  });
+
+  it('cuenta las funciones de cada día', () => {
+    const celdas = diasDelMes('2026-08', [
+      f({ id: 'a', fecha: '2026-08-22' }),
+      f({ id: 'b', fecha: '2026-08-22' }),
+      f({ id: 'c', fecha: '2026-08-25' }),
+    ]);
+    const porFecha = Object.fromEntries(celdas.filter((c) => c.fecha).map((c) => [c.fecha, c.cantidad]));
+    expect(porFecha['2026-08-22']).toBe(2);
+    expect(porFecha['2026-08-25']).toBe(1);
+    expect(porFecha['2026-08-23']).toBe(0);
+  });
+
+  it('respeta el largo real del mes', () => {
+    const dentro = (m) => diasDelMes(m, []).filter((c) => c.dentroDelMes).length;
+    expect(dentro('2026-02')).toBe(28);   // no bisiesto
+    expect(dentro('2024-02')).toBe(29);   // bisiesto
+    expect(dentro('2026-04')).toBe(30);
+    expect(dentro('2026-12')).toBe(31);
+  });
+
+  it('un mes inválido devuelve lista vacía en vez de romper', () => {
+    expect(diasDelMes('no-es-un-mes', [])).toEqual([]);
+    expect(diasDelMes('2026-13', [])).toEqual([]);
+    expect(diasDelMes(null, [])).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('mesesConFunciones: qué flechas del calendario se encienden', () => {
+  it('devuelve los meses únicos, ordenados', () => {
+    expect(mesesConFunciones([
+      f({ fecha: '2026-09-03' }),
+      f({ fecha: '2026-08-22' }),
+      f({ fecha: '2026-08-25' }),
+    ])).toEqual(['2026-08', '2026-09']);
+  });
+
+  it('sin funciones devuelve lista vacía', () => {
+    expect(mesesConFunciones([])).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('navegación de meses', () => {
+  it('avanza y retrocede dentro del año', () => {
+    expect(desplazarMes('2026-08', 1)).toBe('2026-09');
+    expect(desplazarMes('2026-08', -1)).toBe('2026-07');
+  });
+
+  // La razón de existir de esta función.
+  it('cruza el fin de año en las dos direcciones', () => {
+    expect(desplazarMes('2026-12', 1)).toBe('2027-01');
+    expect(desplazarMes('2026-01', -1)).toBe('2025-12');
+    expect(desplazarMes('2026-01', -13)).toBe('2024-12');
+  });
+
+  it('un mes inválido devuelve null', () => {
+    expect(desplazarMes('2026-13', 1)).toBeNull();
+    expect(desplazarMes(null, 1)).toBeNull();
+  });
+
+  it('abre en el mes de hoy si tiene funciones', () => {
+    expect(mesInicial(['2026-07', '2026-08', '2026-09'], HOY)).toBe('2026-08');
+  });
+
+  // Abrir en un mes vacío cuando la temporada arranca la semana que
+  // viene se leería como "no hay teatro".
+  it('si el mes de hoy está vacío, salta al primero por delante', () => {
+    expect(mesInicial(['2026-09', '2026-10'], HOY)).toBe('2026-09');
+  });
+
+  it('si todo quedó atrás, muestra el último; estadoCartelera avisa', () => {
+    expect(mesInicial(['2026-05', '2026-06'], HOY)).toBe('2026-06');
+  });
+
+  it('sin funciones abre en el mes de hoy', () => {
+    expect(mesInicial([], HOY)).toBe('2026-08');
+  });
+
+  // Con un solo mes cargado, frenar en el borde deja las DOS flechas
+  // muertas y vuelve inalcanzable el estado "nada cargado en septiembre".
+  it('deja llegar un mes más allá del rango cargado', () => {
+    expect(rangoNavegable(['2026-08'])).toEqual({ desde: '2026-07', hasta: '2026-09' });
+  });
+
+  it('el margen se mide contra los extremos, no contra cada mes', () => {
+    expect(rangoNavegable(['2026-08', '2026-09', '2026-10']))
+      .toEqual({ desde: '2026-07', hasta: '2026-11' });
+  });
+
+  it('sin funciones no hay nada que navegar', () => {
+    expect(rangoNavegable([])).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('nombres en español: tabla fija, no Intl', () => {
+  it('nombra el mes', () => {
+    expect(nombreMes('2026-08')).toBe('agosto 2026');
+    expect(nombreMes('2026-12')).toBe('diciembre 2026');
+  });
+
+  it('nombra el día con su fecha', () => {
+    expect(etiquetaDia('2026-08-22')).toBe('sábado 22 de agosto');
+  });
+
+  it('una fecha inválida devuelve null en vez de "undefined de undefined"', () => {
+    expect(nombreMes('xx')).toBeNull();
+    expect(etiquetaDia(null)).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('horaDeSalida: el supuesto se declara, no se esconde', () => {
+  it('usa la duración publicada cuando existe', () => {
+    const r = horaDeSalida(f({ hora: '20:00' }), obras['comedia-2026']);   // 95 min
+    expect(r.hora).toBe('21:35');
+    expect(r.supuesta).toBe(false);
+  });
+
+  // El código viejo hacía `?? 0`: la obra "terminaba" al empezar, y eso
+  // dejaba pasar sitios que ya iban a estar cerrados.
+  it('sin duración supone 2 h y lo marca', () => {
+    const r = horaDeSalida(f({ hora: '20:00' }), { duracion_min: null });
+    expect(r.hora).toBe('22:00');
+    expect(r.supuesta).toBe(true);
+  });
+
+  it('el supuesto erra hacia el lado seguro: descarta cocinas al límite', () => {
+    const teatro = teatros['teatro-britanico'];
+    const conDuracion = lugaresCercanos(teatro, lugares, horaDeSalida(f({ hora: '20:00' }), null).hora);
+    // 'cerca-cerrado' cierra 21:00; con el supuesto de 2 h queda fuera.
+    expect(conDuracion.some((x) => x.lugar.id === 'cerca-cerrado')).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('lugaresCercanos: la cena dejó de ser el plan, sigue siendo el criterio', () => {
+  const teatro = teatros['teatro-britanico'];
+
+  it('descarta el más cercano si la cocina ya cerró', () => {
+    // 'cerca-cerrado' está más cerca, pero cierra 21:00 y la función acaba 21:35.
+    const r = lugaresCercanos(teatro, lugares, '21:35');
+    expect(r[0].lugar.id).toBe('cerca-abierto');
+    expect(r.some((x) => x.lugar.id === 'cerca-cerrado')).toBe(false);
+  });
+
+  it('descarta lo que está fuera del radio', () => {
+    expect(lugaresCercanos(teatro, lugares, '21:35').some((x) => x.lugar.id === 'lejos')).toBe(false);
+  });
+
+  it('devuelve la distancia junto al lugar', () => {
+    const [x] = lugaresCercanos(teatro, lugares, '21:35');
+    expect(x.distancia).toBeGreaterThan(0);
+    expect(x.distancia).toBeLessThanOrEqual(600);
+  });
+
+  it('sin teatro o sin coordenadas devuelve lista vacía, no revienta', () => {
+    expect(lugaresCercanos(null, lugares, '21:35')).toEqual([]);
+    expect(lugaresCercanos(teatros['sin-coords'], lugares, '21:35')).toEqual([]);
+  });
+
+  it('sin hora de fin no propone nada: "cenamos después" sería ficción', () => {
+    expect(lugaresCercanos(teatro, lugares, null)).toEqual([]);
   });
 });

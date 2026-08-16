@@ -2,8 +2,9 @@
 
 **En vivo: https://raxcsu.github.io/cartelera-teatro-lima/**
 
-Responder *"es martes, ¿qué hacemos el sábado con S/ 150?"* en menos de un minuto,
-con opciones de salida ya armadas: obra, hora, teatro, dónde comer a pie y costo total.
+La cartelera de teatro de Lima del mes, en una pantalla: mapa de los teatros, calendario,
+y por cada función su hora, su precio publicado y el link para comprar. Dónde cenar cerca
+queda a un toque de distancia, en segundo plano.
 
 Proyecto personal. Sin framework, sin base de datos, sin paso de build.
 
@@ -19,7 +20,7 @@ Para desarrollo:
 
 ```bash
 npm install                    # solo Vitest, nunca se publica
-npm test                       # 44 pruebas sobre la lógica pura
+npm test                       # 79 pruebas sobre la lógica pura
 npm run validar                # valida los JSON y reporta cobertura de confianza
 ```
 
@@ -29,12 +30,19 @@ npm run validar                # valida los JSON y reporta cobertura de confianz
 index.html   styles.css
 js/  datos.js    red, localStorage, overrides
      logica.js   100% funciones puras — todas las pruebas viven acá
+     vista.js    toda la capa DOM
+     mapa.js     Leaflet por CDN — el único trato con red externa
 data/*.json  fuente de verdad, editable a mano
+docs/        encargo-cartelera.md — el pedido de investigación de datos
 scripts/     validar_datos.py — la única puerta de calidad de los datos
 ```
 
 Los datos son archivos JSON. Se editan a mano, se revisan con `git diff` y se publican
 con `git push`. GitHub Pages sirve exactamente los archivos del repo: no hay build.
+
+**El mapa es opcional por diseño.** Leaflet entra por CDN con `import()` dinámico; si no carga,
+su banda desaparece y el resto de la pantalla queda intacto. Un fallo de red no puede leerse
+como "no hay teatro".
 
 ## Sobre los datos
 
@@ -52,8 +60,12 @@ La app distingue dos cosas y las muestra distinto:
 
 | | De dónde sale | Cómo se ve |
 |---|---|---|
-| **Precio de entradas** | publicado por la fuente | `S/ 130` |
-| **Gasto de cena** | estimación por categoría con base documentada | `~S/ 130`, y la etiqueta dice "cena x2 **estimada**" |
+| **Precio de entradas** | publicado por la fuente, tal cual | `S/ 30 – 50`, `desde S/ 35` |
+| **Gasto de cena** | estimación por categoría con base documentada | `~S/ 35 – 60 por persona`, y la etiqueta dice "cena x2 **estimada**" |
+
+El precio grande es el de **una entrada**, no el total para dos: así coincide con el número que
+muestra la ticketera. Si la fuente publica "desde 35" y no da techo, la app dice "desde S/ 35"
+en vez de inventarle un máximo.
 
 Toda estimación lleva `gasto_referencial: true` y la fuente de la estimación en el propio
 JSON. Un número estimado nunca se presenta como precio verificado.
@@ -87,15 +99,19 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 ## Estado
 
-**Fases 0 y 1 terminadas**, y publicado en GitHub Pages.
+Publicado en GitHub Pages, con la interfaz reenfocada al teatro.
 
-- Estructura, esquemas de datos, lógica pura con 44 pruebas y validador.
+- Lógica pura con 79 pruebas, validador y esquemas de datos.
+- Mapa de teatros, calendario del mes, lista por día y precio de entrada por función.
 - Cartelera real de Lima: 5 teatros, 5 obras y 5 funciones para un sábado, todas con fuente.
-- 53 lugares para cenar con horario de cocina, a menos de 600 m de un teatro.
-- Interfaz mínima que arma planes completos de punta a punta.
+- 53 lugares para cenar con horario de cocina, dentro del desplegable de cada función.
 
-Sigue la interfaz completa según `DESIGN.md`: filtros, detalle con mapa y tarjeta compartible.
-El sistema de diseño ya está definido; falta implementarlo.
+**El cuello de botella son los datos, no la pantalla.** Las 5 funciones son todas del mismo día,
+ninguna tiene link de compra y ningún teatro tiene web cargada, así que el botón "Comprar
+entradas" todavía no aparece: aparece solo cuando el dato exista. `docs/encargo-cartelera.md`
+es el pedido de investigación que cierra ese hueco.
+
+Después: filtros y tarjeta compartible, ya diseñados en `DESIGN.md` y sin implementar.
 
 ## Dónde seguir leyendo
 

@@ -80,6 +80,19 @@ def cargar(nombre: str, clave: str):
     return datos[clave]
 
 
+def url_valida(valor, ctx: str, campo: str) -> None:
+    """Solo http y https llegan a un href de la app.
+
+    urlSegura() en js/logica.js ya bloquea el resto en el navegador, pero
+    ahi el dato malo ya viajo: el link simplemente no aparece y nadie se
+    entera de por que. Acá falla ruidosamente, que es donde corresponde.
+    """
+    if valor is None:
+        return
+    if not isinstance(valor, str) or not re.match(r"^https?://", valor.strip(), re.I):
+        err(f"{ctx}: '{campo}' = {valor!r} no es una URL http(s)")
+
+
 def fecha_valida(valor, ctx: str, campo: str, obligatorio: bool = True) -> date | None:
     if valor is None:
         if obligatorio:
@@ -119,6 +132,9 @@ def main() -> int:
         if t.get("id") != esperado:
             err(f"{ctx}: el id no es determinista. Deberia ser '{esperado}'")
 
+        url_valida(t.get("web"), ctx, "web")
+        url_valida(t.get("fuente_url"), ctx, "fuente_url")
+
         lat, lng = t.get("lat"), t.get("lng")
         if lat is None or lng is None:
             avi(f"{ctx}: sin coordenadas. Geocodificar y VERIFICAR contra la direccion.")
@@ -140,6 +156,8 @@ def main() -> int:
             esperado = f"{slug(o.get('titulo'))}-{ini.year}"
             if o.get("id") != esperado:
                 err(f"{ctx}: el id no es determinista. Deberia ser '{esperado}'")
+
+        url_valida(o.get("fuente_url"), ctx, "fuente_url")
 
         if o.get("tipo") not in TIPOS:
             err(f"{ctx}: tipo {o.get('tipo')!r} no esta en {sorted(TIPOS)}")
@@ -175,6 +193,9 @@ def main() -> int:
         esperado = f"{f.get('obra_id')}-{f.get('teatro_id')}-{f.get('fecha')}-{str(f.get('hora') or '').replace(':', '')}"
         if f.get("id") != esperado:
             err(f"{ctx}: el id no es determinista. Deberia ser '{esperado}'")
+
+        url_valida(f.get("url_entradas"), ctx, "url_entradas")
+        url_valida(f.get("fuente_url"), ctx, "fuente_url")
 
         pmin, pmax = f.get("precio_min"), f.get("precio_max")
         for nombre, p in (("precio_min", pmin), ("precio_max", pmax)):

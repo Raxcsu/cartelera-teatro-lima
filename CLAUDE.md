@@ -7,7 +7,7 @@ Proyecto en español: código, comentarios y datos van en español.
 ## Comandos
 
 ```bash
-npm test                          # Vitest, 44 pruebas sobre logica.js
+npm test                          # Vitest, 79 pruebas sobre logica.js
 npx vitest run -t "confianza"     # un solo grupo de pruebas por nombre
 npm run test:watch                # reejecuta al guardar
 
@@ -30,24 +30,29 @@ la Web Share API tendrá la misma restricción por el mismo motivo.
 se publica a GitHub Pages es exactamente lo que hay en el repo. `package.json` y
 `node_modules/` existen solo para Vitest y nunca se publican.
 
-**Los cuatro módulos están cortados por testabilidad, no por pantalla.** Es la
+**Los módulos están cortados por testabilidad, no por pantalla.** Es la
 decisión de arquitectura más importante del proyecto:
 
 ```
 datos.js    red + localStorage + overrides   ← única puerta a los datos     [existe]
 logica.js   100% puro, cero imports          ← AQUÍ VIVEN LAS PRUEBAS       [existe]
-vista.js    DOM                              (Fase 4)                       [NO existe]
+vista.js    DOM                                                            [existe]
+mapa.js     Leaflet por CDN                  ← único trato con red externa  [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
-**Hoy la capa DOM vive inline en `index.html`**, en un `<script type="module">` de unas 50
-líneas. Es deliberado mientras la interfaz sea mínima. Cuando crezca, ese script se muda a
-`vista.js` tal cual: por eso `datos.js` y `logica.js` ya están separados, para que esa mudanza
-no arrastre lógica de negocio con ella.
+`index.html` quedó en 20 líneas: importa `vista.js` y arranca. La capa DOM vivía inline ahí
+hasta que la pantalla creció a mapa + calendario + mes; la mudanza no arrastró lógica de
+negocio porque esa ya estaba separada, que era exactamente la apuesta.
 
 `logica.js` no importa nada y no toca DOM ni red. Todo lo que puede estar mal en un
 cálculo vive ahí y se prueba sin navegador. **Si estás por poner lógica de negocio en
-`vista.js`, va en `logica.js`.**
+`vista.js`, va en `logica.js`.** Es la regla que mandó a `mesInicial()`, `desplazarMes()`,
+`rangoNavegable()` y `rangoPrecio()` a `logica.js` aunque parezcan cosas de interfaz.
+
+`mapa.js` está solo por una razón: es el **único** punto que depende de un recurso externo.
+**Ninguna función suya lanza.** Si el CDN se cae, `crearMapa()` devuelve `null`, `vista.js`
+esconde la banda y la lista queda entera. Un fallo de red no puede leerse como "no hay teatro".
 
 `datos.js` es la costura para V2: hoy hace `fetch` a archivos estáticos; cuando llegue
 la votación apuntará a un Cloudflare Worker y ningún otro módulo se entera.
@@ -96,6 +101,19 @@ obras equivocadas y el `git diff` sería ilegible.
   `costo.incluye`, que es la lista literal (`['entradas x2', 'cena x2 estimada']`).
 - **`data/overrides.json` se aplica ENCIMA de todo refresco.** Ahí van las correcciones
   humanas. Sin eso, verificás una coordenada a mano y el siguiente refresco la borra.
+- **El precio grande es la entrada suelta, no el total para dos.** `rangoPrecio()` muestra lo
+  que publica la fuente y nada más: `S/ 30 – 50`, `desde S/ 35`, `S/ 40`. Multiplicar por dos
+  haría que el número no coincida con el de Teleticket. `calcularCostoTotal()` sigue existiendo
+  pero solo dentro del desplegable de cena.
+- **`scrollIntoView` NO lleva `behavior: 'smooth'`, y no es un olvido.** Con las animaciones
+  del sistema apagadas, pedir `smooth` desde JS no desplaza nada: se queda quieto, en silencio.
+  La suavidad se declara en CSS (`html{scroll-behavior:smooth}`), que degrada a salto
+  instantáneo pero siempre llega.
+- **La grilla del mes son 42 celdas siempre**, aunque el mes entre en 4 filas. Si cambiara de
+  alto al navegar, la lista de abajo saltaría bajo el dedo.
+- **Las flechas del calendario llegan un mes más allá de lo cargado** (`rangoNavegable()`).
+  Frenar en el borde deja las dos flechas muertas cuando hay un solo mes de datos, y con eso el
+  estado "nada cargado en septiembre" queda inalcanzable.
 
 ## Diseño
 
@@ -111,8 +129,18 @@ Dos reglas que se rompen sin querer:
 
 ## Estado del proyecto
 
-Fases 0 y 1 terminadas, y publicado. En los datos hay 5 teatros, 5 obras, 5 funciones para
-el sábado 22 de agosto y 53 lugares para cenar.
+Fases 0 y 1 terminadas y publicado; encima va el **reenfoque a teatro**: la unidad dejó de ser
+el "plan de dos con cena" y pasó a ser la función. Mapa arriba, calendario del mes, lista por
+día, precio de entrada y links. Los restaurantes viven dentro de un desplegable por tarjeta.
+
+En los datos hay 5 teatros, 5 obras, 5 funciones para el sábado 22 de agosto y 53 lugares para
+cenar. **Ninguna función tiene `url_entradas` y ningún teatro tiene `web`**, así que el botón
+"Comprar entradas" todavía no aparece en pantalla: aparece solo cuando el dato exista. Llenar
+eso, y las fechas del mes completo, es el trabajo de `docs/encargo-cartelera.md`.
+
+**Se retiró el ranking.** `PESOS`, `puntuarFuncion()`, `proponerPlanes()` y `motivoDelPrimero()`
+ya no existen: en un calendario el orden lo manda la fecha, y buscar "qué hay el viernes 28" es
+incompatible con una lista ordenada por puntaje. Están en el historial de git.
 
 **El candado de la Fase 1 ya pasó.** Exigía demostrar que un fin de semana real produce 3
 planes con precio conocido dentro de presupuesto, antes de invertir en pantallas. Salieron 5
@@ -129,13 +157,14 @@ diseño con las 14 tareas y el informe de revisiones, la bitácora de diferidos,
 pruebas y el plan original superado. El repo público es solo código y datos, a propósito. Si
 vas a trabajar acá, leelos primero: llevan el porqué de casi todas las decisiones.
 
-**Lo que sigue:** la interfaz completa de `DESIGN.md` (filtros, detalle con mapa por
-`import()` dinámico, tarjeta compartible). El sistema de diseño está definido y falta
-implementarlo. Antes conviene corregir el gasto de los locales de alta cocina vía
-`overrides.json`: ver el ítem 0 de la bitácora.
+**Lo que sigue:** que se ejecute `docs/encargo-cartelera.md` y entren los datos del mes
+completo con sus links. Sin eso, el calendario tiene un solo día marcado y el botón de comprar
+no aparece nunca. Después: filtros y tarjeta compartible. Sigue pendiente corregir el gasto de
+los locales de alta cocina vía `overrides.json` (ítem 0 de la bitácora).
 
-**Todavía no existe** `.claude/commands/actualizar-cartelera.md`. El refresco de cartelera se
-hace a mano por ahora.
+**Todavía no existe** `.claude/commands/actualizar-cartelera.md`. El refresco se hace a mano,
+pero `docs/encargo-cartelera.md` ya tiene el procedimiento entero escrito y es la semilla
+directa de ese comando.
 
 ## Skill routing
 

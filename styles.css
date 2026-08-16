@@ -9,6 +9,11 @@
   --tap:44px;   /* mínimo táctil. No bajar. */
 }
 *{box-sizing:border-box;margin:0;padding:0}
+/* La suavidad del scroll vive ACÁ, no en el scrollIntoView de vista.js.
+   Con las animaciones del sistema apagadas, un behavior:'smooth' pedido
+   desde JS no se desplaza nada: se queda quieto y el clic no hace nada.
+   Declarado en CSS, degrada a salto instantáneo pero siempre llega. */
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);
   -webkit-text-size-adjust:100%}
 .app{max-width:430px;margin:0 auto;padding:22px 20px 40px}
@@ -16,18 +21,100 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .cargando{color:var(--ink2);font-size:14px;padding:40px 0;text-align:center}
 .andamio{background:var(--accent-bg);color:var(--accent);font-size:11.5px;
   padding:7px 11px;border-radius:6px;margin-bottom:14px}
-.kicker{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
-h1{font:400 30px/1.1 var(--serif);margin:9px 0 6px}
-.motivo{font-size:12.5px;line-height:1.45;color:var(--accent);
-  background:var(--accent-bg);border-radius:7px;padding:9px 11px;margin-bottom:18px}
-
-.planes{list-style:none;margin-top:16px}
-.plan{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-  padding:15px;margin-bottom:12px}
-.plan h2{font:400 21px/1.18 var(--serif);margin-bottom:5px;overflow-wrap:break-word}
 .meta{font-size:12.5px;line-height:1.55;color:var(--ink2)}
-.costo{margin-top:9px;font:400 24px/1 var(--serif)}
-.costo small{font:400 11.5px var(--sans);color:var(--ink3);margin-left:6px}
+.meta a{color:var(--accent)}
+
+/* ── mapa ──────────────────────────────────────────────────
+   Banda compacta. Si Leaflet no carga, vista.js le pone [hidden]
+   y no queda ni un hueco gris: la lista sube y ocupa el lugar. */
+.mapa-caja{border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  margin-bottom:14px;background:var(--surface)}
+.mapa{height:168px}
+.mapa-caja[hidden]{display:none}
+/* Pin dibujado, nunca emoji (regla 5 de DESIGN.md). */
+.pin-teatro{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.pin-teatro i{width:11px;height:11px;border-radius:50%;background:var(--accent);
+  border:2px solid #fff;box-shadow:0 1px 3px rgba(58,42,46,.4);flex:0 0 11px}
+.pin-teatro span{font:600 10.5px var(--sans);color:var(--ink);background:rgba(255,255,255,.9);
+  padding:1px 5px;border-radius:4px;box-shadow:0 1px 2px rgba(58,42,46,.18)}
+/* Leaflet mete su propio tipo; que no le gane al sistema. */
+.leaflet-container{font-family:var(--sans)}
+
+/* ── navegación de mes ─────────────────────────────────────
+   Pegajosa arriba: al scrollear, el mapa y la grilla salen y esta
+   barra queda como única referencia de dónde estás. */
+.mes-nav{position:sticky;top:0;z-index:3;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;background:var(--bg);
+  border-bottom:1px solid var(--line);margin:0 -20px;padding:0 12px}
+.mes-nombre{font:400 22px/1.1 var(--serif);text-align:center;flex:1;
+  text-transform:capitalize}
+.mes-ir{width:var(--tap);height:var(--tap);flex:0 0 var(--tap);border:0;
+  background:none;color:var(--accent);font:400 26px/1 var(--serif);cursor:pointer;
+  border-radius:8px}
+.mes-ir:disabled{color:var(--hair);cursor:default}
+.mes-ir:not(:disabled):hover{background:var(--accent-bg)}
+
+/* ── grilla del mes ────────────────────────────────────────
+   42 celdas siempre, así el alto no cambia al pasar de mes y la
+   lista de abajo no salta bajo el dedo. */
+.calendario{padding:10px 0 16px;border-bottom:1px solid var(--line)}
+.semana,.grilla{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.semana{font:600 10.5px var(--sans);color:var(--ink3);text-align:center;
+  letter-spacing:.06em;margin-bottom:4px}
+.celda{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:34px;font:400 13px var(--sans);color:var(--ink2);border:0;background:none;
+  border-radius:7px;position:relative}
+.celda.fuera{visibility:hidden}
+.celda.pasado{color:var(--hair)}
+.celda.hoy{font-weight:700;color:var(--accent)}
+.celda.con-funcion{color:var(--ink);cursor:pointer}
+.celda.con-funcion:hover{background:var(--accent-bg)}
+.celda.con-funcion i{position:absolute;bottom:5px;width:4px;height:4px;
+  border-radius:50%;background:var(--accent)}
+.celda.con-funcion.pasado{color:var(--ink3)}
+.celda.con-funcion.pasado i{background:var(--hair)}
+
+/* ── lista del mes ─────────────────────────────────────────*/
+.dia-titulo{position:sticky;top:var(--tap);z-index:2;background:var(--bg);
+  font:600 10.5px var(--sans);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink3);padding:14px 0 8px}
+.funciones{list-style:none}
+.funcion{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:15px;margin-bottom:10px;scroll-margin-top:96px}
+.funcion.resaltada{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.funcion h3{font:400 20px/1.18 var(--serif);margin-bottom:5px;overflow-wrap:break-word}
+/* El precio es escaneable sin leer: es la pregunta del producto. */
+.precio{margin-top:9px;font:400 24px/1 var(--serif)}
+.precio small{font:400 11.5px var(--sans);color:var(--ink3);margin-left:6px}
+
+.acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acciones:empty{display:none}
+.btn{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 15px;
+  border-radius:9px;border:1px solid var(--hair);color:var(--accent);
+  font:600 12.5px var(--sans);text-decoration:none}
+.btn.primario{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{background:var(--accent-bg)}
+.btn.primario:hover{background:#8e4459}
+
+/* ── el bloque de cena, plegado ────────────────────────────
+   Segundo plano de verdad: ni suma al precio ni ocupa la tarjeta
+   hasta que lo abrís. */
+.cerca{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.cerca summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;
+  font:600 11.5px var(--sans);color:var(--ink3);letter-spacing:.04em}
+.cerca summary::marker{color:var(--hair)}
+.cerca-cuerpo>*+*{margin-top:8px}
+.supuesto{font-size:11.5px;line-height:1.5;color:var(--ink3);
+  background:var(--accent-bg);border-radius:6px;padding:7px 9px}
+.sitios{list-style:none}
+.sitios li{padding:6px 0;border-bottom:1px solid var(--line)}
+.sitios li:last-child{border-bottom:0}
+.sitio-nombre{display:block;font-size:13.5px;color:var(--ink)}
+.total{font:400 17px/1.2 var(--serif);padding-top:4px}
+.total small{display:block;font:400 11px var(--sans);color:var(--ink3);margin-top:3px}
+
+/* Foco de teclado visible en todo lo tocable (DESIGN.md, accesibilidad). */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
 .flag{display:flex;align-items:center;gap:6px;font-size:11.5px;margin-top:7px}
 .flag .dot{width:6px;height:6px;border-radius:50%;flex:0 0 6px}
@@ -62,5 +149,8 @@ h1{font:400 30px/1.1 var(--serif);margin:9px 0 6px}
 .marca.reloj i+i{width:11px;height:1.5px;top:26px;left:27px}
 
 @media (prefers-reduced-motion:no-preference){
-  .plan{transition:border-color .15s ease}
+  .funcion{transition:border-color .15s ease,box-shadow .15s ease}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
 }
