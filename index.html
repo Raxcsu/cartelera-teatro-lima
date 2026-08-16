@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teatro Lima</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main id="app" class="app">
+  <p class="cargando">Cargando cartelera…</p>
+</main>
+
+<script type="module">
+import { cargarTodo, hoyLima, ErrorDeDatos } from './js/datos.js';
+import {
+  proponerPlanes, motivoDelPrimero, estadoCartelera,
+  formatearSoles, formatearDistancia,
+} from './js/logica.js';
+
+const app = document.getElementById('app');
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// FASE 0: pantalla mínima que prueba el circuito completo
+// datos → lógica → pantalla. La interfaz de verdad es la Fase 4.
+try {
+  const hoy = hoyLima();
+  const d = await cargarTodo();
+  const estado = estadoCartelera(d.funciones, hoy);
+
+  if (estado.vencida) {
+    // Los dos vacíos son distintos a propósito: este dice POR QUÉ está vacío.
+    app.innerHTML = `
+      <div class="vacio vencido">
+        <div class="marca reloj"><i></i><i></i></div>
+        <h2>Esta cartelera está vencida</h2>
+        <p>${estado.diasSinVerificar == null
+            ? 'Todavía no hay datos cargados.'
+            : `La última verificación fue hace ${estado.diasSinVerificar} días.`}</p>
+        <p class="nota">No te mostramos funciones viejas como si fueran de hoy.</p>
+      </div>`;
+  } else {
+    const planes = proponerPlanes(d.funciones, {}, { ...d, hoy }, 3);
+    const motivo = motivoDelPrimero(planes[0], planes.slice(1));
+
+    app.innerHTML = `
+      ${d.hayMuestras ? '<p class="andamio">Datos de andamiaje, no cartelera real</p>' : ''}
+      <p class="kicker">${esc(hoy)}</p>
+      <h1>${planes.length} ${planes.length === 1 ? 'plan' : 'planes'}</h1>
+      ${motivo ? `<p class="motivo">${esc(motivo)}</p>` : ''}
+      <ul class="planes">${planes.map((p) => `
+        <li class="plan">
+          <h2>${esc(p.obra?.titulo ?? p.funcion.obra_id)}</h2>
+          <p class="meta">${esc(p.teatro?.nombre ?? '?')} · ${esc(p.funcion.hora)}${
+            p.obra?.duracion_min ? ` · ${p.obra.duracion_min} min` : ''}${
+            p.obra?.idioma && p.obra.idioma !== 'español' ? ` · en ${esc(p.obra.idioma)}` : ''}</p>
+          ${p.lugar ? `<p class="meta">Después: ${esc(p.lugar.nombre)}${
+            formatearDistancia(p.distanciaLugar) ? `, a ${formatearDistancia(p.distanciaLugar)}` : ''}</p>` : ''}
+          <p class="costo">${formatearSoles(p.costo.total)}
+            <small>${
+              p.costo.total == null ? 'falta el precio de la entrada'
+              : !p.costo.completo ? `parcial, falta ${p.costo.falta.join(' y ')}`
+              : esc(p.costo.incluye.join(' + '))}</small></p>
+          ${p.confEfectiva.texto
+            ? `<p class="flag n-${p.confEfectiva.nivel}"><span class="dot"></span>${esc(p.confEfectiva.texto)}</p>`
+            : ''}
+        </li>`).join('')}</ul>`;
+  }
+} catch (e) {
+  // Un fetch que revienta sin capturar deja la pantalla en blanco.
+  // Eso es peor que un error: el usuario cree que no hay teatro.
+  const cual = e instanceof ErrorDeDatos ? ` (${esc(e.archivo)}.json)` : '';
+  app.innerHTML = `
+    <div class="vacio error">
+      <div class="marca"><i></i></div>
+      <h2>No se pudieron cargar los datos</h2>
+      <p>Puede ser falta de señal, o un archivo de datos dañado${cual}.</p>
+      <p class="nota">Si estás en tu PC: revisá que <code>python -m http.server</code> siga corriendo.</p>
+    </div>`;
+  console.error(e);
+}
+</script>
+</body>
+</html>

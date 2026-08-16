@@ -1,0 +1,51 @@
+{
+  "_esquema": {
+    "id": "slug(titulo) + '-' + año(temporada_inicio). Determinista.",
+    "titulo": "string",
+    "sinopsis": "string | null",
+    "tipo": "comedia | drama | musical | danza | infantil | otro",
+    "idioma": "string — importa: ICPNA y Británico montan obras en inglés",
+    "duracion_min": "number | null",
+    "clasificacion": "string | null — ej. '+14'",
+    "temporada_inicio": "YYYY-MM-DD",
+    "temporada_fin": "YYYY-MM-DD | null",
+    "imagen_local": "string | null — ruta en img/obras/, NUNCA una URL externa",
+    "imagen_credito": "string | null — teatro de origen. Obligatorio si hay imagen_local.",
+    "fuente_url": "string | null",
+    "verificado_el": "YYYY-MM-DD | null"
+  },
+  "obras": [
+    {
+      "_muestra": true,
+      "id": "obra-de-muestra-a-2026",
+      "titulo": "Obra de muestra A",
+      "sinopsis": "Registro de andamiaje para fijar el esquema. No es una obra real.",
+      "tipo": "comedia",
+      "idioma": "español",
+      "duracion_min": 95,
+      "clasificacion": "+14",
+      "temporada_inicio": "2026-08-01",
+      "temporada_fin": "2026-09-15",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": null,
+      "verificado_el": null
+    },
+    {
+      "_muestra": true,
+      "id": "obra-de-muestra-b-con-un-titulo-deliberadamente-largo-para-2026",
+      "titulo": "Obra de muestra B con un título deliberadamente largo para probar el reflow",
+      "sinopsis": null,
+      "tipo": "drama",
+      "idioma": "inglés",
+      "duracion_min": 130,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-10",
+      "temporada_fin": null,
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": null,
+      "verificado_el": null
+    }
+  ]
+}

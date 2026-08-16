@@ -1,0 +1,43 @@
+{
+  "_esquema": {
+    "id": "slug(nombre). Determinista. Nunca un contador.",
+    "nombre": "string",
+    "direccion": "string",
+    "distrito": "string",
+    "lat": "number | null — si es null, geocodificar con Nominatim y VERIFICAR contra la dirección",
+    "lng": "number | null",
+    "web": "string | null",
+    "como_llegar": "string | null — nota corta, opcional",
+    "fuente_url": "string — de dónde salió este registro",
+    "verificado_el": "YYYY-MM-DD | null"
+  },
+  "_nota": "Los registros con _muestra:true son de ANDAMIAJE, no cartelera real. validar_datos.py falla si quedan al desplegar.",
+  "teatros": [
+    {
+      "_muestra": true,
+      "id": "teatro-britanico",
+      "nombre": "Teatro Británico",
+      "direccion": "PENDIENTE DE VERIFICAR",
+      "distrito": "Miraflores",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": null,
+      "verificado_el": null
+    },
+    {
+      "_muestra": true,
+      "id": "teatro-la-plaza",
+      "nombre": "Teatro La Plaza",
+      "direccion": "PENDIENTE DE VERIFICAR",
+      "distrito": "Miraflores",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": null,
+      "verificado_el": null
+    }
+  ]
+}

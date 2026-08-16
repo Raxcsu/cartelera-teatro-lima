@@ -1,0 +1,53 @@
+{
+  "_esquema": {
+    "id": "obra_id + '-' + teatro_id + '-' + fecha + '-' + hhmm. Determinista y legible.",
+    "obra_id": "referencia a obras.json",
+    "teatro_id": "referencia a teatros.json",
+    "fecha": "YYYY-MM-DD",
+    "hora": "HH:MM (24h, hora de Lima, UTC-5 sin horario de verano)",
+    "precio_min": "number | null — null si no se pudo verificar. NUNCA un número plausible.",
+    "precio_max": "number | null",
+    "estado": "disponible | agotada | cancelada",
+    "url_entradas": "string | null",
+    "fuente_url": "string | null — de dónde salió este dato",
+    "verificado_el": "YYYY-MM-DD | null",
+    "confianza": "confirmado | probable | sin_verificar"
+  },
+  "_reglas": [
+    "Regla 1: nunca inventar. Sin precio verificado va precio_min:null + confianza:'sin_verificar'.",
+    "Regla 2: fuente_url y verificado_el viajan con cada dato.",
+    "Regla 3: la confianza mostrada se CALCULA a partir de confianza + edad de verificado_el (ver logica.js)."
+  ],
+  "funciones": [
+    {
+      "_muestra": true,
+      "id": "obra-de-muestra-a-2026-teatro-britanico-2026-08-22-2000",
+      "obra_id": "obra-de-muestra-a-2026",
+      "teatro_id": "teatro-britanico",
+      "fecha": "2026-08-22",
+      "hora": "20:00",
+      "precio_min": 60,
+      "precio_max": 90,
+      "estado": "disponible",
+      "url_entradas": null,
+      "fuente_url": null,
+      "verificado_el": "2026-08-16",
+      "confianza": "confirmado"
+    },
+    {
+      "_muestra": true,
+      "id": "obra-de-muestra-b-con-un-titulo-deliberadamente-largo-para-2026-teatro-la-plaza-2026-08-22-1930",
+      "obra_id": "obra-de-muestra-b-con-un-titulo-deliberadamente-largo-para-2026",
+      "teatro_id": "teatro-la-plaza",
+      "fecha": "2026-08-22",
+      "hora": "19:30",
+      "precio_min": null,
+      "precio_max": null,
+      "estado": "disponible",
+      "url_entradas": null,
+      "fuente_url": null,
+      "verificado_el": null,
+      "confianza": "sin_verificar"
+    }
+  ]
+}

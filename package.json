@@ -1,0 +1,16 @@
+{
+  "name": "teatro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cartelera y planes de teatro en Lima. La app es HTML/CSS/JS sin build; estas dependencias son SOLO de desarrollo y nunca se publican.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validar": "python scripts/validar_datos.py",
+    "serve": "python -m http.server 8000"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}
