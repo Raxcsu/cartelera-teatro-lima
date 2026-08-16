@@ -45,6 +45,19 @@ try {
     const planes = proponerPlanes(d.funciones, {}, { ...d, hoy }, 3);
     const motivo = motivoDelPrimero(planes[0], planes.slice(1));
 
+    if (planes.length === 0) {
+    // El otro estado vacío. Con datos frescos, cero resultados significa que
+    // los filtros son estrechos, NO que no haya teatro. Decía "0 planes",
+    // que se lee como lo segundo.
+    app.innerHTML = `
+      <div class="vacio sin-resultados">
+        <div class="marca"><i></i></div>
+        <h2>Nada calza con estos filtros</h2>
+        <p>Hay ${d.funciones.filter((f) => f.fecha >= hoy).length} funciones por delante,
+           pero ninguna cumple lo que pediste.</p>
+        <p class="nota">Prueba ampliando el presupuesto o quitando el filtro de distrito.</p>
+      </div>`;
+    } else {
     app.innerHTML = `
       ${d.hayMuestras ? '<p class="andamio">Datos de andamiaje, no cartelera real</p>' : ''}
       <p class="kicker">${esc(hoy)}</p>
@@ -67,6 +80,7 @@ try {
             ? `<p class="flag n-${p.confEfectiva.nivel}"><span class="dot"></span>${esc(p.confEfectiva.texto)}</p>`
             : ''}
         </li>`).join('')}</ul>`;
+    }
   }
 } catch (e) {
   // Un fetch que revienta sin capturar deja la pantalla en blanco.

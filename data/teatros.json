@@ -9,7 +9,8 @@
     "web": "string | null",
     "como_llegar": "string | null — nota corta, opcional",
     "fuente_url": "string — de dónde salió este registro",
-    "verificado_el": "YYYY-MM-DD | null"
+    "verificado_el": "YYYY-MM-DD | null",
+    "_nota": "string | null — nota humana sobre este registro: de donde salio, que falta verificar. Informativa, la app no la usa."
   },
   "_nota": "Los registros con _muestra:true son de ANDAMIAJE, no cartelera real. validar_datos.py falla si quedan al desplegar.",
   "teatros": [

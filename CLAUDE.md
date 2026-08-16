@@ -20,9 +20,9 @@ npm run serve                     # la app en http://127.0.0.1:8000
 Publicada en **https://raxcsu.github.io/cartelera-teatro-lima/** (GitHub Pages sirve `main`
 desde la raíz; cada `git push` despliega).
 
-**No abras `index.html` con doble clic.** `file://` no es contexto seguro: los
-módulos ES y la Web Share API de la tarjeta no funcionan ahí. Siempre `http.server`
-o la URL publicada.
+**No abras `index.html` con doble clic.** `file://` no es contexto seguro y los módulos ES no
+cargan. Siempre `http.server` o la URL publicada. Cuando se implemente la tarjeta compartible,
+la Web Share API tendrá la misma restricción por el mismo motivo.
 
 ## Arquitectura
 
@@ -34,11 +34,16 @@ se publica a GitHub Pages es exactamente lo que hay en el repo. `package.json` y
 decisión de arquitectura más importante del proyecto:
 
 ```
-datos.js    red + localStorage + overrides   ← única puerta a los datos
-logica.js   100% puro, cero imports          ← AQUÍ VIVEN LAS PRUEBAS
-vista.js    DOM                              (Fase 4)
-tarjeta.js  Canvas + share                   (Fase 5)
+datos.js    red + localStorage + overrides   ← única puerta a los datos     [existe]
+logica.js   100% puro, cero imports          ← AQUÍ VIVEN LAS PRUEBAS       [existe]
+vista.js    DOM                              (Fase 4)                       [NO existe]
+tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
+
+**Hoy la capa DOM vive inline en `index.html`**, en un `<script type="module">` de unas 50
+líneas. Es deliberado mientras la interfaz sea mínima. Cuando crezca, ese script se muda a
+`vista.js` tal cual: por eso `datos.js` y `logica.js` ya están separados, para que esa mudanza
+no arrastre lógica de negocio con ella.
 
 `logica.js` no importa nada y no toca DOM ni red. Todo lo que puede estar mal en un
 cálculo vive ahí y se prueba sin navegador. **Si estás por poner lógica de negocio en

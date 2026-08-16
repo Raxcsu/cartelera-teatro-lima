@@ -12,7 +12,8 @@
     "imagen_local": "string | null — ruta en img/obras/, NUNCA una URL externa",
     "imagen_credito": "string | null — teatro de origen. Obligatorio si hay imagen_local.",
     "fuente_url": "string | null",
-    "verificado_el": "YYYY-MM-DD | null"
+    "verificado_el": "YYYY-MM-DD | null",
+    "_nota": "string | null — nota humana sobre este registro: de donde salio, que falta verificar. Informativa, la app no la usa."
   },
   "obras": [
     {

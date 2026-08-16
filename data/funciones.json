@@ -12,7 +12,8 @@
     "fuente_url": "string | null — de dónde salió este dato",
     "verificado_el": "YYYY-MM-DD | null",
     "confianza": "confirmado | probable | sin_verificar",
-    "precio_referencial": "bool — true si el precio es una estimacion redondeada. Exige fuente_url con la base de la estimacion. Va siempre con confianza 'probable' y se muestra con virgulilla: ~S/ 50"
+    "precio_referencial": "bool — true si el precio es una estimacion redondeada. Exige fuente_url con la base de la estimacion. Va siempre con confianza 'probable' y se muestra con virgulilla: ~S/ 50",
+    "_nota": "string | null — nota humana sobre este registro: de donde salio, que falta verificar. Informativa, la app no la usa."
   },
   "_reglas": [
     "Regla 1: nunca inventar. Sin precio verificado va precio_min:null + confianza:'sin_verificar'.",

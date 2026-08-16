@@ -13,7 +13,7 @@ Proyecto personal. Sin framework, sin base de datos, sin paso de build.
 npm run serve                  # http://127.0.0.1:8000
 ```
 
-No lo abras con doble clic: `file://` rompe los módulos ES y el botón de compartir.
+No lo abras con doble clic: `file://` no es contexto seguro y rompe los módulos ES.
 
 Para desarrollo:
 
@@ -58,8 +58,10 @@ La app distingue dos cosas y las muestra distinto:
 Toda estimación lleva `gasto_referencial: true` y la fuente de la estimación en el propio
 JSON. Un número estimado nunca se presenta como precio verificado.
 
-**Limitación conocida:** la estimación por categoría falla en los locales de alta cocina.
-Hay un caso concreto en los datos actuales, anotado en el código.
+**Limitación conocida:** la estimación por categoría falla en los locales de alta cocina. Hay
+un caso concreto en los datos actuales: uno de los restaurantes cercanos está entre los mejores
+del mundo y la banda lo estima como una trattoria de barrio. Se corrige poniéndole el gasto
+real en `data/overrides.json`, que sobrevive a todos los refrescos.
 
 ### De dónde vienen los datos
 

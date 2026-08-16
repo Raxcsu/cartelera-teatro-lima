@@ -13,7 +13,10 @@
     "fuente_url": "string | null",
     "verificado_el": "YYYY-MM-DD | null",
     "gasto_referencial": "bool — true si el gasto es una estimacion por categoria, no un precio de carta. Exige fuente_gasto_url. La app lo muestra como estimado, nunca como precio verificado.",
-    "fuente_gasto_url": "string — base documentada de la estimacion"
+    "fuente_gasto_url": "string — base documentada de la estimacion",
+    "_osm_opening_hours": "string — el opening_hours crudo de OpenStreetMap, tal cual. Se conserva para poder auditar como se derivo cierra_cocina.",
+    "_a_metros_de": "objeto {teatro_id: metros} — distancia al teatro mas cercano al momento de la investigacion. Informativa: la app recalcula con distanciaMetros().",
+    "_estado": "string (nivel raiz, no por registro) — de donde salio esta tanda de lugares y que le falta."
   },
   "lugares": [
     {

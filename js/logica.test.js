@@ -234,13 +234,32 @@ describe('calcularCostoTotal: invariantes, no gustos', () => {
       .toEqual(['entradas x2', 'cena x2', 'taxi']);
   });
 
-  it('un gasto estimado no se disfraza de precio verificado', () => {
+  it('un gasto de cena estimado no se disfraza de precio verificado', () => {
     const estimado = { ...lugares[0], gasto_referencial: true };
     const c = calcularCostoTotal(f(), estimado);
     expect(c.estimado).toBe(true);
     expect(c.incluye).toContain('cena x2 estimada');
     expect(calcularCostoTotal(f(), lugares[0]).estimado).toBe(false);
     expect(calcularCostoTotal(f(), null).estimado).toBe(false);
+  });
+
+  // precio_referencial estaba documentado y el codigo lo ignoraba: campo muerto
+  // que la revision cruzada destapo. Aplica la misma regla que la cena.
+  it('una entrada de precio estimado tambien marca el total como estimado', () => {
+    const c = calcularCostoTotal(f({ precio_referencial: true }), null);
+    expect(c.estimado).toBe(true);
+    expect(c.incluye).toContain('entradas x2 estimadas');
+  });
+
+  it('con entrada estimada y cena estimada, ambas se declaran', () => {
+    const lugarEst = { ...lugares[0], gasto_referencial: true };
+    const c = calcularCostoTotal(f({ precio_referencial: true }), lugarEst);
+    expect(c.incluye).toEqual(['entradas x2 estimadas', 'cena x2 estimada']);
+  });
+
+  it('sin precio de entrada, precio_referencial no marca nada', () => {
+    const c = calcularCostoTotal(f({ precio_min: null, precio_referencial: true }), null);
+    expect(c.estimado).toBe(false);
   });
 
   it('el taxi no se asume: sin pasarlo, no está en el total', () => {

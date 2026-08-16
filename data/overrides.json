@@ -1,5 +1,5 @@
 {
-  "_que_es": "Correcciones humanas que SOBREVIVEN a cada /actualizar-cartelera. Se aplican ENCIMA de los datos reinvestigados, por id.",
+  "_que_es": "Correcciones humanas que SOBREVIVEN a cada refresco de la cartelera. Se aplican ENCIMA de los datos reinvestigados, por id.",
   "_por_que": "Sin esto, verificas a mano la coordenada de un teatro y el siguiente refresco la borra. El proyecto se degrada solo con cada actualización.",
   "_como_usar": "Poné el id del registro y SOLO los campos que querés forzar. El resto se toma del refresco.",
   "_ejemplo": {

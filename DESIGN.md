@@ -110,7 +110,8 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 |---|---|
 | Layout de escritorio | **Pendiente.** Solo se diseñó 390px. A 1440px hay que decidir qué pasa. |
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
-| Estado de error visual | **A medias, y es un bug.** El HTML usa `class="vacio error"` pero `styles.css` no define `.error`, así que se ve **idéntico** a "nada calza con estos filtros". Rompe la regla de composición nº 6: los estados vacíos tienen que distinguirse entre sí, y un fallo de carga no es lo mismo que un filtro estrecho. |
+| Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
+| Estado "nada calza con estos filtros" | **Escrito, todavía inalcanzable.** La pantalla existe en `index.html` con su clase `.sin-resultados`, pero `proponerPlanes` se llama con criterios vacíos, así que nunca devuelve cero. Se activa sola cuando existan los filtros. Verificado por lógica (`presupuesto: 1` devuelve 0 planes), **no visualmente**. |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
 | Primera vez | **Pendiente.** Qué ve alguien que abre la app sin saber qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
