@@ -14,30 +14,69 @@
   "_nota": "Los registros con _muestra:true son de ANDAMIAJE, no cartelera real. validar_datos.py falla si quedan al desplegar.",
   "teatros": [
     {
-      "_muestra": true,
-      "id": "teatro-britanico",
-      "nombre": "Teatro Británico",
-      "direccion": "PENDIENTE DE VERIFICAR",
+      "id": "auditorio-del-britanico-sede-miraflores",
+      "nombre": "Auditorio del Británico, sede Miraflores",
+      "direccion": "Malecón Balta 740",
       "distrito": "Miraflores",
-      "lat": null,
-      "lng": null,
+      "lat": -12.1236,
+      "lng": -77.03274,
       "web": null,
       "como_llegar": null,
-      "fuente_url": null,
-      "verificado_el": null
+      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Geocodificado por nombre: Nominatim devolvió 'Centro Cultural Británico, Malecón Balta 740'. El Británico tiene varias sedes en Miraflores: VERIFICAR cuál es la del auditorio."
     },
     {
-      "_muestra": true,
-      "id": "teatro-la-plaza",
-      "nombre": "Teatro La Plaza",
-      "direccion": "PENDIENTE DE VERIFICAR",
+      "id": "nuevo-teatro-julieta",
+      "nombre": "Nuevo Teatro Julieta",
+      "direccion": "Pasaje Porta 132",
       "distrito": "Miraflores",
-      "lat": null,
-      "lng": null,
+      "lat": -12.12296,
+      "lng": -77.03079,
       "web": null,
       "como_llegar": null,
-      "fuente_url": null,
-      "verificado_el": null
+      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Nominatim solo resolvió la calle, sin número. La coordenada es el centro del pasaje, no la puerta. VERIFICAR."
+    },
+    {
+      "id": "asociacion-de-artistas-aficionados",
+      "nombre": "Asociación de Artistas Aficionados",
+      "direccion": "Jirón Ica 323",
+      "distrito": "Cercado de Lima",
+      "lat": -12.04568,
+      "lng": -77.0345,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coincidencia exacta por nombre y número en Nominatim."
+    },
+    {
+      "id": "centro-cultural-ricardo-palma",
+      "nombre": "Centro Cultural Ricardo Palma",
+      "direccion": "Avenida José Larco 770",
+      "distrito": "Miraflores",
+      "lat": -12.12548,
+      "lng": -77.02973,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coincidencia exacta por nombre y número en Nominatim."
+    },
+    {
+      "id": "centro-de-convenciones-bianca",
+      "nombre": "Centro de Convenciones Bianca",
+      "direccion": "Avenida Almirante Miguel Grau 135",
+      "distrito": "Barranco",
+      "lat": -12.15072,
+      "lng": -77.0205,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coincidencia exacta por nombre y número en Nominatim."
     }
   ]
 }

@@ -14,36 +14,6 @@
     "verificado_el": "YYYY-MM-DD | null"
   },
   "_nota": "Solo se investigan lugares para teatros CON función en la ventana activa. Ver 'NOT in scope' del diseño.",
-  "lugares": [
-    {
-      "_muestra": true,
-      "id": "lugar-de-muestra-a-miraflores",
-      "nombre": "Lugar de muestra A",
-      "tipo": "cafe",
-      "distrito": "Miraflores",
-      "lat": null,
-      "lng": null,
-      "gasto_min": 25,
-      "gasto_max": 45,
-      "abre": "08:00",
-      "cierra_cocina": "23:00",
-      "fuente_url": null,
-      "verificado_el": null
-    },
-    {
-      "_muestra": true,
-      "id": "lugar-de-muestra-b-cocina-cierra-temprano-miraflores",
-      "nombre": "Lugar de muestra B (cocina cierra temprano)",
-      "tipo": "restaurante",
-      "distrito": "Miraflores",
-      "lat": null,
-      "lng": null,
-      "gasto_min": null,
-      "gasto_max": null,
-      "abre": "12:00",
-      "cierra_cocina": "21:30",
-      "fuente_url": null,
-      "verificado_el": null
-    }
-  ]
+  "lugares": [],
+  "_estado": "Sin investigar todavia. Los planes salen sin cena hasta que se haga esa pasada."
 }
