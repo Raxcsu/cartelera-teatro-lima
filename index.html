@@ -58,7 +58,7 @@ try {
             p.obra?.idioma && p.obra.idioma !== 'español' ? ` · en ${esc(p.obra.idioma)}` : ''}</p>
           ${p.lugar ? `<p class="meta">Después: ${esc(p.lugar.nombre)}${
             formatearDistancia(p.distanciaLugar) ? `, a ${formatearDistancia(p.distanciaLugar)}` : ''}</p>` : ''}
-          <p class="costo">${formatearSoles(p.costo.total)}
+          <p class="costo">${p.costo.estimado && p.costo.total != null ? '~' : ''}${formatearSoles(p.costo.total)}
             <small>${
               p.costo.total == null ? 'falta el precio de la entrada'
               : !p.costo.completo ? `parcial, falta ${p.costo.falta.join(' y ')}`

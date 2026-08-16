@@ -291,9 +291,13 @@ export function calcularCostoTotal(funcion, lugar, opciones = {}) {
     // el número nunca insinúa que cubre algo que no cubre.
     incluye: [
       !faltaEntrada && `entradas x${personas}`,
-      lugar != null && !faltaCena && `cena x${personas}`,
+      lugar != null && !faltaCena &&
+        `cena x${personas}${lugar.gasto_referencial ? ' estimada' : ''}`,
       taxiIdaVuelta > 0 && 'taxi',
     ].filter(Boolean),
+    // Un gasto de cena estimado por categoría no puede disfrazarse de
+    // precio verificado. La interfaz muestra "~" cuando esto es true.
+    estimado: Boolean(lugar?.gasto_referencial && !faltaCena),
     personas,
   };
 }

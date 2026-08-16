@@ -234,6 +234,15 @@ describe('calcularCostoTotal: invariantes, no gustos', () => {
       .toEqual(['entradas x2', 'cena x2', 'taxi']);
   });
 
+  it('un gasto estimado no se disfraza de precio verificado', () => {
+    const estimado = { ...lugares[0], gasto_referencial: true };
+    const c = calcularCostoTotal(f(), estimado);
+    expect(c.estimado).toBe(true);
+    expect(c.incluye).toContain('cena x2 estimada');
+    expect(calcularCostoTotal(f(), lugares[0]).estimado).toBe(false);
+    expect(calcularCostoTotal(f(), null).estimado).toBe(false);
+  });
+
   it('el taxi no se asume: sin pasarlo, no está en el total', () => {
     const sin = calcularCostoTotal(f(), lugares[0]);
     const con = calcularCostoTotal(f(), lugares[0], { taxiIdaVuelta: 50 });

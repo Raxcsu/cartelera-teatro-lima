@@ -11,9 +11,1071 @@
     "abre": "HH:MM | null",
     "cierra_cocina": "HH:MM | null — si la función acaba después de esta hora, el lugar NO se propone",
     "fuente_url": "string | null",
-    "verificado_el": "YYYY-MM-DD | null"
+    "verificado_el": "YYYY-MM-DD | null",
+    "gasto_referencial": "bool — true si el gasto es una estimacion por categoria, no un precio de carta. Exige fuente_gasto_url. La app lo muestra como estimado, nunca como precio verificado.",
+    "fuente_gasto_url": "string — base documentada de la estimacion"
   },
-  "_nota": "Solo se investigan lugares para teatros CON función en la ventana activa. Ver 'NOT in scope' del diseño.",
-  "lugares": [],
-  "_estado": "Sin investigar todavia. Los planes salen sin cena hasta que se haga esa pasada."
+  "lugares": [
+    {
+      "id": "ayahuasca-bar-barranco",
+      "nombre": "Ayahuasca Bar",
+      "tipo": "bar",
+      "distrito": "Barranco",
+      "lat": -12.14715,
+      "lng": -77.02217,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/2686029065",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Tu-We 18:00-02:00; Th-Sa 12:00-3:00; Su 12:00-01:00",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 437
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "barranco-beer-company-barranco",
+      "nombre": "Barranco Beer Company",
+      "tipo": "bar",
+      "distrito": "Barranco",
+      "lat": -12.14848,
+      "lng": -77.02105,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4925308325",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-We 10:00-22:00; Fr-Sa 10:30-03:00; Su 10:30-00:00; Th 10:30-02:00",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 257
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "chifa-chun-yion-union-de-barranco-barranco",
+      "nombre": "Chifa Chun Yion (Unión de Barranco)",
+      "tipo": "restaurante",
+      "distrito": "Barranco",
+      "lat": -12.14731,
+      "lng": -77.02095,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/4760706121",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-17:00, 19:00-23:59",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 383
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "garito-barranco",
+      "nombre": "Garito",
+      "tipo": "bar",
+      "distrito": "Barranco",
+      "lat": -12.15104,
+      "lng": -77.02226,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5485468388",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 20:00-03:00",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 194
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "juanito-de-barranco-barranco",
+      "nombre": "Juanito de Barranco",
+      "tipo": "bar",
+      "distrito": "Barranco",
+      "lat": -12.14952,
+      "lng": -77.02068,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "26:30",
+      "fuente_url": "https://www.openstreetmap.org/node/5359738222",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 11:00-02:30; Su 12:00-02:30",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 135
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "las-vecinas-barranco",
+      "nombre": "Las Vecinas",
+      "tipo": "cafe",
+      "distrito": "Barranco",
+      "lat": -12.14796,
+      "lng": -77.02261,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4262398590",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "We-Mo 10:00-22:00",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 384
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "manduco-pizzeria-restaurante-italiano-barranco",
+      "nombre": "Manduco pizzeria restaurante italiano",
+      "tipo": "restaurante",
+      "distrito": "Barranco",
+      "lat": -12.14812,
+      "lng": -77.0209,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:30",
+      "fuente_url": "https://www.openstreetmap.org/node/7952729385",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "We-Mo 15:00-22:30",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 292
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "obdulia-emolientera-barranco",
+      "nombre": "Obdulia Emolientera",
+      "tipo": "cafe",
+      "distrito": "Barranco",
+      "lat": -12.14622,
+      "lng": -77.02186,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "22:30",
+      "fuente_url": "https://www.openstreetmap.org/node/10092537217",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 16:00-22:30",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 521
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "tostadora-barranco",
+      "nombre": "Tostadora",
+      "tipo": "cafe",
+      "distrito": "Barranco",
+      "lat": -12.14756,
+      "lng": -77.02191,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5257951722",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "We-Sa 17:00-23:00; Su 16:00-22:30",
+      "_a_metros_de": {
+        "centro-de-convenciones-bianca": 384
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "embarcadero-41-cercado-de-lima",
+      "nombre": "Embarcadero 41",
+      "tipo": "restaurante",
+      "distrito": "Cercado de Lima",
+      "lat": -12.04734,
+      "lng": -77.03149,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4451126488",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Su-Th 12:00-21:00; Fr-Sa 00:00-23:00",
+      "_a_metros_de": {
+        "asociacion-de-artistas-aficionados": 376
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "estrella-fu-lai-cercado-de-lima",
+      "nombre": "Estrella fu lai",
+      "tipo": "restaurante",
+      "distrito": "Cercado de Lima",
+      "lat": -12.04681,
+      "lng": -77.03254,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5140690321",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 09:00-22:00",
+      "_a_metros_de": {
+        "asociacion-de-artistas-aficionados": 248
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "lima-cafe-cercado-de-lima",
+      "nombre": "Lima Café",
+      "tipo": "cafe",
+      "distrito": "Cercado de Lima",
+      "lat": -12.04915,
+      "lng": -77.03222,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4457241024",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Fr 07:00-22:00; Sa 08:00-22:00; Su off",
+      "_a_metros_de": {
+        "asociacion-de-artistas-aficionados": 459
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "museo-del-pisco-cercado-de-lima",
+      "nombre": "Museo del Pisco",
+      "tipo": "bar",
+      "distrito": "Cercado de Lima",
+      "lat": -12.04577,
+      "lng": -77.02957,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4334520855",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 10:00-22:00; Su 10:00-19:00",
+      "_a_metros_de": {
+        "asociacion-de-artistas-aficionados": 536
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "aida-sushi-bar-miraflores",
+      "nombre": "Aida Sushi Bar",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12108,
+      "lng": -77.03381,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5579429321",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:30-22:00; Su 12:30-16:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 303
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "alfresco-miraflores",
+      "nombre": "Alfresco",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12418,
+      "lng": -77.03321,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4292803196",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-23:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 82
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "amankaya-miraflores",
+      "nombre": "Amankaya",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12768,
+      "lng": -77.02845,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "24:00",
+      "fuente_url": "https://www.openstreetmap.org/node/12123349301",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Tu-Su 12:00-17:00, 19:00-00:00; Mo 12:00-17:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 282
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "arabica-espresso-bar-miraflores",
+      "nombre": "Arabica Espresso Bar",
+      "tipo": "cafe",
+      "distrito": "Miraflores",
+      "lat": -12.12099,
+      "lng": -77.03357,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4702955790",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 08:00-22:00; Su 14:00-21:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 304
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "barra-botanica-miraflores",
+      "nombre": "Barra Botánica",
+      "tipo": "cafe",
+      "distrito": "Miraflores",
+      "lat": -12.12217,
+      "lng": -77.03304,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/9953111163",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 09:00-22:00; Su 09:00-20:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 162
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "barra-maretazo-miraflores",
+      "nombre": "Barra Maretazo",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12294,
+      "lng": -77.02769,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/6049824084",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-22:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 337
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "bazar-miraflores",
+      "nombre": "Bazar",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12082,
+      "lng": -77.03225,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5402792721",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Tu-Sa 19:30-03:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 286
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "brujas-de-cachiche-miraflores",
+      "nombre": "Brujas de Cachiche",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12286,
+      "lng": -77.03609,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/1435192552",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:00-23:59; Su 12:30-16:30",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 373
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "cafe-la-paz-miraflores",
+      "nombre": "Cafe La Paz",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12194,
+      "lng": -77.03001,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:30",
+      "fuente_url": "https://www.openstreetmap.org/node/4216572990",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 09:00-23:30",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 142
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "cafe-cafe-miraflores",
+      "nombre": "Cafe cafe",
+      "tipo": "cafe",
+      "distrito": "Miraflores",
+      "lat": -12.12053,
+      "lng": -77.03033,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/1669641512",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 09:00-03:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 275
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "defino-mar-miraflores",
+      "nombre": "Defino Mar",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12346,
+      "lng": -77.03678,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/2279898348",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00 - 22:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 439
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "dulce-alpaca-miraflores",
+      "nombre": "Dulce Alpaca",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12215,
+      "lng": -77.02583,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/13744152402",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 09:00-22:00; Su 09:00-21:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 547
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "el-infusionista-bar-miraflores",
+      "nombre": "El Infusionista Bar",
+      "tipo": "bar",
+      "distrito": "Miraflores",
+      "lat": -12.11982,
+      "lng": -77.02816,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "26:00",
+      "fuente_url": "https://www.openstreetmap.org/node/9951656968",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Th, Su 17:00-00:30; Fr, Sa 17:00-02:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 451
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "el-jardin-de-jazmin-miraflores",
+      "nombre": "El Jardín de Jazmín",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12621,
+      "lng": -77.02706,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4376010350",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:00-22:00; Su 12:00-18:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 302
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "el-parquetito-miraflores",
+      "nombre": "El Parquetito",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.122,
+      "lng": -77.03004,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:30",
+      "fuente_url": "https://www.openstreetmap.org/node/4216576289",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 09:00-23:30",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 135
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "ginebra-miraflores",
+      "nombre": "Ginebra",
+      "tipo": "bar",
+      "distrito": "Miraflores",
+      "lat": -12.12004,
+      "lng": -77.02684,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "25:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4664434292",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Th 09:00-18:00; Fr-Sa 12:00-01:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 538
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "houlihan-s-miraflores",
+      "nombre": "Houlihan's",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12168,
+      "lng": -77.03241,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "25:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4336091220",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-01:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 216
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "huambra-miraflores",
+      "nombre": "Huambra",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12463,
+      "lng": -77.03177,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/12856685510",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-We 12:30-21:00; Th-Sa 12:30-23:00; Su 12:30-17:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 156
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "huaringas-miraflores",
+      "nombre": "Huaringas",
+      "tipo": "bar",
+      "distrito": "Miraflores",
+      "lat": -12.12274,
+      "lng": -77.03603,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/5754564822",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 19:00-23:59",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 370
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "la-gloria-miraflores",
+      "nombre": "La Gloria",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.11778,
+      "lng": -77.03045,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5892067685",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 13:00-22:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 577
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "la-terraza-del-pardo-miraflores",
+      "nombre": "La Terraza del Pardo",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.11815,
+      "lng": -77.03264,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:30",
+      "fuente_url": "https://www.openstreetmap.org/node/6049797584",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 06:45-23:30",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 572
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "maido-miraflores",
+      "nombre": "Maido",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12539,
+      "lng": -77.03061,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:45",
+      "fuente_url": "https://www.openstreetmap.org/node/3581929393",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:30-22:45; Su 12:30-17:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 96
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "makoto-sushi-bar-miraflores-miraflores",
+      "nombre": "Makoto Sushi Bar Miraflores",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.11809,
+      "lng": -77.03301,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/5992164842",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-23:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 593
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "manolo-miraflores",
+      "nombre": "Manolo",
+      "tipo": "cafe",
+      "distrito": "Miraflores",
+      "lat": -12.12305,
+      "lng": -77.02936,
+      "gasto_min": 15,
+      "gasto_max": 30,
+      "abre": null,
+      "cierra_cocina": "25:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4417016570",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Fr 07:15-01:00; Sa-Su 08:15-01:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 156
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "matsuei-miraflores",
+      "nombre": "Matsuei",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.1183,
+      "lng": -77.03046,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:30",
+      "fuente_url": "https://www.openstreetmap.org/node/12118648801",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:30-15:30,19:30-22:30; Su 12:30-16:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 519
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "nuevo-mundo-miraflores",
+      "nombre": "Nuevo Mundo",
+      "tipo": "bar",
+      "distrito": "Miraflores",
+      "lat": -12.12158,
+      "lng": -77.02891,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4791339021",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Su-Th 17:00-01:00; Fr-Sa 17:00-03:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 256
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "o-sole-mio-pizza-miraflores",
+      "nombre": "O Sole Mio Pizza",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12094,
+      "lng": -77.03383,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:30",
+      "fuente_url": "https://www.openstreetmap.org/node/4602901889",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 11:00-23:30; Su 11:00-17:00",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 318
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "omnia-miraflores",
+      "nombre": "Omnia",
+      "tipo": "bar",
+      "distrito": "Miraflores",
+      "lat": -12.11997,
+      "lng": -77.02985,
+      "gasto_min": 25,
+      "gasto_max": 45,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4419840890",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 17:00-23:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 348
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "pardos-chicken-miraflores",
+      "nombre": "Pardos Chicken",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12542,
+      "lng": -77.02554,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "25:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4181890872",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Th 12:00-00:00; Fr-Sa 12:00-01:00; Su 12:00-23:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 456
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "popolo-pizza-miraflores-miraflores",
+      "nombre": "Popolo Pizza Miraflores",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12142,
+      "lng": -77.02766,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:30",
+      "fuente_url": "https://www.openstreetmap.org/node/8968784271",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-22:30",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 381
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "punto-azul-miraflores",
+      "nombre": "Punto Azul",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12637,
+      "lng": -77.02818,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/4382389659",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo 18:00-23:59; Tu-Sa 12:00-23:59; Su 12:00-17:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 195
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "rafael-osterling-miraflores",
+      "nombre": "Rafael Osterling",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12531,
+      "lng": -77.03137,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "24:00",
+      "fuente_url": "https://www.openstreetmap.org/node/2279901516",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-We 13:00-15:00,20:00-23:00; Th-Fr 13:00-15:00,20:00-00:00; Sa 20:00-00:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 179
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "san-marcelo-miraflores",
+      "nombre": "San Marcelo",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12226,
+      "lng": -77.03146,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "27:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4343704618",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Th 11:30-01:00; Fr-Sa 11:30-03:00; Su 12:30-01:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 106
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "saqra-miraflores",
+      "nombre": "Saqra",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12402,
+      "lng": -77.02703,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/4152194291",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Th 12:00-23:00; Fr-Su 12:00-23:59",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 335
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "social-miraflores",
+      "nombre": "Social.",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12895,
+      "lng": -77.0265,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "25:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4882102722",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 06:30-01:00",
+      "_a_metros_de": {
+        "centro-cultural-ricardo-palma": 521
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "sr-saltado-miraflores",
+      "nombre": "Sr. Saltado",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12225,
+      "lng": -77.02734,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:30",
+      "fuente_url": "https://www.openstreetmap.org/node/6556419985",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 12:00-22:30",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 383
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "sushi-pop-miraflores",
+      "nombre": "Sushi Pop",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.11993,
+      "lng": -77.02808,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4849841121",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Fr 08:00-16:00, 21:00-23:00; Sa 08:00-23:00; Su 08:00-22:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 447
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "terra-cuina-miraflores",
+      "nombre": "Terra Cuina",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12359,
+      "lng": -77.03615,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:59",
+      "fuente_url": "https://www.openstreetmap.org/node/6049767591",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 12:30-23:59",
+      "_a_metros_de": {
+        "auditorio-del-britanico-sede-miraflores": 371
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "tierra-santa-miraflores",
+      "nombre": "Tierra Santa",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.12319,
+      "lng": -77.02829,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "23:30",
+      "fuente_url": "https://www.openstreetmap.org/node/5005805759",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Sa 09:00-23:30; Su 10:00-16:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 273
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    },
+    {
+      "id": "trattoria-dei-prati-miraflores",
+      "nombre": "Trattoria dei Prati",
+      "tipo": "restaurante",
+      "distrito": "Miraflores",
+      "lat": -12.1214,
+      "lng": -77.02735,
+      "gasto_min": 35,
+      "gasto_max": 60,
+      "abre": null,
+      "cierra_cocina": "22:00",
+      "fuente_url": "https://www.openstreetmap.org/node/4311916891",
+      "verificado_el": "2026-08-16",
+      "_osm_opening_hours": "Mo-Su 13:00-22:00",
+      "_a_metros_de": {
+        "nuevo-teatro-julieta": 412
+      },
+      "gasto_referencial": true,
+      "fuente_gasto_url": "https://hikersbay.com/prices/peru/p/miraflores?lang=es"
+    }
+  ],
+  "_estado": "53 sitios de OpenStreetMap con horario publicado, a menos de 600 m de un teatro y con cocina abierta despues de las 22:00. Nombre, coordenada y horario son datos reales de OSM. El gasto es una ESTIMACION por categoria con base documentada, no un precio de carta: cada sitio lleva gasto_referencial:true."
 }
