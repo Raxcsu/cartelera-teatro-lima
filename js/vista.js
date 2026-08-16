@@ -269,6 +269,19 @@ async function pintarMapa(app, delMes) {
   const caja = app.querySelector('.mapa-caja');
   if (mapa) { mapa.destruir(); mapa = null; }
 
+  // La banda se REVELA antes de crear el mapa, y no es cosmético.
+  //
+  // Un elemento con [hidden] no tiene caja, así que Leaflet lo mide 0x0:
+  // fitBounds calcula un zoom enorme, maxZoom lo recorta en 15 y el mapa
+  // queda encuadrado sobre el centro correcto con los teatros a más de mil
+  // píxeles fuera de cuadro. Pasó en producción: un mapa de Lima sin un
+  // solo pin a la vista. Revelarlo después no lo arregla — invalidateSize()
+  // corrige el tamaño pero conserva el zoom equivocado, y el ResizeObserver
+  // de mapa.js tampoco, porque Chrome no notifica elementos sin caja.
+  //
+  // Si el mapa no se puede crear, la banda vuelve a esconderse abajo.
+  caja.hidden = false;
+
   // Un teatro por marca, no una por función: cinco funciones en el mismo
   // teatro son un solo pin con el conteo.
   const porTeatro = new Map();

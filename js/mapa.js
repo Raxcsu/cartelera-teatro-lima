@@ -96,17 +96,53 @@ export async function crearMapa(contenedor, puntos = [], opciones = {}) {
     }
 
     // Encuadre: un solo teatro no tiene "bounds" útiles, así que se centra.
-    if (conCoords.length === 1) {
-      mapa.setView([conCoords[0].lat, conCoords[0].lng], 15);
+    const encuadrar = () => {
+      if (conCoords.length === 1) {
+        mapa.setView([conCoords[0].lat, conCoords[0].lng], 15);
+      } else {
+        // Márgenes ajustados: 34px arriba y abajo se comían 40% de una
+        // banda de 168px, y en Lima eso se traduce en medio mapa de mar.
+        mapa.fitBounds(conCoords.map((p) => [p.lat, p.lng]), { padding: [22, 16], maxZoom: 15 });
+      }
+    };
+    encuadrar();
+
+    /**
+     * Reencuadrar cuando el contenedor cambia de tamaño.
+     *
+     * invalidateSize() sola NO alcanza, y esto costó un bug visible: corrige
+     * el tamaño que Leaflet cree tener, pero conserva centro y zoom. Si
+     * fitBounds() corrió con el contenedor mal medido —la banda se dibuja
+     * antes de que la página termine de acomodarse— el encuadre queda mal
+     * para siempre. En producción salieron los 5 teatros fuera de cuadro:
+     * un mapa de Lima sin un solo pin a la vista.
+     *
+     * Le pasa igual a cualquiera que rote el celular, así que la respuesta
+     * es escuchar al contenedor, no ejecutar una vez y confiar.
+     *
+     * Deja de reencuadrar en cuanto el usuario mueve el mapa: si arrastró
+     * hasta Barranco, una rotación de pantalla no puede devolverlo al inicio.
+     */
+    let tocadoPorElUsuario = false;
+    mapa.on('dragstart zoomstart', () => { tocadoPorElUsuario = true; });
+
+    let observador = null;
+    if (typeof ResizeObserver === 'function') {
+      observador = new ResizeObserver(() => {
+        mapa.invalidateSize();
+        if (!tocadoPorElUsuario) encuadrar();
+      });
+      observador.observe(contenedor);
     } else {
-      mapa.fitBounds(conCoords.map((p) => [p.lat, p.lng]), { padding: [34, 34], maxZoom: 15 });
+      requestAnimationFrame(() => { mapa.invalidateSize(); encuadrar(); });
     }
 
-    // La banda del mapa se dibuja antes de que Leaflet mida el contenedor;
-    // sin esto quedan teselas grises en la mitad derecha.
-    requestAnimationFrame(() => mapa.invalidateSize());
-
-    return { destruir: () => { try { mapa.remove(); } catch { /* ya estaba muerto */ } } };
+    return {
+      destruir: () => {
+        try { observador?.disconnect(); } catch { /* no importa */ }
+        try { mapa.remove(); } catch { /* ya estaba muerto */ }
+      },
+    };
   } catch (e) {
     console.warn('El mapa no se pudo dibujar; la app sigue sin él.', e);
     return null;
