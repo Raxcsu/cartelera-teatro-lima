@@ -106,11 +106,12 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 
 ## Pendientes conocidos
 
-| Falta | Nota |
+| Falta | Estado |
 |---|---|
-| Layout de escritorio | Solo se diseñó 390px. A 1440px hay que decidir qué pasa. |
-| Estado de carga | Los datos vienen por red; ese momento no está diseñado. |
-| Estado de error visual | Está especificado que exista, no cómo se ve. |
-| Estado "guardado" | Se puede marcar un plan y no hay diseño de cómo se ve marcado. |
-| Primera vez | Qué ve alguien que abre la app sin saber qué es. |
-| Marca del reloj | La del estado vencido se lee más como una L que como un reloj. |
+| Layout de escritorio | **Pendiente.** Solo se diseñó 390px. A 1440px hay que decidir qué pasa. |
+| Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
+| Estado de error visual | **A medias, y es un bug.** El HTML usa `class="vacio error"` pero `styles.css` no define `.error`, así que se ve **idéntico** a "nada calza con estos filtros". Rompe la regla de composición nº 6: los estados vacíos tienen que distinguirse entre sí, y un fallo de carga no es lo mismo que un filtro estrecho. |
+| Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
+| Primera vez | **Pendiente.** Qué ve alguien que abre la app sin saber qué es. |
+| Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
+| Filtros, detalle con mapa, tarjeta | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. La interfaz publicada es la lista mínima. |
