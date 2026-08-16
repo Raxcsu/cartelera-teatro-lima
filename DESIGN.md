@@ -57,12 +57,16 @@ y no como un dato de sistema.
 
 | Uso | Regla |
 |---|---|
-| Título de pantalla | serif 30px / 1.1 |
-| Título de obra, plan #1 | serif 23px / 1.13 |
-| Título de obra, planes 2 y 3 | serif 17px / 1.2 |
-| Precio destacado | serif 27px |
+| Nombre del mes | serif 22px / 1.1, capitalizado |
+| Título de obra | serif 20px / 1.18 |
+| Precio de entrada | serif 24px / 1 |
 | Metadatos | sans 12.5px / 1.55, color `--ink2` |
-| Etiquetas de sección | sans 10.5px, `letter-spacing:.11em`, mayúsculas, `--ink3` |
+| Encabezado de día y etiquetas de sección | sans 10.5px, `letter-spacing:.11em`, mayúsculas, `--ink3` |
+
+Antes había tres niveles de título de obra (plan #1 grande, planes 2 y 3 chicos) porque
+`puntuarFuncion` rankeaba y la composición tenía que **mostrar** que había ordenado. Con el
+ranking retirado el orden lo manda la fecha, así que todas las tarjetas pesan igual y un solo
+tamaño es lo correcto.
 
 ## Reglas de composición
 
@@ -97,10 +101,15 @@ su fallo no toca el resto de la pantalla.
 ## Accesibilidad, verificada no supuesta
 
 - Todo texto sobre `--bg` mide **4.5:1 o más**. Comprobado por cálculo, no a ojo.
-- **Área táctil mínima 44×44px.** Los chips de filtro estaban en 33px y suben a 44.
+- **Área táctil mínima 44×44px**, vía `--tap`. Los chips de filtro estaban en 33px y suben a 44.
+  Las celdas del calendario cayeron en el mismo error (estaban en 34px) y también suben: es
+  el defecto que más se repite, así que medí antes de dar por buena una grilla.
 - El estado de confianza **nunca depende solo del color**: el punto siempre va con texto
-  ("confirmado hace 12 días", "cena sin precio verificado").
-- Contraste a verificar cuando exista código: foco de teclado visible en todo lo tocable.
+  ("verificar antes de ir", "confirmado hace 12 días").
+- **Foco de teclado visible en todo lo tocable.** Implementado: `:focus-visible` con contorno
+  de acento y `outline-offset`, en `styles.css`.
+- El movimiento reducido se respeta por media query, y el scroll suave se declara en CSS a
+  propósito: pedirlo desde JS no desplaza nada con las animaciones del sistema apagadas.
 
 ## La tarjeta compartible
 

@@ -3,8 +3,8 @@
 **En vivo: https://raxcsu.github.io/cartelera-teatro-lima/**
 
 La cartelera de teatro de Lima del mes, en una pantalla: mapa de los teatros, calendario,
-y por cada función su hora, su precio publicado y el link para comprar. Dónde cenar cerca
-queda a un toque de distancia, en segundo plano.
+y por cada función su hora y su precio tal como lo publica la fuente — con el link de compra
+en cuanto esa fuente lo dé. Dónde cenar cerca queda a un toque de distancia, en segundo plano.
 
 Proyecto personal. Sin framework, sin base de datos, sin paso de build.
 
@@ -117,5 +117,7 @@ Después: filtros y tarjeta compartible, ya diseñados en `DESIGN.md` y sin impl
 
 - **`CLAUDE.md`** — cómo trabajar en el código: comandos, arquitectura, las reglas del dato y
   las cosas que parecen bugs y no lo son. Empezá por acá.
-- **`DESIGN.md`** — el sistema visual: paleta con contraste verificado, tipografía y reglas de
-  composición.
+- **`DESIGN.md`** — el sistema visual: paleta con contraste verificado, tipografía, reglas de
+  composición y los pendientes conocidos.
+- **`docs/encargo-cartelera.md`** — el pedido de investigación de datos: qué buscar, en qué
+  fuentes, con qué esquema y qué NO hacer. Es lo que destraba el resto del proyecto.

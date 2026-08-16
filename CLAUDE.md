@@ -90,9 +90,10 @@ obras equivocadas y el `git diff` sería ilegible.
 
 - **`precio_min: null` no se descarta por presupuesto.** Un precio desconocido no es un
   precio caro. Descartarlo escondería funciones que quizá sí entran.
-- **Los dos estados de vacío son distintos a propósito.** "Nada calza con estos filtros"
-  y "esta cartelera está vencida" tienen distinto color, distinto texto y distinta
-  acción. Si se parecieran, el modelo de confianza quedaría anulado en la práctica.
+- **Los TRES estados de vacío son distintos a propósito.** "Nada cargado en septiembre",
+  "esta cartelera está vencida" y "no se pudieron cargar los datos" tienen distinto color,
+  distinto texto y distinta acción. Si se parecieran, el modelo de confianza quedaría anulado
+  en la práctica: el usuario leería "no hay teatro" en los tres casos.
 - **`costo.completo`, `costo.incluyeCena` y `costo.estimado` son tres cosas distintas.**
   `completo` = no falta ningún precio de lo que está incluido. `incluyeCena` = el plan tiene
   restaurante. `estimado` = alguno de esos precios es una estimación referencial. Un plan sin
@@ -114,6 +115,20 @@ obras equivocadas y el `git diff` sería ilegible.
 - **Las flechas del calendario llegan un mes más allá de lo cargado** (`rangoNavegable()`).
   Frenar en el borde deja las dos flechas muertas cuando hay un solo mes de datos, y con eso el
   estado "nada cargado en septiembre" queda inalcanzable.
+- **La banda del mapa se revela ANTES de crear el mapa**, nunca después. Un elemento con
+  `[hidden]` no tiene caja, así que Leaflet lo mide 0×0, `fitBounds()` calcula un zoom enorme y
+  `maxZoom` lo recorta en 15: el mapa queda centrado bien y con todos los teatros a más de mil
+  píxeles fuera de cuadro. Salió así en producción. Y no se arregla después: `invalidateSize()`
+  corrige el tamaño pero conserva el zoom, y un `ResizeObserver` tampoco, porque Chrome no
+  notifica elementos sin caja.
+- **Un `href` necesita `urlSegura()`, no alcanza con `esc()`.** El escape convierte `<>&"` y no
+  toca ni un carácter de `javascript:alert(1)`, que se ejecuta igual al hacer clic. Los links de
+  compra y de fuente los llena una investigación externa (`docs/encargo-cartelera.md`), así que
+  el dato entra de afuera. `validar_datos.py` hace la misma comprobación del lado de los datos.
+- **Una obra sin `duracion_min` se supone de 2 h, y la pantalla lo dice.** El código viejo usaba
+  `?? 0`, con lo que la obra "terminaba" a la hora de empezar y `cocinaAbierta()` dejaba pasar
+  sitios que ya iban a estar cerrados. `horaDeSalida()` devuelve `supuesta: true` para que la
+  tarjeta declare el supuesto en vez de esconderlo.
 
 ## Diseño
 
