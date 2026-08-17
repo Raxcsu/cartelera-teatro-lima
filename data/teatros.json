@@ -21,11 +21,11 @@
       "distrito": "Miraflores",
       "lat": -12.1236,
       "lng": -77.03274,
-      "web": null,
+      "web": "https://britanico.edu.pe/cultural/",
       "como_llegar": null,
-      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "fuente_url": "https://britanico.edu.pe/cultural/",
       "verificado_el": "2026-08-16",
-      "_nota": "Geocodificado por nombre: Nominatim devolvió 'Centro Cultural Británico, Malecón Balta 740'. El Británico tiene varias sedes en Miraflores: VERIFICAR cuál es la del auditorio."
+      "_nota": "Coordenada por Nominatim (Malecón Balta 740). El Comercio y Lima Gris ubican el auditorio en Calle Bellavista 531, Miraflores: VERIFICAR la sede exacta antes de ir."
     },
     {
       "id": "nuevo-teatro-julieta",
@@ -34,11 +34,11 @@
       "distrito": "Miraflores",
       "lat": -12.12296,
       "lng": -77.03079,
-      "web": null,
+      "web": "https://nuevoteatrojulieta.wixsite.com/nuevo-teatro-julieta",
       "como_llegar": null,
-      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "fuente_url": "https://nuevoteatrojulieta.wixsite.com/nuevo-teatro-julieta",
       "verificado_el": "2026-08-16",
-      "_nota": "Nominatim solo resolvió la calle, sin número. La coordenada es el centro del pasaje, no la puerta. VERIFICAR."
+      "_nota": "Coordenada Nominatim al centro del pasaje, sin número. VERIFICAR la puerta."
     },
     {
       "id": "asociacion-de-artistas-aficionados",
@@ -47,11 +47,11 @@
       "distrito": "Cercado de Lima",
       "lat": -12.04568,
       "lng": -77.0345,
-      "web": null,
+      "web": "https://aaalima.pe/",
       "como_llegar": null,
-      "fuente_url": "https://nominatim.openstreetmap.org/",
+      "fuente_url": "https://aaalima.pe/",
       "verificado_el": "2026-08-16",
-      "_nota": "Coincidencia exacta por nombre y número en Nominatim."
+      "_nota": "Sala Teatro Ricardo Roca Rey de la AAA. Coincidencia exacta por nombre y número en Nominatim."
     },
     {
       "id": "centro-cultural-ricardo-palma",
@@ -64,7 +64,7 @@
       "como_llegar": null,
       "fuente_url": "https://nominatim.openstreetmap.org/",
       "verificado_el": "2026-08-16",
-      "_nota": "Coincidencia exacta por nombre y número en Nominatim."
+      "_nota": "Coincidencia exacta por nombre y número en Nominatim. Teleticket muestra 'Noche de enredos' con dirección Av. Larco 1150 (Teatro Auditorio Miraflores), que es otro local: posible confusión de sede."
     },
     {
       "id": "centro-de-convenciones-bianca",
@@ -78,6 +78,84 @@
       "fuente_url": "https://nominatim.openstreetmap.org/",
       "verificado_el": "2026-08-16",
       "_nota": "Coincidencia exacta por nombre y número en Nominatim."
+    },
+    {
+      "id": "auditorio-del-centro-cultural-de-jesus-maria",
+      "nombre": "Auditorio del Centro Cultural de Jesús María",
+      "direccion": "Avenida Horacio Urteaga 535",
+      "distrito": "Jesús María",
+      "lat": null,
+      "lng": null,
+      "web": "https://www.munijesusmaria.gob.pe/teatro/",
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/LUM016",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar y verificar (dirección Av. Horacio Urteaga 535)."
+    },
+    {
+      "id": "la-estacion-de-barranco",
+      "nombre": "La Estación de Barranco",
+      "direccion": "Avenida Pedro de Osma 112",
+      "distrito": "Barranco",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/mujer-que-no-jode-es-hombre-edicion-2026-estacion-de-barranco-2026",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar (dirección Av. Pedro de Osma 112)."
+    },
+    {
+      "id": "jazz-zone",
+      "nombre": "Jazz Zone",
+      "direccion": "Avenida La Paz 656, Pasaje El Suche",
+      "distrito": "Miraflores",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/nos-casamos-la-cagamos-jazz-zone-2026",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar (dirección Av. La Paz 656, Pasaje El Suche)."
+    },
+    {
+      "id": "capital-restobar",
+      "nombre": "Capital Restobar",
+      "direccion": "Avenida Almirante Miguel Grau 680",
+      "distrito": "Barranco",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/divorcio-y-tango-comedia-de-parejas-en-barranco-capital-restobar",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar (dirección Av. Miguel Grau 680, Barranco)."
+    },
+    {
+      "id": "teatro-auditorio-miraflores",
+      "nombre": "Teatro Auditorio Miraflores",
+      "direccion": "Avenida José Larco 1150",
+      "distrito": "Miraflores",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/los-inoxidables-miraflores-teatro-auditorio-miraflores-2026",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar (dirección Av. Larco 1150)."
+    },
+    {
+      "id": "teatro-canout",
+      "nombre": "Teatro Canout",
+      "direccion": "Avenida Petit Thouars 4550",
+      "distrito": "Miraflores",
+      "lat": null,
+      "lng": null,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://teleticket.com.pe/evento/guapotes-en-vivo-teatro-canout",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenadas pendientes de geocodificar (dirección Av. Petit Thouars 4550)."
     }
   ]
 }
