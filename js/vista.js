@@ -14,10 +14,11 @@
 import { cargarTodo, hoyLima, ErrorDeDatos } from './datos.js';
 import { crearMapa } from './mapa.js';
 import {
-  filtrarFunciones, agruparPorDia, diasDelMes, mesesConFunciones,
+  filtrarFunciones, agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones,
   desplazarMes, mesInicial, rangoNavegable, confianzaEfectiva, estadoCartelera,
-  rangoPrecio, nombreMes, etiquetaDia, formatearSoles, formatearDistancia,
-  horaDeSalida, lugaresCercanos, calcularCostoTotal, urlSegura,
+  nombreMes, etiquetaDia, diaCorto, formatearDistancia,
+  generoVisible, resumenElenco, necesitaRecorte,
+  horaDeSalida, lugaresCercanos, urlSegura,
 } from './logica.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
@@ -29,6 +30,7 @@ const DIAS_CORTOS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 // mapa que lo explica; el resto está a un clic en la lista.
 const OBRAS_EN_POPUP = 3;
 const DIAS_EN_POPUP = 2;
+const NOMBRES_EN_POPUP = 2;
 
 // ── estado de la pantalla ────────────────────────────────────
 let datos = null;
@@ -96,10 +98,14 @@ function pintarEsqueleto(app) {
           <h2 class="mes-nombre" aria-live="polite"></h2>
           <button type="button" class="mes-ir" data-ir="1" aria-label="Mes siguiente">&rsaquo;</button>
         </nav>
-        <div class="calendario">
-          <div class="semana" aria-hidden="true">${DIAS_CORTOS.map((d) => `<span>${d}</span>`).join('')}</div>
-          <div class="grilla" role="group" aria-label="Días con función"></div>
-        </div>
+        <div class="tira" role="group" aria-label="Próximos días"></div>
+        <details class="mes-completo">
+          <summary>Ver el mes completo</summary>
+          <div class="calendario">
+            <div class="semana" aria-hidden="true">${DIAS_CORTOS.map((d) => `<span>${d}</span>`).join('')}</div>
+            <div class="grilla" role="group" aria-label="Todos los días del mes"></div>
+          </div>
+        </details>
       </div>
       <section class="lista" aria-live="polite"></section>
     </div>`;
@@ -111,9 +117,28 @@ function pintarEsqueleto(app) {
     refrescar(app);
   });
 
-  app.querySelector('.grilla').addEventListener('click', (ev) => {
+  // Un solo oyente para los dos calendarios. La tira y la grilla marcan
+  // sus días con el mismo `data-fecha`, así que delegando en la caja que
+  // las contiene el salto se escribe una vez y no dos.
+  app.querySelector('.calendario-caja').addEventListener('click', (ev) => {
     const celda = ev.target.closest('[data-fecha]');
     if (celda) irA(app, `dia-${celda.dataset.fecha}`);
+  });
+
+  // El "seguir leyendo" de las sinopsis, por delegación en .lista.
+  //
+  // Uno por tarjeta se acumularía: la lista se reescribe entera en cada
+  // cambio de mes y los oyentes viejos morirían con sus nodos, pero los
+  // nuevos se sumarían a este mismo bloque en cada pasada. Es el problema
+  // que ya resolvió así el "Ver más" del popup en mapa.js.
+  app.querySelector('.lista').addEventListener('click', (ev) => {
+    const boton = ev.target.closest('[data-mas]');
+    if (!boton) return;
+    const caja = boton.closest('.sinopsis-caja');
+    if (!caja) return;
+    const abierta = caja.classList.toggle('abierta');
+    boton.setAttribute('aria-expanded', String(abierta));
+    boton.textContent = abierta ? 'Mostrar menos' : 'Seguir leyendo';
   });
 }
 
@@ -135,9 +160,54 @@ function refrescar(app) {
     boton.disabled = !rango || !destino || destino < rango.desde || destino > rango.hasta;
   }
 
+  pintarTira(app, delMes);
   pintarGrilla(app, delMes);
   pintarLista(app, delMes);
   pintarMapa(app, delMes);
+}
+
+/**
+ * La tira: una fila de días en vez de una grilla de seis.
+ *
+ * Es lo primero que se ve del calendario y ocupa ~115px donde la grilla
+ * ocupaba ~340px. Ese aire es lo que hace que la primera obra entre en
+ * pantalla sin scrollear, que era el punto de todo el cambio.
+ *
+ * NO hace falta desplazarla al día de hoy, y conviene saber por qué antes
+ * de "arreglarlo": diasParaTira() ya descarta lo pasado, así que hoy es
+ * siempre el primer chip y scrollLeft 0 es la posición correcta. Si algún
+ * día se quisiera centrar otro día, va con `tira.scrollLeft = ...` y NUNCA
+ * con `chip.scrollIntoView()`: sobre un hijo de un contenedor con scroll
+ * horizontal, scrollIntoView desplaza además el ancestro vertical, y en
+ * escritorio eso mueve .lista sola al cargar.
+ */
+function pintarTira(app, delMes) {
+  const tira = app.querySelector('.tira');
+  const dias = diasParaTira(mesVisible, delMes, hoy);
+
+  // Un mes enteramente pasado no tiene tira. Que ya pasó lo cuenta la
+  // lista; repetirlo con una fila de días muertos no agrega nada.
+  tira.hidden = !dias.length;
+  if (!dias.length) { tira.innerHTML = ''; return; }
+
+  tira.innerHTML = dias.map((d) => {
+    const clases = ['chip'];
+    if (d.esHoy) clases.push('hoy');
+    const cuerpo = `<span class="chip-dia">${esc(diaCorto(d.fecha) ?? '')}</span>` +
+                   `<span class="chip-num">${Number(d.fecha.slice(8))}</span>`;
+
+    // Sin funciones no es un botón: no hay sección a la que saltar, y un
+    // control que al tocarlo no hace nada miente sobre lo que ofrece.
+    // El día igual se muestra, porque el hueco es información.
+    if (!d.cantidad) return `<span class="${clases.join(' ')}">${cuerpo}</span>`;
+
+    clases.push('con-funcion');
+    // "función" pierde la tilde al pluralizar: son "funciones".
+    const cuantas = `${d.cantidad} ${d.cantidad === 1 ? 'función' : 'funciones'}`;
+    return `<button type="button" class="${clases.join(' ')}" data-fecha="${d.fecha}"
+      aria-label="${esc(etiquetaDia(d.fecha) ?? d.fecha)}, ${cuantas}"
+      >${cuerpo}<i></i></button>`;
+  }).join('');
 }
 
 function pintarGrilla(app, delMes) {
@@ -200,19 +270,43 @@ function pintarLista(app, delMes) {
 function tarjeta(f) {
   const obra = datos.obras[f.obra_id] ?? null;
   const teatro = datos.teatros[f.teatro_id] ?? null;
-  const precio = rangoPrecio(f);
   const conf = confianzaEfectiva(f.confianza, f.verificado_el, hoy);
+
+  const elenco = resumenElenco(obra);
+  const sinopsis = String(obra?.sinopsis ?? '').trim();
+  const recortable = necesitaRecorte(sinopsis);
+
+  // El género abre la línea porque es lo que más rápido engancha o
+  // descarta: "comedia" decide antes que la hora. Cada trozo aparece
+  // solo si existe — armar la línea filtrando en vez de concatenar
+  // condicionales es lo que evita el " ·  · " de un dato faltante.
+  const meta = [
+    generoVisible(obra),
+    f.hora,
+    [teatro?.nombre ?? '?', teatro?.distrito].filter(Boolean).join(', '),
+    obra?.duracion_min ? `${obra.duracion_min} min` : null,
+    obra?.idioma && obra.idioma !== 'español' ? `en ${obra.idioma}` : null,
+  ].filter(Boolean).map((t) => esc(t)).join(' · ');
 
   return `
     <li class="funcion" data-teatro="${esc(f.teatro_id)}">
       <h4>${esc(obra?.titulo ?? f.obra_id)}</h4>
-      <p class="meta">${esc(f.hora)} · ${esc(teatro?.nombre ?? '?')}${
-        teatro?.distrito ? `, ${esc(teatro.distrito)}` : ''}${
-        obra?.duracion_min ? ` · ${esc(obra.duracion_min)} min` : ''}${
-        obra?.idioma && obra.idioma !== 'español' ? ` · en ${esc(obra.idioma)}` : ''}</p>
+      <p class="meta">${meta}</p>
 
-      <p class="precio">${esc(precio.texto)}${
-        precio.min != null ? '<small>por entrada</small>' : ''}</p>
+      ${elenco ? `<p class="elenco">Con ${esc(elenco.texto)}${
+        elenco.otros ? ` <span class="otros">y ${elenco.otros} más</span>` : ''}</p>` : ''}
+
+      ${sinopsis ? `
+        <div class="sinopsis-caja${recortable ? ' recortable' : ''}">
+          <p class="sinopsis">${esc(sinopsis)}</p>
+          ${recortable
+            // La clase `recortable` es la que enciende el line-clamp, y el
+            // botón sale del MISMO booleano. Si el CSS recortara siempre,
+            // una sinopsis apenas más larga que tres líneas escondería su
+            // final sin ofrecer manera de abrirlo.
+            ? '<button type="button" class="mas-texto" data-mas aria-expanded="false">Seguir leyendo</button>'
+            : ''}
+        </div>` : ''}
 
       ${conf.texto
         ? `<p class="flag n-${conf.nivel}"><span class="dot"></span>${esc(conf.texto)}</p>`
@@ -236,9 +330,13 @@ function enlace(url, texto, extra = '') {
 /**
  * El bloque de restaurantes, plegado.
  *
- * La cena dejó de ser parte del plan y del precio, pero "¿qué hay cerca
- * que siga abierto cuando salgamos?" sigue siendo una pregunta real.
- * Vive acá adentro: se abre solo si te interesa.
+ * Ya no lleva precios: ni el gasto por persona ni el total de la salida.
+ * Lo que queda es la única pregunta que seguía siendo real, "¿qué hay
+ * cerca que siga abierto cuando salgamos?", y esa se contesta con un
+ * nombre y una distancia. Vive acá adentro: se abre solo si te interesa.
+ *
+ * Lo que SÍ se queda es el supuesto de las 2 h, porque no es adorno:
+ * gobierna qué cocinas siguen abiertas a la hora de salida.
  */
 function cerca(f, obra, teatro) {
   const salida = horaDeSalida(f, obra);
@@ -246,8 +344,6 @@ function cerca(f, obra, teatro) {
   // Sin sitios y sin nada que contar del teatro, un desplegable vacío
   // solo promete algo que no hay.
   if (!sitios.length && !urlSegura(teatro?.web) && !teatro?.direccion) return '';
-
-  const costo = sitios.length ? calcularCostoTotal(f, sitios[0].lugar) : null;
 
   return `
     <details class="cerca">
@@ -265,18 +361,8 @@ function cerca(f, obra, teatro) {
           <ul class="sitios">${sitios.map((s) => `
             <li>
               <span class="sitio-nombre">${esc(s.lugar.nombre)}</span>
-              <span class="meta">${esc(formatearDistancia(s.distancia) ?? '')}${
-                s.lugar.gasto_min != null
-                  ? ` · ${s.lugar.gasto_referencial ? '~' : ''}${formatearSoles(s.lugar.gasto_min)}${
-                      s.lugar.gasto_max && s.lugar.gasto_max !== s.lugar.gasto_min
-                        ? ` – ${Math.round(s.lugar.gasto_max)}` : ''} por persona`
-                  : ' · sin precio'}</span>
+              <span class="meta">${esc(formatearDistancia(s.distancia) ?? '')}</span>
             </li>`).join('')}</ul>
-
-          ${costo?.total != null ? `
-            <p class="total">${costo.estimado ? '~' : ''}${formatearSoles(costo.total)}
-              <small>${esc(costo.incluye.join(' + '))}, en ${esc(sitios[0].lugar.nombre)}</small></p>`
-            : ''}
         ` : ''}
       </div>
     </details>`;
@@ -358,10 +444,17 @@ async function pintarMapa(app, delMes) {
 }
 
 /**
- * La tarjeta que se abre al tocar un pin: obra, género, teatro, fechas,
- * horarios y un "Ver más" que lleva a la lista. Es el mockup, con una
- * salvedad de la Regla 1 del dato — el género solo aparece si la fuente
- * lo publicó; `tipo: "otro"` es literalmente "nadie lo dijo".
+ * La tarjeta que se abre al tocar un pin: obra, género, elenco, teatro,
+ * fechas, horarios y un "Ver más" que lleva a la lista.
+ *
+ * Es una versión corta de la tarjeta de la lista, no otra cosa: género y
+ * elenco salen de las MISMAS funciones (generoVisible, resumenElenco), así
+ * que un pin y su tarjeta no pueden contradecirse. Antes el criterio del
+ * género vivía escrito acá adentro, y era cuestión de tiempo que la lista
+ * lo escribiera distinto.
+ *
+ * El elenco se corta en 2 y no en 3: el popup mide 280px de ancho y tres
+ * nombres se comen dos líneas que le hacen falta a las fechas.
  *
  * Devuelve HTML ya escapado. Todo lo que entra pasa por esc().
  */
@@ -377,9 +470,8 @@ function popupTeatro(teatro, funciones) {
 
   const bloques = obras.map(([obraId, fs]) => {
     const obra = datos.obras[obraId] ?? null;
-    // 'otro' es el valor que llevan las obras cuyo género no publicó ninguna
-    // fuente. Rellenarlo con algo plausible sería inventar; se omite.
-    const genero = obra?.tipo && obra.tipo !== 'otro' ? obra.tipo : null;
+    const genero = generoVisible(obra);
+    const elenco = resumenElenco(obra, NOMBRES_EN_POPUP);
 
     // agruparPorDia ya ordena por fecha y por hora. Ese orden no puede
     // vivir en dos lados: si acá se ordenara distinto, el popup y la lista
@@ -392,6 +484,8 @@ function popupTeatro(teatro, funciones) {
       <div class="obra">
         <p class="obra-titulo">${esc(obra?.titulo ?? obraId)}</p>
         ${genero ? `<p class="meta">${esc(genero)}</p>` : ''}
+        ${elenco ? `<p class="meta elenco">Con ${esc(elenco.texto)}${
+          elenco.otros ? ` y ${elenco.otros} más` : ''}</p>` : ''}
         ${dias.map((d) => `<p class="meta">${esc(etiquetaDia(d.fecha) ?? d.fecha)} · ${
           d.funciones.map((f) => esc(f.hora)).join(', ')}</p>`).join('')}
         ${otrosDias > 0

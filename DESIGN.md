@@ -44,23 +44,26 @@ como aviso. Por eso el acento es rosa vino y no dorado.
 ## Tipografía
 
 ```css
---serif:'Bodoni MT','Didot',Georgia,'Times New Roman',serif;   /* títulos y precios */
+--serif:'Bodoni MT','Didot',Georgia,'Times New Roman',serif;   /* títulos y nombres de mes */
 --sans:'Segoe UI',system-ui,-apple-system,sans-serif;          /* todo lo demás */
 ```
 
 Sin fuentes externas: no hay build, y una fuente por CDN es una petición de red que
 puede fallar justo cuando alguien abre el link con mala señal.
 
-El serif de alto contraste es lo que hace el trabajo de "formal y con estilo". **Los
-precios van en serif, no en sans**: `S/ 148` en Bodoni se lee como una cifra considerada
-y no como un dato de sistema.
+El serif de alto contraste es lo que hace el trabajo de "formal y con estilo". Queda para
+títulos de obra y nombres de mes. **Antes también llevaba los precios** —`S/ 148` en Bodoni se
+leía como cifra considerada y no como dato de sistema—, pero el precio salió de pantalla con
+el reenfoque a la obra.
 
 | Uso | Regla |
 |---|---|
 | Nombre de la app | sans 12.5px, `letter-spacing:.24em`, mayúsculas, `--accent` |
 | Nombre del mes | serif 22px / 1.1, capitalizado |
 | Título de obra | serif 20px / 1.18 |
-| Precio de entrada | serif 24px / 1 |
+| Elenco | sans 12.5px / 1.5, color `--ink`; el "y N más" en `--ink3` |
+| Sinopsis | sans 13.5px / 1.55, color `--ink2`, recortada a 3 líneas |
+| Día de la tira | sans 9.5px mayúsculas sobre número sans 16px |
 | Metadatos | sans 12.5px / 1.55, color `--ink2` |
 | Encabezado de día y etiquetas de sección | sans 10.5px, `letter-spacing:.11em`, mayúsculas, `--ink3` |
 
@@ -71,9 +74,15 @@ tamaño es lo correcto.
 
 ## Reglas de composición
 
-1. **El precio es escaneable sin leer.** Es la primera pregunta de cualquiera que mira una
-   cartelera. Va en serif grande y muestra el rango publicado tal cual: `S/ 30 – 50`,
-   `desde S/ 35`. Nunca multiplicado por dos, o deja de coincidir con Teleticket.
+1. **La tarjeta responde "¿qué obra es?", en ese orden: título, género y elenco, sinopsis.**
+   El género abre la línea de metadatos porque es lo que más rápido engancha o descarta —
+   "comedia" decide antes que la hora. El elenco va entero y visible: es el otro gancho.
+   La sinopsis va tercera y recortada, porque es lo único que se lee y no se escanea.
+
+   Acá vivía **el precio en serif de 24px**, que era la primera pregunta cuando la app
+   contestaba "¿cuánto sale?". Salió de pantalla junto con el gasto de los restaurantes.
+   Si alguna vez vuelve, vuelve **debajo** de la sinopsis y no encima: el orden de esta lista
+   es el orden de la decisión.
 2. **Los afiches mandan** cuando existan. Son el único activo visual del proyecto. Nunca
    por debajo de 56px de ancho.
 3. **Nada de emoji.** Renderizan distinto en cada celular y rompen la tipografía. Los
@@ -103,13 +112,13 @@ de otros.
 ┌────────────────────────────────────────────────┐
 │              THEATER WITH HER ♥                │  <header> en index.html
 ├──────────────────────────┬─────────────────────┤
-│                          │  ‹  agosto  ›       │
-│                          │  L M M J V S D      │  .calendario-caja
-│          MAPA            │  [grilla 42 celdas] │  (fija)
+│                          │  ‹  agosto 2026  ›  │
+│                          │ [17][18][19][20]→   │  .calendario-caja
+│          MAPA            │  Ver el mes completo│  (fija, ~115px)
 │    (alto completo)       ├─────────────────────┤
-│                          │  SÁBADO 22       ▲  │
+│                          │  LUNES 17        ▲  │
 │                          │  [tarjeta]       │  │  .lista
-│                          │  DOMINGO 23   scroll│  (lo único que scrollea)
+│                          │  MARTES 18    scroll│  (lo único que scrollea)
 └──────────────────────────┴─────────────────────┘
    minmax(0,1.15fr)            minmax(0,420px)
 ```
@@ -122,31 +131,58 @@ de otros.
 - **Sin mapa, la columna se retira entera** y la que queda se acota a 620px y se centra. Un mes
   de 42 celdas a 1300px de ancho no se lee, se recorre. Pasa de verdad y no solo si se cae el
   CDN: un mes sin funciones no tiene un solo pin, así que tampoco tiene mapa.
-- **La grilla del mes son 264px fijos** (42 celdas × 44px de área táctil) y no se negocian. Con
-  eso, en una ventana de 700px de alto la lista se queda con unos 260px: dos tarjetas y media.
-  Es el precio de tener calendario y mapa a la vez, y es coherente con una app que es un
-  calendario, pero conviene mirarlo de nuevo cuando entren los datos del mes completo.
+- **La caja del calendario mide ~115px cerrada, no 340px.** Antes eran la barra de mes más una
+  grilla de 42 celdas: 264px fijos que en una ventana de 700px de alto dejaban a la lista con
+  ~260px, o sea dos tarjetas y media. Ese era el pendiente "presupuesto vertical", y se resolvió
+  cambiando la grilla por una **tira horizontal de días** con el mes completo plegado detrás de
+  `<details class="mes-completo">`.
 
-### El tinte de las teselas
+  Lo que **no** se hizo, y es la parte importante: no se achicaron las celdas. Un chip mide 44px
+  como manda la regla de área táctil. Lo que se achicó es el número de filas, seis a una.
+  Abierto, el mes recupera sus 42 celdas y la caja se limita a `max-height:46vh` con scroll
+  propio, o empujaría la lista fuera de la pantalla.
 
-Las teselas de OpenStreetMap son el único bloque de verde y azul saturado en una pantalla de
-rosa pastel y serif. Se corrigen con un filtro, **no con colores nuevos**: la regla de la paleta
-sigue intacta.
+## La tira de días
 
-```css
-.leaflet-tile-pane{filter:grayscale(.5) sepia(.2) saturate(.9) brightness(1.06) contrast(.94)}
-@media (prefers-contrast:more){.leaflet-tile-pane{filter:none}}
+```
+‹        agosto 2026        ›
+┌───┐┌───┐┌───┐┌───┐┌───┐
+│LUN││MAR││MIÉ││JUE││VIE│  →  scroll horizontal
+│ 17││ 18││ 19││ 20││ 21│
+│ • ││   ││ • ││ • ││ • │     el punto = hay función
+└───┘└───┘└───┘└───┘└───┘
+Ver el mes completo
 ```
 
-Va en el *pane* de teselas y no en el contenedor: Leaflet separa teselas, marcadores, popups y
-controles en capas distintas, así que teñir solo la de abajo deja los pines rosa y los
-contrastes ya verificados sin tocar. Si el sistema pide más contraste, el filtro se retira: el
-mapa se lee antes que combina.
+- **Lleva todos los días que quedan del mes, no solo los que tienen función.** Los huecos son
+  información: sin ellos, tres días seguidos de teatro se verían igual que tres salteados.
+- **Un día sin función no es un botón**, es un `<span>`. No hay sección a la que saltar, y un
+  control que al tocarlo no hace nada miente sobre lo que ofrece.
+- **Sin una sola función en el mes no hay tira.** Es la misma regla que ya seguía el mapa. En
+  octubre se veían 31 chips muertos encima del cartel "nada cargado en octubre".
+- El día de hoy va en `--accent` con borde de acento. **No se usa el ámbar del semáforo**, que
+  es la regla de la paleta.
 
-La tarjeta que abre un pin —teatro, obra, fechas y horarios, y un "Ver más" que lleva a la
-lista— usa la superficie y la tipografía de las tarjetas de función. **El género aparece solo si
-la fuente lo publicó:** `tipo: "otro"` significa que no lo dijo nadie, y rellenarlo sería
-inventar.
+### El mapa base: CARTO Positron
+
+Las teselas de OpenStreetMap eran el único bloque de verde y azul saturado en una pantalla de
+rosa pastel y serif, y se corregían con un filtro sobre `.leaflet-tile-pane`. **Ese filtro se
+retiró**: Positron ya es un mapa base gris claro y de bajo contraste, hecho para que lo que se
+dibuja encima resalte, y filtrarlo solo lo lavaba más.
+
+Si algún día vuelve un mapa base saturado, el filtro vuelve en el *pane* de teselas y **nunca**
+en el contenedor: Leaflet separa teselas, marcadores, popups y controles en capas distintas, así
+que teñir solo la de abajo deja los pines rosa y los contrastes ya verificados sin tocar.
+
+**El pin pasó de 11 a 20px** de diámetro, con anillo blanco de 3px. A 11 el círculo se perdía
+sobre las teselas y había que buscarlo. El número está duplicado en la constante `PIN` de
+`js/mapa.js`, de donde sale el `iconAnchor`: si los dos se separan, cada teatro queda corrido
+de su coordenada real y el mapa igual se ve bien.
+
+La tarjeta que abre un pin —teatro, obra, género, elenco, fechas y horarios, y un "Ver más" que
+lleva a la lista— usa la superficie y la tipografía de las tarjetas de función. **El género y el
+elenco aparecen solo si la fuente los publicó:** `tipo: "otro"` y `elenco: []` significan que no
+lo dijo nadie, y rellenarlos sería inventar.
 
 ### Decisión revisada: el mapa vuelve a la pantalla principal
 
@@ -164,7 +200,12 @@ su fallo no toca el resto de la pantalla.
 - Todo texto sobre `--bg` mide **4.5:1 o más**. Comprobado por cálculo, no a ojo.
 - **Área táctil mínima 44×44px**, vía `--tap`. Los chips de filtro estaban en 33px y suben a 44.
   Las celdas del calendario cayeron en el mismo error (estaban en 34px) y también suben: es
-  el defecto que más se repite, así que medí antes de dar por buena una grilla.
+  el defecto que más se repite, así que medí antes de dar por buena una grilla. Cuando hubo que
+  achicar el calendario, la tentación fue bajar la celda a 36px; se rechazó y se cambió la
+  forma en su lugar. **Ganar espacio nunca se paga con el área táctil.**
+- **El "seguir leyendo" de la sinopsis lleva `aria-expanded`** y cambia su propio texto a
+  "Mostrar menos". Y solo existe cuando hay algo que desplegar: una sinopsis corta se muestra
+  entera, sin botón y sin recorte, para que nunca quede texto oculto sin manera de abrirlo.
 - El estado de confianza **nunca depende solo del color**: el punto siempre va con texto
   ("verificar antes de ir", "confirmado hace 12 días").
 - **Foco de teclado visible en todo lo tocable.** Implementado: `:focus-visible` con contorno
@@ -181,10 +222,12 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 - **1080×1080, cuadrada.** No 4:5. El cuadrado nunca se recorta en la vista previa de
   WhatsApp, y cerrar el formato elimina el espacio muerto en vez de rellenarlo.
 - Estructura: fecha, título en serif grande, luego dos columnas (afiche a la izquierda,
-  datos a la derecha en pares etiqueta/valor), precio abajo a la derecha.
+  datos a la derecha en pares etiqueta/valor). **El precio ya no va**: salió de la pantalla y
+  no puede volver por la puerta de atrás en una imagen que además se reenvía durante semanas.
+  Su lugar lo ocupan género y elenco.
 - Pie obligatorio en dos partes: **crédito del afiche** al teatro de origen, y **fecha de
-  verificación de precios**. Lo primero es la mitigación de derechos de autor; lo segundo
-  evita que una imagen reenviada semanas después mienta sobre el precio.
+  verificación**. Lo primero es la mitigación de derechos de autor; lo segundo evita que una
+  imagen reenviada semanas después afirme una función que ya no existe.
 
 ## Pendientes conocidos
 
@@ -194,11 +237,12 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
 | Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
 | Estado de mes vacío | **Hecho y ALCANZABLE.** `.sin-resultados` se ve navegando a un mes sin funciones. Dejó de ser inalcanzable porque `rangoNavegable()` permite un mes más allá del rango cargado — exactamente para que este estado exista de verdad. Verificado en navegador. |
-| Mapa | **Hecho, con un límite geométrico atenuado.** Banda de 260px en móvil, columna a alto completo en escritorio; pines dibujados con CSS, nombre al pasar por encima y tarjeta al tocar. Teselas teñidas por filtro. Caída del CDN verificada: la banda se va a 0px, la columna se retira y la lista queda entera. **Los tres teatros de Miraflores estaban a 3px unos de otros** en la banda: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m, una razón de 39 a 1. En los ~620px de la columna de escritorio esa distancia pasa a unos 15px, o sea que se pueden tocar por separado; en móvil el límite sigue igual. La lista es la navegación real; el mapa contesta "¿está cerca?". |
-| Presupuesto vertical | **A revisar, en las dos pantallas.** En móvil la cabecera (título 32 + mapa 260 + barra 44 + calendario 319) pasa de **650px**: en un celular de 844px se ve el encabezado del día y apenas el borde de la primera tarjeta. En escritorio el problema cambia de forma pero no desaparece: la caja del calendario se lleva ~350px de la columna derecha y a 700px de ventana la lista se queda con ~260px. Conviene mirarlo con datos de un mes completo antes de darlo por bueno. |
-| Calendario del mes | **Hecho.** 42 celdas fijas, lunes primero, punto en los días con función. |
+| Mapa | **Hecho, con un límite geométrico atenuado.** Banda de 260px en móvil, columna a alto completo en escritorio; pines de 20px dibujados con CSS, nombre al pasar por encima y tarjeta al tocar. Mapa base CARTO Positron, sin filtro. **Los dos modos de falla verificados provocándolos de verdad:** con el CDN de Leaflet caído la banda se va a 0px, la columna se retira y la lista queda entera; con solo las teselas caídas la capa cambia sola a OpenStreetMap y la atribución lo refleja. **Los tres teatros de Miraflores estaban a 3px unos de otros** en la banda: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m, una razón de 39 a 1. En los ~620px de la columna de escritorio esa distancia pasa a unos 15px. La lista es la navegación real; el mapa contesta "¿está cerca?". |
+| Presupuesto vertical | **Hecho.** Era el pendiente más viejo. La grilla de 42 celdas pasó a una tira horizontal con el mes plegado detrás de `<details>`: la caja del calendario cayó de ~340px a ~115px en escritorio y ~161px en móvil. Medido en navegador a 386×840 y a 1041×703. En móvil la primera tarjeta ahora empieza a 534px en vez de ~706px. **No se tocó el área táctil**: los chips siguen en 44px. |
+| Calendario del mes | **Hecho.** Tira horizontal de los días que quedan del mes; las 42 celdas fijas siguen existiendo, plegadas en "Ver el mes completo". Lunes primero, punto en los días con función. |
+| Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 12/12 con sinopsis, 8/12 con género, 8/12 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
 | Primera vez | **Parcial.** La app ya se presenta con su nombre en la cabecera, y el mapa avisa mientras carga. Sigue sin haber nada que explique qué es la pantalla. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
-| Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 5 obras, así que la regla 2 de composición no tiene nada que gobernar todavía. |
-| Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. |
+| Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 12 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
+| Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (8 obras con dato) y distrito. |

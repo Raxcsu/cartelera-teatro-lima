@@ -145,6 +145,10 @@ def main() -> int:
                 err(f"{ctx}: lng {lng} esta fuera de Lima")
 
     # ── obras ────────────────────────────────────────────────
+    # Lo que ahora falta llenar. El reporte de abajo apunta aca porque es
+    # aca donde se decide si la tarjeta tiene algo que contar.
+    sin_sinopsis = sin_genero = sin_elenco = 0
+
     for o in obras:
         ctx = f"obra '{o.get('id')}'"
         ini = fecha_valida(o.get("temporada_inicio"), ctx, "temporada_inicio")
@@ -170,9 +174,37 @@ def main() -> int:
         if str(o.get("imagen_local") or "").startswith("http"):
             err(f"{ctx}: imagen_local debe ser una ruta local, no una URL externa")
 
+        # `elenco` es la lista de nombres TAL COMO los publica la fuente.
+        # Nadie decide aca quien es "conocido": si la fuente lo nombra es
+        # porque es el gancho de la obra, y si no nombra a nadie va [].
+        # Deducir fama seria inventar igual que inventar un precio.
+        elenco = o.get("elenco")
+        if elenco is None:
+            avi(f"{ctx}: sin 'elenco'. Va [] si la fuente no publica nombres.")
+            elenco = []
+        elif not isinstance(elenco, list):
+            err(f"{ctx}: 'elenco' tiene que ser una lista, no {type(elenco).__name__}")
+            elenco = []
+        else:
+            for n in elenco:
+                if not isinstance(n, str) or not n.strip():
+                    err(f"{ctx}: el elenco trae un nombre vacio o que no es texto: {n!r}")
+
+        # Regla 2: la fuente viaja con el dato. Vale igual para un texto
+        # que para un precio — una sinopsis sin procedencia es una sinopsis
+        # que nadie puede volver a verificar.
+        if (o.get("sinopsis") or elenco) and not o.get("fuente_url"):
+            err(f"{ctx}: tiene sinopsis o elenco pero no tiene fuente_url")
+
+        if not str(o.get("sinopsis") or "").strip():
+            sin_sinopsis += 1
+        if o.get("tipo") in (None, "", "otro"):
+            sin_genero += 1
+        if not elenco:
+            sin_elenco += 1
+
     # ── funciones ────────────────────────────────────────────
     por_confianza = {c: 0 for c in CONFIANZAS}
-    sin_precio = 0
     vistos = set()
 
     for f in funciones:
@@ -213,7 +245,14 @@ def main() -> int:
         if f.get("estado") not in ESTADOS:
             err(f"{ctx}: estado {f.get('estado')!r} no esta en {sorted(ESTADOS)}")
 
-        # Regla 1: no inventar. Confirmado exige fuente y fecha de verificacion.
+        # Regla 1: no inventar.
+        #
+        # 'confirmado' cambio de sujeto cuando el precio salio de pantalla.
+        # Antes certificaba el precio y por eso se exigia precio_min; ahora
+        # certifica LA FUNCION: "esto va a ocurrir, en esta fecha y en este
+        # teatro". La prueba mas fuerte de eso es poder comprar la entrada,
+        # asi que url_entradas se exige junto con fuente y fecha.
+        #
         # Los registros de andamiaje quedan exentos: no tienen fuente real
         # porque no son datos reales. El flag --deploy impide que salgan.
         if conf == "confirmado" and not f.get("_muestra"):
@@ -221,15 +260,14 @@ def main() -> int:
                 err(f"{ctx}: dice 'confirmado' pero no tiene verificado_el")
             if not f.get("fuente_url"):
                 err(f"{ctx}: dice 'confirmado' pero no tiene fuente_url")
-        if conf == "confirmado" and pmin is None:
-            err(f"{ctx}: dice 'confirmado' pero no tiene precio. Usa 'sin_verificar'.")
+            if not f.get("url_entradas"):
+                err(f"{ctx}: dice 'confirmado' pero no tiene url_entradas. "
+                    "Confirmado es 'esta funcion va a ocurrir'; sin donde "
+                    "comprarla, usa 'probable'.")
 
         ver = fecha_valida(f.get("verificado_el"), ctx, "verificado_el", obligatorio=False)
         if ver and ver > hoy:
             err(f"{ctx}: verificado_el esta en el futuro")
-
-        if pmin is None:
-            sin_precio += 1
 
     # ── lugares ──────────────────────────────────────────────
     for l in lugares:
@@ -266,8 +304,21 @@ def main() -> int:
         pct = f"{100 * n / total:.0f}%" if total else "—"
         barra = "#" * round(20 * n / total) if total else ""
         print(f"  {c:<14} {n:>4}  {pct:>4}  {barra}")
-    print(f"  {'sin precio':<14} {sin_precio:>4}")
     print(f"  {'TOTAL':<14} {total:>4}\n")
+
+    # Lo que le falta a la PANTALLA, que ya no es el precio. Una obra sin
+    # sinopsis, sin genero y sin elenco produce una tarjeta que solo sabe
+    # decir el titulo y la hora, y eso no ayuda a decidir si ir.
+    n_obras = len(obras)
+    print("  COBERTURA DE LA OBRA")
+    print("  " + "-" * 44)
+    for etiqueta, n in (("sin sinopsis", sin_sinopsis),
+                        ("sin genero", sin_genero),
+                        ("sin elenco", sin_elenco)):
+        pct = f"{100 * n / n_obras:.0f}%" if n_obras else "—"
+        barra = "#" * round(20 * n / n_obras) if n_obras else ""
+        print(f"  {etiqueta:<14} {n:>4}  {pct:>4}  {barra}")
+    print(f"  {'TOTAL':<14} {n_obras:>4}\n")
 
     return reportar()
 

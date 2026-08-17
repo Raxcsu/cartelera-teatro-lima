@@ -58,20 +58,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .mapa{height:260px}
 .mapa-caja[hidden]{display:none}
 
-/* El tinte de las teselas.
-   Las de OpenStreetMap son el único bloque de verde y azul saturado en una
-   pantalla de rosa pastel y serif. El filtro las lleva a papel cálido.
-   Va en .leaflet-tile-pane y NO en el contenedor del mapa: Leaflet separa
-   teselas, marcadores, popups y controles en panes distintos, así que teñir
-   solo el de abajo deja los pines rosa, el popup y la atribución con sus
-   contrastes ya verificados. */
-.leaflet-tile-pane{filter:grayscale(.5) sepia(.2) saturate(.9) brightness(1.06) contrast(.94)}
-/* Si el sistema pide más contraste, el mapa se lee antes que combina. */
-@media (prefers-contrast:more){.leaflet-tile-pane{filter:none}}
-/* Pin dibujado, nunca emoji (regla 5 de DESIGN.md). */
-.pin-teatro{display:flex;align-items:center;gap:5px;white-space:nowrap}
-.pin-teatro i{width:11px;height:11px;border-radius:50%;background:var(--accent);
-  border:2px solid #fff;box-shadow:0 1px 3px rgba(58,42,46,.4);flex:0 0 11px}
+/* Acá vivía un filtro sobre .leaflet-tile-pane: las teselas de
+   OpenStreetMap eran el único bloque de verde y azul saturado en una
+   pantalla de rosa pastel y serif, y había que llevarlas a papel cálido.
+   Con CARTO Positron el mapa base YA es gris claro y de bajo contraste
+   —está hecho para eso—, así que el filtro encima solo lo lavaba más y
+   se retiró junto con su excepción de prefers-contrast.
+
+   Si algún día vuelve un mapa base saturado, el filtro vuelve en
+   .leaflet-tile-pane y NUNCA en el contenedor: Leaflet separa teselas,
+   marcadores, popups y controles en panes distintos, y teñir el
+   contenedor apagaría el acento y el semáforo junto con el mar. */
+
+/* Pin dibujado, nunca emoji (regla 5 de DESIGN.md).
+   20px, no 11: a 11 el círculo desaparecía sobre las teselas y había que
+   buscarlo. El número está duplicado en la constante PIN de mapa.js, de
+   donde sale el iconAnchor — si cambia acá, cambia allá, o cada teatro
+   queda corrido de su coordenada real sin que se note. */
+.pin-teatro{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pin-teatro i{width:20px;height:20px;border-radius:50%;background:var(--accent);
+  border:3px solid #fff;box-shadow:0 1px 4px rgba(58,42,46,.45);flex:0 0 20px}
 /* El nombre aparece al pasar por encima o enfocar, NO siempre.
    Los teatros de Miraflores están a 200 m unos de otros: con cinco
    nombres completos fijos en una banda de 168px las etiquetas se pisan
@@ -86,7 +92,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 /* El pin con el cursor encima va al frente, o su nombre queda debajo del vecino. */
 .pin-teatro:hover,.pin-teatro.activo{z-index:1000!important}
 /* `activo` = su tarjeta está abierta. mapa.js la pone y la saca. */
-.pin-teatro.activo i{box-shadow:0 0 0 4px var(--accent-bg),0 1px 3px rgba(58,42,46,.4)}
+.pin-teatro.activo i{box-shadow:0 0 0 5px var(--accent-bg),0 1px 4px rgba(58,42,46,.45)}
 @media (prefers-reduced-motion:no-preference){
   .pin-teatro span{transition:opacity .12s ease,transform .12s ease}
 }
@@ -143,10 +149,51 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .mes-ir:disabled{color:var(--hair);cursor:default}
 .mes-ir:not(:disabled):hover{background:var(--accent-bg)}
 
+/* ── la tira de días ───────────────────────────────────────
+   Una fila en lugar de una grilla de seis: ~115px contra ~340px, y ese
+   aire es exactamente lo que sube la primera obra a pantalla.
+
+   Lleva TODOS los días que quedan del mes, con función o sin ella. Los
+   huecos son información: si solo listara los días con teatro, tres días
+   seguidos se verían idénticos a tres días salteados. */
+.tira{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;
+  padding:10px 0 12px;position:relative;
+  /* La barra se esconde, el scroll queda: en móvil el gesto es táctil y
+     en escritorio están las flechas del mes. */
+  scrollbar-width:none}
+.tira::-webkit-scrollbar{display:none}
+.tira[hidden]{display:none}
+/* 44px de ancho mínimo: el área táctil de DESIGN.md no se negocia. Lo que
+   se achicó para ganar sitio es el NÚMERO de filas, no el tamaño del
+   blanco al que hay que apuntar. */
+.chip{flex:0 0 auto;min-width:var(--tap);scroll-snap-align:start;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:7px 6px 10px;border:1px solid transparent;border-radius:10px;
+  background:none;position:relative;color:var(--ink3)}
+.chip-dia{font:600 9.5px var(--sans);letter-spacing:.07em;text-transform:uppercase}
+.chip-num{font:400 16px/1 var(--sans)}
+.chip.con-funcion{color:var(--ink);cursor:pointer;
+  border-color:var(--line);background:var(--surface)}
+.chip.con-funcion:hover{background:var(--accent-bg);border-color:var(--hair)}
+.chip.con-funcion i{position:absolute;bottom:4px;width:4px;height:4px;
+  border-radius:50%;background:var(--accent)}
+.chip.hoy{color:var(--accent)}
+.chip.hoy .chip-num{font-weight:700}
+.chip.hoy.con-funcion{border-color:var(--accent)}
+
+/* El mes completo, plegado. Sigue siendo el único lugar donde se ve la
+   FORMA del mes —qué cae en fin de semana, dónde están los huecos largos—
+   pero deja de ser lo primero que ocupa la pantalla. */
+.mes-completo{border-top:1px solid var(--line)}
+.mes-completo summary{min-height:var(--tap);display:flex;align-items:center;
+  cursor:pointer;font:600 11.5px var(--sans);color:var(--ink3);letter-spacing:.04em}
+.mes-completo summary::marker{color:var(--hair)}
+.calendario-caja{border-bottom:1px solid var(--line)}
+
 /* ── grilla del mes ────────────────────────────────────────
    42 celdas siempre, así el alto no cambia al pasar de mes y la
    lista de abajo no salta bajo el dedo. */
-.calendario{padding:10px 0 16px;border-bottom:1px solid var(--line)}
+.calendario{padding:10px 0 16px}
 .semana,.grilla{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .semana{font:600 10.5px var(--sans);color:var(--ink3);text-align:center;
   letter-spacing:.06em;margin-bottom:4px}
@@ -175,9 +222,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
   padding:15px;margin-bottom:10px;scroll-margin-top:96px}
 .funcion.resaltada{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
 .funcion h4{font:400 20px/1.18 var(--serif);margin-bottom:5px;overflow-wrap:break-word}
-/* El precio es escaneable sin leer: es la pregunta del producto. */
-.precio{margin-top:9px;font:400 24px/1 var(--serif)}
-.precio small{font:400 11.5px var(--sans);color:var(--ink3);margin-left:6px}
+
+/* ── la obra dentro de la tarjeta ──────────────────────────
+   El orden es el de la pregunta del producto: qué obra es, quién actúa,
+   de qué trata. Acá arriba iba el precio en 24px de serif, que era la
+   pregunta anterior. */
+.elenco{font-size:12.5px;line-height:1.5;color:var(--ink);margin-top:6px}
+.elenco .otros{color:var(--ink3)}
+.sinopsis-caja{margin-top:9px}
+.sinopsis{font-size:13.5px;line-height:1.55;color:var(--ink2)}
+/* El recorte se aplica SOLO con .recortable, y esa clase sale del mismo
+   booleano que decide si hay botón (necesitaRecorte). Recortar siempre
+   escondería el final de una sinopsis apenas larga sin ofrecer cómo
+   abrirlo, que es peor que cuatro líneas. */
+.sinopsis-caja.recortable .sinopsis{display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:3;line-clamp:3;overflow:hidden}
+.sinopsis-caja.recortable.abierta .sinopsis{display:block;overflow:visible}
+.mas-texto{display:inline-flex;align-items:center;min-height:var(--tap);
+  padding:0;border:0;background:none;cursor:pointer;
+  font:600 11.5px var(--sans);color:var(--accent);letter-spacing:.03em}
+.mas-texto:hover{text-decoration:underline}
 
 .acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .acciones:empty{display:none}
@@ -192,8 +256,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .btn.primario:hover{background:#8e4459}
 
 /* ── el bloque de cena, plegado ────────────────────────────
-   Segundo plano de verdad: ni suma al precio ni ocupa la tarjeta
-   hasta que lo abrís. */
+   Segundo plano de verdad: no ocupa la tarjeta hasta que lo abrís, y
+   ya no lleva precios. Solo nombre y distancia de lo que sigue abierto
+   cuando termina la función. */
 .cerca{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
 .cerca summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;
   font:600 11.5px var(--sans);color:var(--ink3);letter-spacing:.04em}
@@ -205,8 +270,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .sitios li{padding:6px 0;border-bottom:1px solid var(--line)}
 .sitios li:last-child{border-bottom:0}
 .sitio-nombre{display:block;font-size:13.5px;color:var(--ink)}
-.total{font:400 17px/1.2 var(--serif);padding-top:4px}
-.total small{display:block;font:400 11px var(--sans);color:var(--ink3);margin-top:3px}
 
 /* Foco de teclado visible en todo lo tocable (DESIGN.md, accesibilidad). */
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -290,13 +353,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
      baja de su tamaño de contenido, así que el overflow de .lista nunca se
      activaría: crecería la página entera y el mapa se iría de cuadro. */
   .panel{grid-area:panel;display:flex;flex-direction:column;min-height:0}
-  /* La grilla de 42 celdas a 44px son 264px fijos, y no se tocan: el área
-     táctil mínima es regla de DESIGN.md. Así que el aire que gana la lista
-     sale de los márgenes de la caja, que es lo único negociable acá. */
+  /* Con la tira, la caja mide ~115px cerrada en vez de los ~340px de la
+     grilla de 42 celdas. Ese es el aire que gana la lista, y sale de
+     mostrar menos días a la vez —no de achicar el blanco al que se
+     apunta, que sigue en los 44px que manda DESIGN.md. */
   .calendario-caja{background:var(--surface);border:1px solid var(--line);
     border-radius:14px;padding:2px 14px 4px;margin-bottom:12px}
   .mes-nav{position:static;margin:0;padding:0;background:none}
-  .calendario{border-bottom:0;padding:6px 0 0}
+  .calendario{padding:6px 0 0}
+  /* Abierto, el mes no puede empujar la lista fuera de la pantalla: el
+     grid le da a la caja el alto que pida y .lista se queda sin sitio.
+     Con scroll propio, el mes completo cabe siempre. */
+  .mes-completo[open]{max-height:46vh;overflow-y:auto}
   .lista{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;
     scrollbar-gutter:stable;padding-right:10px}
   /* Pegajoso dentro de .lista, que es el contenedor que scrollea ahora. */

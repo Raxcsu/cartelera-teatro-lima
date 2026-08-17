@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
   slug, idTeatro, idObra, idFuncion, idLugar,
   diasEntre, confianzaEfectiva, estadoCartelera,
-  formatearSoles, formatearDistancia, rangoPrecio, urlSegura,
-  nombreMes, etiquetaDia,
+  formatearDistancia, urlSegura,
+  nombreMes, etiquetaDia, diaCorto,
+  generoVisible, resumenElenco, necesitaRecorte,
   distanciaMetros, sumarMinutos, cocinaAbierta, lugaresCercanos, horaDeSalida,
-  filtrarFunciones, calcularCostoTotal,
-  agruparPorDia, diasDelMes, mesesConFunciones, desplazarMes, mesInicial, rangoNavegable,
+  filtrarFunciones,
+  agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones, desplazarMes,
+  mesInicial, rangoNavegable,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -117,18 +119,95 @@ describe('estadoCartelera: los dos vacíos son distintos', () => {
 
 // ─────────────────────────────────────────────────────────────
 describe('formato: nunca NaN en pantalla', () => {
-  it('precio null dice "sin precio", no S/ NaN', () => {
-    expect(formatearSoles(null)).toBe('sin precio');
-    expect(formatearSoles(undefined)).toBe('sin precio');
-    expect(formatearSoles(NaN)).toBe('sin precio');
-    expect(formatearSoles(0)).toBe('S/ 0');
-    expect(formatearSoles(148.4)).toBe('S/ 148');
-  });
-
   it('distancias', () => {
     expect(formatearDistancia(null)).toBeNull();
     expect(formatearDistancia(237)).toBe('240 m');
     expect(formatearDistancia(1520)).toBe('1.5 km');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('generoVisible: "otro" no es un género', () => {
+  it('devuelve el género cuando la fuente lo publicó', () => {
+    expect(generoVisible({ tipo: 'comedia' })).toBe('comedia');
+  });
+
+  // 'otro' es literalmente "nadie lo dijo". Escribirlo en la tarjeta
+  // informa menos que dejar la línea afuera.
+  it('"otro" devuelve null, no la palabra "otro"', () => {
+    expect(generoVisible({ tipo: 'otro' })).toBeNull();
+  });
+
+  it('sin tipo, vacío o sin obra devuelve null', () => {
+    expect(generoVisible({ tipo: null })).toBeNull();
+    expect(generoVisible({ tipo: '   ' })).toBeNull();
+    expect(generoVisible({})).toBeNull();
+    expect(generoVisible(null)).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('resumenElenco: los nombres como los publica la fuente', () => {
+  const conElenco = (...elenco) => ({ id: 'o', elenco });
+
+  it('une en español, sin coma antes de la "y"', () => {
+    expect(resumenElenco(conElenco('Aldo Miyashiro')).texto).toBe('Aldo Miyashiro');
+    expect(resumenElenco(conElenco('Aldo Miyashiro', 'Lucho Cáceres')).texto)
+      .toBe('Aldo Miyashiro y Lucho Cáceres');
+    expect(resumenElenco(conElenco('Aldo Miyashiro', 'Lucho Cáceres', 'Ebelin Ortiz')).texto)
+      .toBe('Aldo Miyashiro, Lucho Cáceres y Ebelin Ortiz');
+  });
+
+  it('corta en max y cuenta los que quedan afuera', () => {
+    const r = resumenElenco(conElenco('A', 'B', 'C', 'D', 'E'), 3);
+    expect(r.otros).toBe(2);
+  });
+
+  // Salió así en pantalla: "Con Aldo Miyashiro, Lucho Cáceres y Ebelin
+  // Ortiz y 3 más". La pantalla escribe "y N más" a continuación, así que
+  // la lista no puede traer su propia "y" o quedan dos seguidas.
+  it('con nombres afuera, la lista va con comas y sin "y"', () => {
+    expect(resumenElenco(conElenco('A', 'B', 'C', 'D'), 3).texto).toBe('A, B, C');
+    expect(`Con ${resumenElenco(conElenco('A', 'B', 'C', 'D'), 3).texto} y 1 más`)
+      .not.toMatch(/ y .* y /);
+  });
+
+  it('sin nadie afuera, otros es 0 — nunca "y 0 más"', () => {
+    expect(resumenElenco(conElenco('A', 'B')).otros).toBe(0);
+  });
+
+  // Un elenco vacío tiene que devolver null y no una cadena vacía: la
+  // tarjeta decide con esto si pinta la línea entera o la omite.
+  it('sin elenco devuelve null, nunca una cadena vacía', () => {
+    expect(resumenElenco(conElenco())).toBeNull();
+    expect(resumenElenco({ elenco: null })).toBeNull();
+    expect(resumenElenco({})).toBeNull();
+    expect(resumenElenco(null)).toBeNull();
+    expect(resumenElenco({ elenco: 'Aldo Miyashiro' })).toBeNull();   // string, no lista
+  });
+
+  it('descarta nombres vacíos en vez de dejar comas sueltas', () => {
+    expect(resumenElenco(conElenco('A', '  ', 'B')).texto).toBe('A y B');
+    expect(resumenElenco(conElenco('  ', null))).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('necesitaRecorte: cuándo va el "seguir leyendo"', () => {
+  it('un texto corto no lleva botón', () => {
+    expect(necesitaRecorte('Comedia sobre la amistad.')).toBe(false);
+  });
+
+  it('uno largo sí', () => {
+    expect(necesitaRecorte('x'.repeat(181))).toBe(true);
+    expect(necesitaRecorte('x'.repeat(180))).toBe(false);   // el umbral no es inclusivo
+  });
+
+  // Una obra sin sinopsis no puede ofrecer un botón que no abra nada.
+  it('sin texto, nunca', () => {
+    expect(necesitaRecorte(null)).toBe(false);
+    expect(necesitaRecorte('')).toBe(false);
+    expect(necesitaRecorte(' '.repeat(300))).toBe(false);   // espacios no son sinopsis
   });
 });
 
@@ -173,12 +252,6 @@ describe('filtrarFunciones: fuente única de verdad', () => {
     expect(filtrarFunciones(fs, { desde: '2026-08-24' }, ctx)).toHaveLength(1);
   });
 
-  it('precio null NO se descarta por presupuesto: se desconoce, no es caro', () => {
-    const fs = [f({ id: 'caro', precio_min: 200 }), f({ id: 'desconocido', precio_min: null })];
-    const r = filtrarFunciones(fs, { precioMax: 100 }, ctx);
-    expect(r.map((x) => x.id)).toEqual(['desconocido']);
-  });
-
   it('filtra por tipo, idioma y distrito', () => {
     const fs = [f({ id: 'c' }), f({ id: 'd', obra_id: 'drama-2026' })];
     expect(filtrarFunciones(fs, { tipo: 'comedia' }, ctx).map((x) => x.id)).toEqual(['c']);
@@ -189,131 +262,6 @@ describe('filtrarFunciones: fuente única de verdad', () => {
   it('soloConfirmados deja fuera lo probable y lo sin verificar', () => {
     const fs = [f({ id: 'ok' }), f({ id: 'p', confianza: 'probable' })];
     expect(filtrarFunciones(fs, { soloConfirmados: true }, ctx).map((x) => x.id)).toEqual(['ok']);
-  });
-});
-
-// ─────────────────────────────────────────────────────────────
-describe('calcularCostoTotal: invariantes, no gustos', () => {
-  it('cuenta para dos personas', () => {
-    const c = calcularCostoTotal(f({ precio_min: 60, precio_max: 60 }), null);
-    expect(c.total).toBe(120);
-  });
-
-  it('suma la cena de ambos', () => {
-    const c = calcularCostoTotal(f({ precio_min: 60, precio_max: 60 }), lugares[0]);
-    expect(c.min).toBe(120 + 50);
-    expect(c.max).toBe(120 + 90);
-    expect(c.completo).toBe(true);
-  });
-
-  it('sin precio de entrada el total es null, NUNCA NaN', () => {
-    const c = calcularCostoTotal(f({ precio_min: null, precio_max: null }), lugares[0]);
-    expect(c.total).toBeNull();
-    expect(Number.isNaN(c.total)).toBe(false);
-    expect(c.completo).toBe(false);
-    expect(c.falta).toContain('entradas');
-  });
-
-  // Bug encontrado corriendo la app, no en revisión: sin lugar, `completo`
-  // daba true y la pantalla decía "los dos, con cena" en un plan sin cena.
-  it('sin lugar distingue "no falta nada" de "no hay cena"', () => {
-    const c = calcularCostoTotal(f(), null);
-    expect(c.completo).toBe(true);
-    expect(c.incluyeCena).toBe(false);
-  });
-
-  it('con lugar completo, incluye cena', () => {
-    const c = calcularCostoTotal(f(), lugares[0]);
-    expect(c.completo).toBe(true);
-    expect(c.incluyeCena).toBe(true);
-  });
-
-  it('declara exactamente qué está contando', () => {
-    expect(calcularCostoTotal(f(), null).incluye).toEqual(['entradas x2']);
-    expect(calcularCostoTotal(f(), lugares[0]).incluye).toEqual(['entradas x2', 'cena x2']);
-    expect(calcularCostoTotal(f(), lugares[0], { taxiIdaVuelta: 50 }).incluye)
-      .toEqual(['entradas x2', 'cena x2', 'taxi']);
-  });
-
-  it('un gasto de cena estimado no se disfraza de precio verificado', () => {
-    const estimado = { ...lugares[0], gasto_referencial: true };
-    const c = calcularCostoTotal(f(), estimado);
-    expect(c.estimado).toBe(true);
-    expect(c.incluye).toContain('cena x2 estimada');
-    expect(calcularCostoTotal(f(), lugares[0]).estimado).toBe(false);
-    expect(calcularCostoTotal(f(), null).estimado).toBe(false);
-  });
-
-  // precio_referencial estaba documentado y el codigo lo ignoraba: campo muerto
-  // que la revision cruzada destapo. Aplica la misma regla que la cena.
-  it('una entrada de precio estimado tambien marca el total como estimado', () => {
-    const c = calcularCostoTotal(f({ precio_referencial: true }), null);
-    expect(c.estimado).toBe(true);
-    expect(c.incluye).toContain('entradas x2 estimadas');
-  });
-
-  it('con entrada estimada y cena estimada, ambas se declaran', () => {
-    const lugarEst = { ...lugares[0], gasto_referencial: true };
-    const c = calcularCostoTotal(f({ precio_referencial: true }), lugarEst);
-    expect(c.incluye).toEqual(['entradas x2 estimadas', 'cena x2 estimada']);
-  });
-
-  it('sin precio de entrada, precio_referencial no marca nada', () => {
-    const c = calcularCostoTotal(f({ precio_min: null, precio_referencial: true }), null);
-    expect(c.estimado).toBe(false);
-  });
-
-  it('el taxi no se asume: sin pasarlo, no está en el total', () => {
-    const sin = calcularCostoTotal(f(), lugares[0]);
-    const con = calcularCostoTotal(f(), lugares[0], { taxiIdaVuelta: 50 });
-    expect(con.total - sin.total).toBe(50);
-    expect(sin.incluye).not.toContain('taxi');
-  });
-
-  it('con lugar sin gasto declarado el total es parcial y lo declara', () => {
-    const c = calcularCostoTotal(f(), { gasto_min: null, gasto_max: null });
-    expect(c.completo).toBe(false);
-    expect(c.falta).toContain('cena');
-    expect(c.total).not.toBeNull();
-  });
-});
-
-// ─────────────────────────────────────────────────────────────
-describe('rangoPrecio: el precio se muestra como lo publica la fuente', () => {
-  it('con mínimo y máximo muestra el rango', () => {
-    expect(rangoPrecio(f({ precio_min: 30, precio_max: 50 })).texto).toBe('S/ 30 – 50');
-  });
-
-  // 'Inmaduros' dice "desde 35 soles" y no publica techo. Inventarle uno
-  // sería exactamente lo que prohíbe la Regla 1.
-  it('sin máximo dice "desde", no un rango falso', () => {
-    expect(rangoPrecio(f({ precio_min: 35, precio_max: null })).texto).toBe('desde S/ 35');
-  });
-
-  it('precio único no se muestra como rango de un solo valor', () => {
-    expect(rangoPrecio(f({ precio_min: 40, precio_max: 40 })).texto).toBe('S/ 40');
-  });
-
-  it('sin precio nunca produce NaN', () => {
-    const r = rangoPrecio(f({ precio_min: null, precio_max: null }));
-    expect(r.texto).toBe('sin precio');
-    expect(r.texto).not.toMatch(/NaN/);
-    expect(r.min).toBeNull();
-  });
-
-  it('el precio referencial se marca con virgulilla', () => {
-    const r = rangoPrecio(f({ precio_min: 50, precio_max: null, precio_referencial: true }));
-    expect(r.texto).toBe('desde ~S/ 50');
-    expect(r.estimado).toBe(true);
-  });
-
-  // Mismo criterio que calcularCostoTotal: no hay nada estimado si no hay número.
-  it('referencial sin precio no se marca como estimado', () => {
-    expect(rangoPrecio(f({ precio_min: null, precio_referencial: true })).estimado).toBe(false);
-  });
-
-  it('una función indefinida no rompe', () => {
-    expect(rangoPrecio(undefined).texto).toBe('sin precio');
   });
 });
 
@@ -409,6 +357,67 @@ describe('diasDelMes: la grilla del calendario', () => {
 });
 
 // ─────────────────────────────────────────────────────────────
+describe('diasParaTira: la fila de días', () => {
+  const enAgosto = [
+    f({ id: 'a', fecha: '2026-08-10' }),   // pasado
+    f({ id: 'b', fecha: '2026-08-16' }),   // hoy
+    f({ id: 'c', fecha: '2026-08-22' }),
+    f({ id: 'd', fecha: '2026-08-22' }),
+  ];
+
+  it('arranca en hoy: lo pasado no tiene adónde llevarte', () => {
+    const tira = diasParaTira('2026-08', enAgosto, HOY);
+    expect(tira[0].fecha).toBe(HOY);
+    expect(tira.every((d) => d.fecha >= HOY)).toBe(true);
+  });
+
+  it('llega hasta fin de mes y no se sale', () => {
+    const tira = diasParaTira('2026-08', enAgosto, HOY);
+    expect(tira).toHaveLength(16);                      // del 16 al 31
+    expect(tira[tira.length - 1].fecha).toBe('2026-08-31');
+  });
+
+  // Los huecos son información: si la tira solo listara los días con
+  // teatro, tres días seguidos se verían igual que tres salteados.
+  it('incluye los días SIN función, con cantidad 0', () => {
+    const tira = diasParaTira('2026-08', enAgosto, HOY);
+    const porFecha = Object.fromEntries(tira.map((d) => [d.fecha, d.cantidad]));
+    expect(porFecha['2026-08-22']).toBe(2);
+    expect(porFecha['2026-08-23']).toBe(0);
+    expect(porFecha['2026-08-17']).toBe(0);
+  });
+
+  it('marca hoy, y solo hoy', () => {
+    const tira = diasParaTira('2026-08', enAgosto, HOY);
+    expect(tira.filter((d) => d.esHoy).map((d) => d.fecha)).toEqual([HOY]);
+  });
+
+  it('un mes futuro con funciones entra entero', () => {
+    const enSetiembre = [f({ id: 's', fecha: '2026-09-12' })];
+    expect(diasParaTira('2026-09', enSetiembre, HOY)).toHaveLength(30);
+  });
+
+  // Sin esto la vista pintaría una fila de días muertos debajo de
+  // "este mes ya pasó", contando dos veces la misma noticia.
+  it('un mes íntegramente pasado devuelve lista vacía', () => {
+    expect(diasParaTira('2026-07', enAgosto, HOY)).toEqual([]);
+  });
+
+  // Salió en pantalla: octubre mostraba 31 chips muertos encima del cartel
+  // "nada cargado en octubre". Misma regla que el mapa, que tampoco se
+  // dibuja en un mes sin funciones.
+  it('un mes sin una sola función devuelve lista vacía, no 31 días muertos', () => {
+    expect(diasParaTira('2026-10', enAgosto, HOY)).toEqual([]);
+    expect(diasParaTira('2026-10', [], HOY)).toEqual([]);
+  });
+
+  it('un mes inválido no rompe', () => {
+    expect(diasParaTira('2026-13', [], HOY)).toEqual([]);
+    expect(diasParaTira(null, [], HOY)).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
 describe('mesesConFunciones: qué flechas del calendario se encienden', () => {
   it('devuelve los meses únicos, ordenados', () => {
     expect(mesesConFunciones([
@@ -487,9 +496,24 @@ describe('nombres en español: tabla fija, no Intl', () => {
     expect(etiquetaDia('2026-08-22')).toBe('sábado 22 de agosto');
   });
 
+  it('abrevia el día a tres letras, con tilde', () => {
+    expect(diaCorto('2026-08-22')).toBe('sáb');
+    expect(diaCorto('2026-08-19')).toBe('mié');   // no 'mie'
+    expect(diaCorto('2026-08-17')).toBe('lun');
+    expect(diaCorto('2026-08-23')).toBe('dom');
+  });
+
+  it('las siete abreviaturas son distintas entre sí', () => {
+    const semana = ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20',
+                    '2026-08-21', '2026-08-22', '2026-08-23'].map(diaCorto);
+    expect(new Set(semana).size).toBe(7);
+  });
+
   it('una fecha inválida devuelve null en vez de "undefined de undefined"', () => {
     expect(nombreMes('xx')).toBeNull();
     expect(etiquetaDia(null)).toBeNull();
+    expect(diaCorto('no-es-fecha')).toBeNull();
+    expect(diaCorto(null)).toBeNull();
   });
 });
 

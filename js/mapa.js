@@ -16,10 +16,37 @@ const VERSION = '1.9.4';
 const CDN_JS  = `https://unpkg.com/leaflet@${VERSION}/dist/leaflet-src.esm.js`;
 const CDN_CSS = `https://unpkg.com/leaflet@${VERSION}/dist/leaflet.css`;
 
-// OpenStreetMap exige atribución visible. No es decorativa: es la
-// condición de uso de las teselas.
-const TESELAS = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const CREDITO = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+/**
+ * Las teselas: CARTO Positron, un mapa base gris claro hecho para que lo
+ * que se dibuja encima resalte. Reemplazó al OSM estándar, cuyos verdes y
+ * rutas amarillas competían con los pines y obligaban a un filtro CSS
+ * para calmarlos.
+ *
+ * Es una SEGUNDA dependencia externa, y su modo de falla NO es el de
+ * Leaflet. Si cae el CDN de la librería, crearMapa() devuelve null y la
+ * banda desaparece limpia. Si caen solo las teselas, Leaflet vive y deja
+ * un rectángulo gris con pines flotando sobre nada: el hueco sin
+ * explicación que este proyecto evita. Por eso OSM se queda como
+ * RESPALDO y no como reliquia — ver el manejo de 'tileerror'.
+ *
+ * La atribución no es decorativa en ninguno de los dos: es la condición
+ * de uso. Positron va sobre datos de OSM, así que se acreditan los dos.
+ */
+const OSM = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const TESELAS = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const CREDITO = `${OSM} &copy; <a href="https://carto.com/attributions">CARTO</a>`;
+const TESELAS_RESPALDO = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+/**
+ * Lado del círculo del pin, en píxeles.
+ *
+ * Tiene que coincidir con el `width`/`height` de `.pin-teatro i` en
+ * styles.css, porque de acá sale el `iconAnchor` — la mitad del icono, o
+ * sea el punto del círculo que se apoya en la coordenada real. Si los dos
+ * números se separan, cada teatro queda corrido en pantalla respecto de
+ * dónde está de verdad, y en silencio: el mapa se ve perfectamente bien.
+ */
+const PIN = 20;
 
 let promesaLeaflet = null;
 
@@ -89,7 +116,35 @@ export async function crearMapa(contenedor, puntos = [], opciones = {}) {
       zoomSnap: 0.25,
     });
 
-    L.tileLayer(TESELAS, { attribution: CREDITO, maxZoom: 19 }).addTo(mapa);
+    // `{r}` solo se sustituye por '@2x' si detectRetina está encendido;
+    // sin eso quedaría literal en la URL y las teselas darían 404.
+    const base = L.tileLayer(TESELAS, {
+      attribution: CREDITO, maxZoom: 19, subdomains: 'abcd', detectRetina: true,
+    }).addTo(mapa);
+
+    /**
+     * Respaldo de teselas.
+     *
+     * Que fallen unas pocas es ruido de red normal y no justifica cambiar
+     * de proveedor a mitad de camino. Un fallo sostenido significa que
+     * CARTO no está, y ahí el mapa se queda gris con los pines flotando
+     * sobre nada. Pasado el umbral se pasa a OSM UNA sola vez.
+     *
+     * El orden importa: primero se agrega la capa nueva y recién después
+     * se saca la vieja, o entre las dos operaciones se ve el fondo pelado.
+     */
+    const FALLOS_PARA_CAMBIAR = 6;
+    let fallos = 0;
+    let yaSeCambio = false;
+    base.on('tileerror', () => {
+      if (yaSeCambio || (fallos += 1) < FALLOS_PARA_CAMBIAR) return;
+      yaSeCambio = true;
+      console.warn('Las teselas de CARTO no responden; se pasa a OpenStreetMap.');
+      try {
+        L.tileLayer(TESELAS_RESPALDO, { attribution: OSM, maxZoom: 19 }).addTo(mapa);
+        mapa.removeLayer(base);
+      } catch { /* si tampoco se puede, queda el mapa gris y la lista entera */ }
+    });
 
     for (const p of conCoords) {
       // Pin dibujado con CSS, nunca emoji: renderizan distinto en cada
@@ -99,7 +154,9 @@ export async function crearMapa(contenedor, puntos = [], opciones = {}) {
         html: `<i></i><span>${String(p.nombre ?? '')
           .replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))}</span>`,
         iconSize: null,
-        iconAnchor: [7, 7],
+        // La MITAD del círculo: es el punto que se apoya en la coordenada.
+        // Sale de PIN para que no pueda quedar desfasado del CSS.
+        iconAnchor: [PIN / 2, PIN / 2],
       });
 
       const marca = L.marker([p.lat, p.lng], {

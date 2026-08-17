@@ -2,9 +2,12 @@
 
 **En vivo: https://raxcsu.github.io/cartelera-teatro-lima/**
 
-La cartelera de teatro de Lima del mes, en una pantalla: mapa de los teatros, calendario,
-y por cada función su hora y su precio tal como lo publica la fuente — con el link de compra
-en cuanto esa fuente lo dé. Dónde cenar cerca queda a un toque de distancia, en segundo plano.
+La cartelera de teatro de Lima del mes, en una pantalla: mapa de los teatros, tira de días, y
+por cada función **de qué trata la obra, de qué género es y quién actúa**, con su hora, su
+teatro y el link de compra. Dónde cenar cerca queda a un toque de distancia, en segundo plano.
+
+El precio se guarda con su fuente pero no se muestra: la pregunta que contesta la app es
+"¿qué obra es y vale la pena?", no "¿cuánto sale?".
 
 En el celular va todo apilado; desde 900px de ancho se abre en dos columnas, con el mapa
 grande a la izquierda y el calendario sobre la lista a la derecha.
@@ -23,8 +26,8 @@ Para desarrollo:
 
 ```bash
 npm install                    # solo Vitest, nunca se publica
-npm test                       # 79 pruebas sobre la lógica pura
-npm run validar                # valida los JSON y reporta cobertura de confianza
+npm test                       # 80 pruebas sobre la lógica pura
+npm run validar                # valida los JSON y reporta cobertura de confianza y de obra
 ```
 
 ## Cómo está armado
@@ -43,53 +46,54 @@ scripts/     validar_datos.py — la única puerta de calidad de los datos
 Los datos son archivos JSON. Se editan a mano, se revisan con `git diff` y se publican
 con `git push`. GitHub Pages sirve exactamente los archivos del repo: no hay build.
 
-**El mapa es opcional por diseño.** Leaflet entra por CDN con `import()` dinámico; si no carga,
-su banda desaparece —y en escritorio, su columna entera— y el resto de la pantalla queda
-intacto. Un fallo de red no puede leerse como "no hay teatro".
+**El mapa es opcional por diseño, en dos niveles.** Leaflet entra por CDN con `import()`
+dinámico; si no carga, su banda desaparece —y en escritorio, su columna entera— y el resto de la
+pantalla queda intacto. Y si lo que falla son solo las teselas de CARTO, la capa cambia sola a
+OpenStreetMap en vez de dejar un rectángulo gris. Un fallo de red no puede leerse como "no hay
+teatro".
 
 ## Sobre los datos
 
 Un dato de cartelera tiene fecha de caducidad, así que el proyecto la modela en vez de
 fingir que no existe. Cada función guarda de dónde salió y cuándo se verificó, y la app
-degrada la señal de confianza sola con el paso de los días: un precio confirmado hace seis
-semanas no puede verse igual que uno de hoy.
+degrada la señal de confianza sola con el paso de los días: algo confirmado hace seis
+semanas no puede verse igual que algo de hoy.
 
-**Nunca se inventa un precio.** Si no se pudo verificar, se muestra como no verificado.
-Es preferible a llegar al teatro con un número que ya cambió.
+**Nunca se inventa nada.** No solo el precio: si ninguna fuente publica la sinopsis, va `null` y
+la tarjeta no la muestra. Si nadie publica el género, va `"otro"` y la línea desaparece entera
+en vez de decir "otro". Si nadie nombra al elenco, va `[]`.
 
-### Precio verificado y gasto estimado no son lo mismo
+### Qué certifica el semáforo de confianza
 
-La app distingue dos cosas y las muestra distinto:
+Verde, ámbar o gris, y **siempre acompañado de texto** — nunca solo color. Certifica que **la
+función va a ocurrir**: fecha, hora y teatro. Para llegar a `confirmado`, una función necesita
+fuente, fecha de verificación y link de compra; sin dónde comprarla se queda en `probable`, que
+en pantalla se lee "verificar antes de ir".
 
-| | De dónde sale | Cómo se ve |
-|---|---|---|
-| **Precio de entradas** | publicado por la fuente, tal cual | `S/ 30 – 50`, `desde S/ 35` |
-| **Gasto de cena** | estimación por categoría con base documentada | `~S/ 35 – 60 por persona`, y la etiqueta dice "cena x2 **estimada**" |
+Hoy 20 de las 47 funciones están `confirmado` y 27 `probable`.
 
-El precio grande es el de **una entrada**, no el total para dos: así coincide con el número que
-muestra la ticketera. Si la fuente publica "desde 35" y no da techo, la app dice "desde S/ 35"
-en vez de inventarle un máximo.
+### Sobre el elenco: nadie decide acá quién es "conocido"
 
-Toda estimación lleva `gasto_referencial: true` y la fuente de la estimación en el propio
-JSON. Un número estimado nunca se presenta como precio verificado.
+Los nombres se copian tal como los publica la fuente. Si una fuente nombra a alguien es porque
+es el gancho de la obra; si no nombra a nadie, el elenco va vacío. Deducir fama sería inventar
+igual que inventar un precio.
 
-**Limitación conocida:** la estimación por categoría falla en los locales de alta cocina. Hay
-un caso concreto en los datos actuales: uno de los restaurantes cercanos está entre los mejores
-del mundo y la banda lo estima como una trattoria de barrio. Se corrige poniéndole el gasto
-real en `data/overrides.json`, que sobrevive a todos los refrescos.
+Con una consecuencia incómoda que se respeta igual: dos shows publican solo el nombre de pila de
+sus comediantes ("Maribel y Jaime"), y como un nombre de pila suelto no se puede verificar, su
+elenco queda vacío aunque la información exista en alguna parte.
 
 ### De dónde vienen los datos
 
 - **Teatros:** coordenadas de [Nominatim](https://nominatim.openstreetmap.org/), contrastadas
-  contra la dirección publicada. **Dos de los cinco todavía no están confirmadas** y lo dicen
-  en su propia nota dentro de `data/teatros.json`: el Británico tiene varias sedes en
-  Miraflores y no se sabe cuál tiene el auditorio, y del Teatro Julieta Nominatim resolvió el
-  pasaje pero no el número, así que la coordenada es el centro de la cuadra y no la puerta.
-- **Cartelera:** agregadores editoriales de Lima. Como no son la web oficial del teatro ni el
-  checkout de la ticketera, **toda función está marcada `probable`**, no `confirmado`. Por eso
-  la app dice "verificar antes de ir" en todas.
+  contra la dirección publicada. **Los 11 ya la tienen**, así que todas las funciones aparecen
+  en el mapa.
+- **Cartelera, sinopsis, género y elenco:** Teleticket, Joinnus y agregadores editoriales de
+  Lima (enlima, Infobae), cada dato con su `fuente_url`.
 - **Lugares para cenar:** nombre, coordenada y horario de cierre de cocina salen de
-  [OpenStreetMap](https://www.openstreetmap.org/). El gasto es estimado.
+  [OpenStreetMap](https://www.openstreetmap.org/).
+
+Los precios siguen guardándose con su fuente y su fecha, y el validador los revisa, pero no se
+muestran en pantalla. Lo mismo con el gasto estimado de los restaurantes.
 
 ## Material de terceros
 
@@ -105,19 +109,23 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 ## Estado
 
-Publicado en GitHub Pages, con la interfaz reenfocada al teatro.
+Publicado en GitHub Pages, con la interfaz reenfocada a la obra.
 
-- Lógica pura con 79 pruebas, validador y esquemas de datos.
-- Mapa de teatros, calendario del mes, lista por día y precio de entrada por función.
-- Cartelera real de Lima: 5 teatros, 5 obras y 5 funciones para un sábado, todas con fuente.
+- Lógica pura con 80 pruebas, validador y esquemas de datos.
+- Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,
+  hora, teatro y link de compra.
+- Cartelera real de Lima: 11 teatros, 12 obras y 47 funciones en agosto y septiembre, todas con
+  fuente y todas con link de compra.
 - 53 lugares para cenar con horario de cocina, dentro del desplegable de cada función.
 
-**El cuello de botella son los datos, no la pantalla.** Las 5 funciones son todas del mismo día,
-ninguna tiene link de compra y ningún teatro tiene web cargada, así que el botón "Comprar
-entradas" todavía no aparece: aparece solo cuando el dato exista. `docs/encargo-cartelera.md`
-es el pedido de investigación que cierra ese hueco.
+**El cuello de botella son los datos, no la pantalla**, y se acaba de comprobar otra vez: la
+tarjeta nueva no servía de nada mientras 9 de 12 obras no tuvieran sinopsis. Lo que la hizo
+funcionar fue la investigación. Cobertura actual: **12/12 con sinopsis, 8/12 con género, 8/12
+con elenco**, y los huecos son huecos que ninguna fuente publica.
 
-Después: filtros y tarjeta compartible, ya diseñados en `DESIGN.md` y sin implementar.
+Los 11 teatros tienen coordenadas, así que `npm run validar` sale con **cero avisos**. Lo que
+falta en los datos es menor: solo 4 de los 11 teatros tienen `web`. Después: filtros (por género
+y distrito) y tarjeta compartible, ya diseñados en `DESIGN.md` y sin implementar.
 
 ## Dónde seguir leyendo
 

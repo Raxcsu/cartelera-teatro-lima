@@ -106,16 +106,6 @@ export function estadoCartelera(funciones, hoy) {
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Regla 1 dice que un precio no verificado va como null. La
- * consecuencia obligatoria es que nada aritmético puede tocarlo
- * sin guarda, o la pantalla muestra "S/ NaN".
- */
-export function formatearSoles(monto) {
-  if (monto == null || Number.isNaN(monto)) return 'sin precio';
-  return `S/ ${Math.round(monto)}`;
-}
-
-/**
  * Deja pasar solo http y https. Devuelve null para todo lo demás.
  *
  * Escapar con &lt; y &quot; alcanza para texto, pero NO para un href:
@@ -144,28 +134,76 @@ export function formatearDistancia(metros) {
   return `${(metros / 1000).toFixed(1)} km`;
 }
 
+// ─────────────────────────────────────────────────────────────
+//  La obra en pantalla
+//
+//  Qué se muestra de una obra y qué se calla. Las tres funciones de acá
+//  comparten un criterio: lo que la fuente no publicó se devuelve como
+//  null, nunca como texto de relleno. La tarjeta omite la línea entera
+//  y el hueco queda declarado en vez de disimulado.
+// ─────────────────────────────────────────────────────────────
+
 /**
- * Cómo se lee el precio de una entrada. ÚNICO lugar donde se decide.
+ * El género de una obra, o null.
  *
- * Se muestra el rango tal como lo publica la fuente, sin multiplicar por
- * nadie. Las fuentes son desparejas a propósito y hay que respetarlo:
- * "Cáscaras" publica S/ 30-50, "Inmaduros" publica "desde 35" y no dice
- * techo, "Ipacankure" publica un precio único. Rellenar el techo que
- * falta sería inventar, que es justo lo que prohíbe la Regla 1.
+ * 'otro' NO es un género: es el valor que llevan las obras cuyo género no
+ * publicó ninguna fuente. Mostrarlo pondría la palabra "otro" en la
+ * tarjeta, que informa menos que el silencio.
+ *
+ * Vivía inline dentro de popupTeatro(), en vista.js. Salió acá cuando el
+ * género pasó a verse también en la tarjeta: la misma regla decidida en
+ * dos archivos se separa sola con el tiempo.
  */
-export function rangoPrecio(funcion) {
-  const min = funcion?.precio_min ?? null;
-  const max = funcion?.precio_max ?? null;
+export function generoVisible(obra) {
+  const tipo = String(obra?.tipo ?? '').trim();
+  return tipo && tipo !== 'otro' ? tipo : null;
+}
 
-  // Sin número no hay nada que estimar: mismo criterio que calcularCostoTotal.
-  if (min == null) return { min: null, max: null, texto: 'sin precio', estimado: false };
+/**
+ * El elenco listo para leer: "Aldo Miyashiro, Lucho Cáceres y Ebelin Ortiz".
+ *
+ * Acá NADIE decide quién es "conocido", y es la Regla 1 aplicada a los
+ * nombres. Si la fuente nombra a alguien es porque es el gancho de la
+ * obra; si no nombra a nadie, `elenco` va vacío y esto devuelve null.
+ * Deducir fama sería inventar igual que inventar un precio.
+ *
+ * @returns {{texto: string, otros: number}|null}
+ */
+export function resumenElenco(obra, max = 3) {
+  const nombres = (Array.isArray(obra?.elenco) ? obra.elenco : [])
+    .map((n) => String(n ?? '').trim())
+    .filter(Boolean);
+  if (!nombres.length) return null;
 
-  const estimado = Boolean(funcion?.precio_referencial);
-  const tilde = estimado ? '~' : '';
+  const visibles = nombres.slice(0, Math.max(1, max));
+  const otros = nombres.length - visibles.length;
 
-  if (max == null)  return { min, max: null, texto: `desde ${tilde}${formatearSoles(min)}`, estimado };
-  if (max === min)  return { min, max, texto: `${tilde}${formatearSoles(min)}`, estimado };
-  return { min, max, texto: `${tilde}${formatearSoles(min)} – ${Math.round(max)}`, estimado };
+  // "A", "A y B", "A, B y C". En español no va coma antes de la "y".
+  //
+  // Pero cuando quedan nombres AFUERA, la lista va entera con comas: la
+  // "y" la aporta el "y N más" que la pantalla escribe a continuación.
+  // Poner las dos daba "Con A, B y C y 3 más", que salió así en pantalla.
+  const texto = otros > 0 || visibles.length === 1
+    ? visibles.join(', ')
+    : `${visibles.slice(0, -1).join(', ')} y ${visibles[visibles.length - 1]}`;
+
+  return { texto, otros };
+}
+
+/**
+ * ¿La sinopsis necesita un "seguir leyendo"?
+ *
+ * Cuenta caracteres y NO líneas, a propósito. Las líneas dependen del
+ * ancho, de la tipografía y de dónde caiga cada palabra: para saberlas
+ * hay que medir el DOM, y este archivo no lo toca ni puede tocarlo. El
+ * recorte visual lo hace CSS con line-clamp; esto solo decide si además
+ * hace falta el botón.
+ *
+ * El umbral se erra hacia arriba a propósito: un botón que despliega dos
+ * palabras molesta más que tres líneas de más.
+ */
+export function necesitaRecorte(texto, umbral = 180) {
+  return String(texto ?? '').trim().length > umbral;
 }
 
 /**
@@ -189,8 +227,12 @@ export function nombreMes(anioMes) {
   return `${MESES[mes - 1]} ${m[1]}`;
 }
 
-/** 'sábado 22 de agosto'. null si la fecha no es 'YYYY-MM-DD' válida. */
-export function etiquetaDia(fecha) {
+/**
+ * Descompone 'YYYY-MM-DD' con el día de semana ya girado a lunes = 0.
+ * Privada, y compartida por etiquetaDia() y diaCorto(): la misma
+ * aritmética de fechas escrita dos veces se desincroniza sola.
+ */
+function partesDelDia(fecha) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(fecha ?? ''));
   if (!m) return null;
   const [anio, mes, dia] = [Number(m[1]), Number(m[2]), Number(m[3])];
@@ -198,8 +240,27 @@ export function etiquetaDia(fecha) {
   const t = Date.UTC(anio, mes - 1, dia);
   if (Number.isNaN(t)) return null;
   // getUTCDay(): domingo = 0. Se gira a lunes = 0.
-  const diaSemana = (new Date(t).getUTCDay() + 6) % 7;
-  return `${DIAS[diaSemana]} ${dia} de ${MESES[mes - 1]}`;
+  return { anio, mes, dia, diaSemana: (new Date(t).getUTCDay() + 6) % 7 };
+}
+
+/** 'sábado 22 de agosto'. null si la fecha no es 'YYYY-MM-DD' válida. */
+export function etiquetaDia(fecha) {
+  const p = partesDelDia(fecha);
+  if (!p) return null;
+  return `${DIAS[p.diaSemana]} ${p.dia} de ${MESES[p.mes - 1]}`;
+}
+
+/**
+ * 'sáb'. La abreviatura que va sobre el número en cada chip de la tira,
+ * donde 'sábado' entero no entra.
+ *
+ * Se corta a tres letras CON tilde: 'mié' y no 'mie'. Quitarla para que
+ * los chips midan igual sería un error de ortografía a cambio de nada —
+ * la tilde no ocupa ancho.
+ */
+export function diaCorto(fecha) {
+  const p = partesDelDia(fecha);
+  return p ? DIAS[p.diaSemana].slice(0, 3) : null;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -288,14 +349,14 @@ export function lugaresCercanos(teatro, lugares = [], horaFin, opciones = {}) {
 
 // ─────────────────────────────────────────────────────────────
 //  Filtrado — FUENTE ÚNICA
-//  La lista y las propuestas consumen esta misma función. Si cada
-//  una filtrara por su cuenta, divergirían: cambiás el filtro de
-//  precio en la lista y las propuestas seguirían con el criterio viejo.
+//  La lista, la grilla y el mapa consumen esta misma función. Si cada
+//  uno filtrara por su cuenta, divergirían: cambiás el filtro de género
+//  en la lista y el mapa seguiría pintando pines con el criterio viejo.
 // ─────────────────────────────────────────────────────────────
 
 export function filtrarFunciones(funciones, criterios = {}, ctx = {}) {
   const { obras = {}, teatros = {} } = ctx;
-  const { desde, hasta, tipo, distrito, precioMax, idioma, soloConfirmados } = criterios;
+  const { desde, hasta, tipo, distrito, idioma, soloConfirmados } = criterios;
 
   return funciones.filter((f) => {
     if (f.estado === 'cancelada' || f.estado === 'agotada') return false;
@@ -308,10 +369,6 @@ export function filtrarFunciones(funciones, criterios = {}, ctx = {}) {
     if (tipo && obra?.tipo !== tipo) return false;
     if (idioma && obra?.idioma !== idioma) return false;
     if (distrito && teatro?.distrito !== distrito) return false;
-
-    // Precio null NO se descarta por presupuesto: se desconoce, no es caro.
-    // Descartarlo escondería funciones que quizá sí entran.
-    if (precioMax != null && f.precio_min != null && f.precio_min > precioMax) return false;
 
     if (soloConfirmados && f.confianza !== 'confirmado') return false;
     return true;
@@ -390,6 +447,40 @@ export function diasDelMes(anioMes, funciones = []) {
   return celdas;
 }
 
+/**
+ * Los días de la tira: una fila horizontal en lugar de una grilla de seis.
+ *
+ * La tira es lo primero que se ve del calendario, y por eso lleva TODOS
+ * los días que quedan del mes, no solo los que tienen función. Los huecos
+ * son información: "el jueves no hay nada" es una respuesta. Si la tira
+ * listara únicamente los días con teatro, tres días seguidos con función
+ * se verían idénticos a tres días salteados.
+ *
+ * Lo pasado no entra. Es el mismo corte que ya hacen la lista y el mapa:
+ * un día que ya ocurrió no tiene adónde llevarte.
+ *
+ * Reusa diasDelMes() en vez de rehacer el almanaque.
+ *
+ * Devuelve [] —y la vista entonces no pinta tira— en los DOS casos en que
+ * la fila no señalaría nada:
+ *
+ *  - el mes entero quedó atrás, o
+ *  - no queda ni una función por delante (octubre sin investigar).
+ *
+ * El segundo se vio en pantalla: 31 chips muertos encima de un cartel que
+ * ya decía "nada cargado en octubre", o sea el mismo dato contado dos
+ * veces, una de ellas con ruido. Es la misma regla que ya sigue el mapa,
+ * que en un mes sin funciones tampoco se dibuja. La forma del mes sigue
+ * estando en la grilla, detrás de "Ver el mes completo".
+ */
+export function diasParaTira(anioMes, funciones = [], hoy) {
+  const dias = diasDelMes(anioMes, funciones)
+    .filter((c) => c.dentroDelMes && (!hoy || c.fecha >= hoy))
+    .map((c) => ({ fecha: c.fecha, cantidad: c.cantidad, esHoy: c.fecha === hoy }));
+
+  return dias.some((d) => d.cantidad) ? dias : [];
+}
+
 /** Meses 'YYYY-MM' con al menos una función, ordenados. Decide qué
  *  flechas del calendario se encienden y cuáles se apagan. */
 export function mesesConFunciones(funciones = []) {
@@ -454,90 +545,28 @@ export function mesInicial(meses = [], hoy) {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  Costo — solo para la cena del detalle
-//  El precio que manda en pantalla es rangoPrecio(), la entrada tal
-//  como la publica la fuente. Esto calcula el "y si además cenan",
-//  que vive dentro de la tarjeta expandida.
-// ─────────────────────────────────────────────────────────────
-
-/**
- * Qué entra en el costo de una salida.
- *
- *  entradas × 2  — sí, siempre. Es una salida de dos.
- *  cena × 2      — sí, cuando el plan tiene lugar.
- *  taxi          — NO por defecto, y es la decisión de fondo.
- *
- * El taxi depende de desde dónde salgan y de si van en auto propio.
- * Meter un número fijo haría mentir al filtro de presupuesto, que es
- * exactamente lo que este proyecto no hace con los precios de entrada.
- * Queda como parámetro: si algún día la interfaz pregunta "¿van en
- * taxi?", se pasa acá y el total lo refleja.
- *
- * Devuelve `incluye`: la lista de lo que SÍ está contado. Un booleano
- * no alcanza para ser honesto. La interfaz muestra esa lista, así que
- * el total nunca puede insinuar que cubre algo que no cubre.
- */
-export const PERSONAS = 2;
-
-export function calcularCostoTotal(funcion, lugar, opciones = {}) {
-  const { personas = PERSONAS, taxiIdaVuelta = 0 } = opciones;
-
-  const entradaMin = funcion?.precio_min ?? null;
-  const entradaMax = funcion?.precio_max ?? funcion?.precio_min ?? null;
-  const cenaMin = lugar?.gasto_min ?? null;
-  const cenaMax = lugar?.gasto_max ?? lugar?.gasto_min ?? null;
-
-  const faltaEntrada = entradaMin == null;
-  const faltaCena = lugar != null && cenaMin == null;
-
-  const min = (entradaMin ?? 0) * personas + (cenaMin ?? 0) * personas + taxiIdaVuelta;
-  const max = (entradaMax ?? 0) * personas + (cenaMax ?? 0) * personas + taxiIdaVuelta;
-
-  return {
-    total: faltaEntrada ? null : min,
-    min: faltaEntrada ? null : min,
-    max: faltaEntrada ? null : max,
-    // `completo` = no falta ningún precio de lo que SÍ está incluido.
-    // `incluyeCena` = si hay cena en el plan. Sin este segundo dato la
-    // interfaz decía "los dos, con cena" en planes que no tenían cena:
-    // completo era true porque no faltaba nada... al no haber nada.
-    completo: !faltaEntrada && !faltaCena,
-    incluyeCena: lugar != null,
-    falta: [faltaEntrada && 'entradas', faltaCena && 'cena'].filter(Boolean),
-    // Lo que el total SÍ cuenta. La interfaz lo muestra tal cual, así
-    // el número nunca insinúa que cubre algo que no cubre.
-    incluye: [
-      !faltaEntrada &&
-        `entradas x${personas}${funcion?.precio_referencial ? ' estimadas' : ''}`,
-      lugar != null && !faltaCena &&
-        `cena x${personas}${lugar.gasto_referencial ? ' estimada' : ''}`,
-      taxiIdaVuelta > 0 && 'taxi',
-    ].filter(Boolean),
-    // Ningún precio estimado puede disfrazarse de precio verificado. Vale para
-    // los dos lados: la entrada (precio_referencial) y la cena
-    // (gasto_referencial). La interfaz muestra "~" cuando esto es true.
-    estimado: Boolean(
-      (funcion?.precio_referencial && !faltaEntrada) ||
-      (lugar?.gasto_referencial && !faltaCena),
-    ),
-    personas,
-  };
-}
-
-// ─────────────────────────────────────────────────────────────
-//  Nota sobre el ranking retirado
+//  Notas sobre lo retirado
 //
-//  Hasta la vista de mes existían PESOS, puntuarFuncion(),
+//  El ranking. Hasta la vista de mes existían PESOS, puntuarFuncion(),
 //  proponerPlanes() y motivoDelPrimero(): la app mostraba 3 planes
-//  ordenados por confianza, cercanía, precio y género.
+//  ordenados por confianza, cercanía, precio y género. Se retiraron
+//  cuando el eje del producto pasó a ser el calendario, donde el orden
+//  lo manda la fecha: buscar "qué hay el viernes 28" es incompatible
+//  con una lista ordenada por puntaje.
 //
-//  Se retiraron a propósito. El eje del producto pasó a ser el
-//  calendario, y en un calendario el orden lo manda la fecha: buscar
-//  "qué hay el viernes 28" es incompatible con una lista ordenada por
-//  puntaje. Un ranking además pesaba fuerte la cercanía a un
-//  restaurante, que ya no es protagonista.
+//  El precio. Después existieron rangoPrecio(), calcularCostoTotal(),
+//  PERSONAS y formatearSoles(), y el criterio `precioMax` de
+//  filtrarFunciones(). La pregunta del producto dejó de ser "¿cuánto
+//  sale?" y pasó a ser "¿qué obra es?": el precio de la entrada y el
+//  gasto del restaurante salieron de la pantalla y con ellos las cinco.
 //
-//  Están en el historial de git si alguna vez vuelve la pantalla de
-//  propuestas. No se dejan como código muerto: el proyecto ya arrastra
-//  uno (leerGuardados/alternarGuardado en datos.js) y dos son peor.
+//  Ojo con lo que ESTO no significa: los precios siguen en los JSON,
+//  con su fuente y su fecha, y el validador los sigue revisando. Lo que
+//  se retiró es la manera de mostrarlos, no el dato. Si algún día vuelve
+//  a pantalla, vuelve de acá — y con él la guarda contra "S/ NaN", que
+//  era la consecuencia obligatoria de que un precio pueda ser null.
+//
+//  Todo está en el historial de git. No se deja como código muerto: el
+//  proyecto ya arrastra uno (leerGuardados/alternarGuardado en datos.js)
+//  y dos son peor.
 // ─────────────────────────────────────────────────────────────
