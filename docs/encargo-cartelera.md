@@ -141,6 +141,10 @@ referencia canónica; esto es la versión legible.
 
 - `tipo` — exactamente uno de: `comedia`, `drama`, `musical`, `danza`, `infantil`, `otro`.
   Si la fuente no publica el género, va `otro`. No lo deduzcas del título.
+  **Se ve en pantalla:** la tarjeta que abre un pin del mapa muestra el género debajo del
+  título de la obra, y con `otro` esa línea desaparece entera en vez de decir "otro". Como con
+  `duracion_min`, conseguirlo de la fuente cambia un hueco por un dato. Hoy las 5 obras están
+  en `otro` porque ninguna fuente lo publicó.
 - `idioma` — obligatorio. Importa de verdad: ICPNA y el Británico montan obras en inglés.
 - `duracion_min` — **tiene efecto real, no es un adorno.** La app calcula con ella a qué hora
   termina la función y con eso decide qué restaurantes siguen con la cocina abierta. Si va
