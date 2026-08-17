@@ -57,6 +57,7 @@ y no como un dato de sistema.
 
 | Uso | Regla |
 |---|---|
+| Nombre de la app | sans 12.5px, `letter-spacing:.24em`, mayúsculas, `--accent` |
 | Nombre del mes | serif 22px / 1.1, capitalizado |
 | Título de obra | serif 20px / 1.18 |
 | Precio de entrada | serif 24px / 1 |
@@ -81,11 +82,71 @@ tamaño es lo correcto.
    normal y manda a las flechas. Cartelera vencida cambia a fondo cálido y marca ámbar.
    Fallo de carga tiene su propio fondo y marca roja. Si se parecieran, el modelo de
    confianza quedaría anulado.
-5. **El mapa es opcional, no estructural.** Si Leaflet no carga, su banda desaparece entera
-   y la lista sube: nunca un rectángulo gris esperando. El mapa nunca lleva información que
-   no esté también en la lista.
-6. **La barra de mes es lo único pegajoso de nivel superior.** Al scrollear, mapa y grilla
-   salen y ella queda a 44px. Los encabezados de día se pegan debajo, a `top: var(--tap)`.
+5. **El mapa es opcional, no estructural.** Si Leaflet no carga, su banda desaparece entera y
+   la lista sube; en escritorio se retira además su columna del grid, porque esconder solo la
+   caja dejaría media pantalla vacía. Mientras carga, la caja dice "Cargando el mapa…": nunca
+   un rectángulo esperando sin explicación. El mapa nunca lleva información que no esté también
+   en la lista, y muestra el mismo recorte que ella —de hoy en adelante—, o un pin llevaría a
+   una tarjeta que no existe.
+6. **Lo pegajoso depende de quién scrollea.** En móvil scrollea la página: la barra de mes
+   queda arriba a 44px y los encabezados de día debajo, a `top: var(--tap)`. En escritorio
+   scrollea solo la lista: la barra de mes vive dentro de la caja del calendario, que no se
+   mueve, y los encabezados de día se pegan a `top: 0` dentro de la lista.
+
+## Escritorio: dos columnas desde 900px
+
+Hasta acá solo existían 390px. A 1440px se veía una columna de 430px centrada en un mar de
+fondo rosa, y el mapa encajonado en una banda donde los teatros de Miraflores caían a 3px unos
+de otros.
+
+```
+┌────────────────────────────────────────────────┐
+│              THEATER WITH HER ♥                │  <header> en index.html
+├──────────────────────────┬─────────────────────┤
+│                          │  ‹  agosto  ›       │
+│                          │  L M M J V S D      │  .calendario-caja
+│          MAPA            │  [grilla 42 celdas] │  (fija)
+│    (alto completo)       ├─────────────────────┤
+│                          │  SÁBADO 22       ▲  │
+│                          │  [tarjeta]       │  │  .lista
+│                          │  DOMINGO 23   scroll│  (lo único que scrollea)
+└──────────────────────────┴─────────────────────┘
+   minmax(0,1.15fr)            minmax(0,420px)
+```
+
+- **El breakpoint pide alto además de ancho:** `(min-width:900px) and (min-height:600px)`. En
+  una ventana ancha y baja, un layout de `100dvh` deja la lista sin sitio y la columna de
+  siempre es mejor respuesta.
+- **La página no scrollea; la lista sí.** El mapa queda siempre a la vista, que es la razón de
+  ponerlo en su propia columna.
+- **Sin mapa, la columna se retira entera** y la que queda se acota a 620px y se centra. Un mes
+  de 42 celdas a 1300px de ancho no se lee, se recorre. Pasa de verdad y no solo si se cae el
+  CDN: un mes sin funciones no tiene un solo pin, así que tampoco tiene mapa.
+- **La grilla del mes son 264px fijos** (42 celdas × 44px de área táctil) y no se negocian. Con
+  eso, en una ventana de 700px de alto la lista se queda con unos 260px: dos tarjetas y media.
+  Es el precio de tener calendario y mapa a la vez, y es coherente con una app que es un
+  calendario, pero conviene mirarlo de nuevo cuando entren los datos del mes completo.
+
+### El tinte de las teselas
+
+Las teselas de OpenStreetMap son el único bloque de verde y azul saturado en una pantalla de
+rosa pastel y serif. Se corrigen con un filtro, **no con colores nuevos**: la regla de la paleta
+sigue intacta.
+
+```css
+.leaflet-tile-pane{filter:grayscale(.5) sepia(.2) saturate(.9) brightness(1.06) contrast(.94)}
+@media (prefers-contrast:more){.leaflet-tile-pane{filter:none}}
+```
+
+Va en el *pane* de teselas y no en el contenedor: Leaflet separa teselas, marcadores, popups y
+controles en capas distintas, así que teñir solo la de abajo deja los pines rosa y los
+contrastes ya verificados sin tocar. Si el sistema pide más contraste, el filtro se retira: el
+mapa se lee antes que combina.
+
+La tarjeta que abre un pin —teatro, obra, fechas y horarios, y un "Ver más" que lleva a la
+lista— usa la superficie y la tipografía de las tarjetas de función. **El género aparece solo si
+la fuente lo publicó:** `tipo: "otro"` significa que no lo dijo nadie, y rellenarlo sería
+inventar.
 
 ### Decisión revisada: el mapa vuelve a la pantalla principal
 
@@ -129,15 +190,15 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 
 | Falta | Estado |
 |---|---|
-| Layout de escritorio | **Pendiente.** Solo se diseñó 390px. A 1440px hay que decidir qué pasa. |
+| Layout de escritorio | **Hecho.** Dos columnas desde 900×600: mapa a alto completo a la izquierda, calendario fijo y lista con scroll propio a la derecha. Ver la sección de arriba. Verificado en navegador a 1041×703 y, bajando el breakpoint a propósito, en el repliegue a una columna. |
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
 | Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
 | Estado de mes vacío | **Hecho y ALCANZABLE.** `.sin-resultados` se ve navegando a un mes sin funciones. Dejó de ser inalcanzable porque `rangoNavegable()` permite un mes más allá del rango cargado — exactamente para que este estado exista de verdad. Verificado en navegador. |
-| Mapa | **Hecho, con un límite geométrico conocido.** Banda de 260px, pines dibujados con CSS y nombre al pasar por encima. Caída del CDN verificada: la banda se va a 0px y la lista queda entera. **Los tres teatros de Miraflores quedan a 3px unos de otros** y no se pueden tocar por separado sin acercar el mapa: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m — una razón de 39 a 1 que ninguna altura de banda resuelve. La lista de abajo es la navegación real; el mapa contesta "¿está cerca?". |
-| Presupuesto vertical | **A revisar.** La cabecera (mapa 260 + barra 44 + calendario 319) suma **625px**. En un celular de 844px eso deja ver el encabezado del día y apenas el borde de la primera tarjeta. Es coherente con una app que es un calendario, pero conviene mirarlo con datos de un mes completo antes de darlo por bueno. |
+| Mapa | **Hecho, con un límite geométrico atenuado.** Banda de 260px en móvil, columna a alto completo en escritorio; pines dibujados con CSS, nombre al pasar por encima y tarjeta al tocar. Teselas teñidas por filtro. Caída del CDN verificada: la banda se va a 0px, la columna se retira y la lista queda entera. **Los tres teatros de Miraflores estaban a 3px unos de otros** en la banda: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m, una razón de 39 a 1. En los ~620px de la columna de escritorio esa distancia pasa a unos 15px, o sea que se pueden tocar por separado; en móvil el límite sigue igual. La lista es la navegación real; el mapa contesta "¿está cerca?". |
+| Presupuesto vertical | **A revisar, en las dos pantallas.** En móvil la cabecera (título 32 + mapa 260 + barra 44 + calendario 319) pasa de **650px**: en un celular de 844px se ve el encabezado del día y apenas el borde de la primera tarjeta. En escritorio el problema cambia de forma pero no desaparece: la caja del calendario se lleva ~350px de la columna derecha y a 700px de ventana la lista se queda con ~260px. Conviene mirarlo con datos de un mes completo antes de darlo por bueno. |
 | Calendario del mes | **Hecho.** 42 celdas fijas, lunes primero, punto en los días con función. |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
-| Primera vez | **Pendiente.** Qué ve alguien que abre la app sin saber qué es. |
+| Primera vez | **Parcial.** La app ya se presenta con su nombre en la cabecera, y el mapa avisa mientras carga. Sigue sin haber nada que explique qué es la pantalla. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
 | Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 5 obras, así que la regla 2 de composición no tiene nada que gobernar todavía. |
 | Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. |

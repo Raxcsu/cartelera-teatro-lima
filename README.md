@@ -6,6 +6,9 @@ La cartelera de teatro de Lima del mes, en una pantalla: mapa de los teatros, ca
 y por cada función su hora y su precio tal como lo publica la fuente — con el link de compra
 en cuanto esa fuente lo dé. Dónde cenar cerca queda a un toque de distancia, en segundo plano.
 
+En el celular va todo apilado; desde 900px de ancho se abre en dos columnas, con el mapa
+grande a la izquierda y el calendario sobre la lista a la derecha.
+
 Proyecto personal. Sin framework, sin base de datos, sin paso de build.
 
 ## Arrancar
@@ -41,8 +44,8 @@ Los datos son archivos JSON. Se editan a mano, se revisan con `git diff` y se pu
 con `git push`. GitHub Pages sirve exactamente los archivos del repo: no hay build.
 
 **El mapa es opcional por diseño.** Leaflet entra por CDN con `import()` dinámico; si no carga,
-su banda desaparece y el resto de la pantalla queda intacto. Un fallo de red no puede leerse
-como "no hay teatro".
+su banda desaparece —y en escritorio, su columna entera— y el resto de la pantalla queda
+intacto. Un fallo de red no puede leerse como "no hay teatro".
 
 ## Sobre los datos
 

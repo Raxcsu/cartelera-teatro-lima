@@ -41,9 +41,19 @@ mapa.js     Leaflet por CDN                  ← único trato con red externa  [
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
-`index.html` quedó en 20 líneas: importa `vista.js` y arranca. La capa DOM vivía inline ahí
-hasta que la pantalla creció a mapa + calendario + mes; la mudanza no arrastró lógica de
-negocio porque esa ya estaba separada, que era exactamente la apuesta.
+`index.html` es la cabecera y el arranque, nada más. La capa DOM vivía inline ahí hasta que la
+pantalla creció a mapa + calendario + mes; la mudanza no arrastró lógica de negocio porque esa
+ya estaba separada, que era exactamente la apuesta. **La única excepción es el `<header>` con
+el nombre de la app**, y está ahí a propósito: es constante y no dato, así se ve durante
+"Cargando cartelera…" y sobrevive a los estados de error y de cartelera vencida, que reemplazan
+todo `#app`. De paso es el único `<h1>` de la página, así que ninguna pantalla queda sin
+encabezado de primer nivel.
+
+**Hay dos layouts, no uno responsive a medias.** Debajo de 900×600 es la columna de 430px de
+siempre. Desde ahí es un grid de dos columnas: mapa a alto completo a la izquierda, y a la
+derecha `.calendario-caja` fija sobre `.lista`, que es lo único que scrollea. Lo gobiernan tres
+clases que pone `vista.js`: `pantalla` enciende el grid, `sin-mapa` retira su columna, y el
+envoltorio `.panel` es la columna derecha. El detalle visual está en `DESIGN.md`.
 
 `logica.js` no importa nada y no toca DOM ni red. Todo lo que puede estar mal en un
 cálculo vive ahí y se prueba sin navegador. **Si estás por poner lógica de negocio en
@@ -132,6 +142,36 @@ obras equivocadas y el `git diff` sería ilegible.
   toca ni un carácter de `javascript:alert(1)`, que se ejecuta igual al hacer clic. Los links de
   compra y de fuente los llena una investigación externa (`docs/encargo-cartelera.md`), así que
   el dato entra de afuera. `validar_datos.py` hace la misma comprobación del lado de los datos.
+- **El filtro de las teselas va en `.leaflet-tile-pane`, nunca en el contenedor.** Leaflet
+  separa teselas, marcadores, popups y controles en *panes* distintos. Teñir solo el de abajo
+  deja los pines rosa y los contrastes ya verificados sin tocar; ponerlo en el contenedor
+  apagaría el acento y el semáforo de confianza junto con el mar.
+- **La hoja de Leaflet se inserta ANTES de `styles.css`, no al final del `<head>`.** Trae
+  reglas para el popup, los controles y la atribución con la misma especificidad que las
+  nuestras, y el orden desempata: agregada al final ganaba todas y el mapa se veía por defecto
+  por más que `styles.css` dijera otra cosa. Ver `pedirCss()` en `js/mapa.js`; es lo que evita
+  una fila de `!important`.
+- **`.sin-mapa` no es decorativa.** En móvil alcanzaba con esconder la caja del mapa: la lista
+  subía. En el grid de escritorio, esconder el contenido deja la pista de la columna en pie, o
+  sea media pantalla vacía. La clase retira la columna entera. Se resolvió con una clase y no
+  con `:has()` para no depender de soporte reciente.
+- **`min-height:0` en `.app`, `.panel` y `.lista` es lo que hace posible el scroll interno.**
+  Por defecto un hijo de grid o de flex no baja de su tamaño de contenido, así que el
+  `overflow-y:auto` de la lista nunca se activaría: crecería la página entera y el mapa se
+  iría de cuadro. El síntoma no se parece en nada a la causa.
+- **El ancho del popup se configura en JS, jamás en CSS.** Leaflet mide el contenido y escribe
+  el ancho inline en `.leaflet-popup-content`; una regla que lo pise le rompe el cálculo. Va en
+  `bindPopup({maxWidth, minWidth})`.
+- **`zoomSnap: 0.25`, y no es un capricho.** Por defecto `fitBounds` redondea el zoom hacia
+  abajo al entero más cercano, y medio nivel es un factor de 1,4 de más: los teatros entraban
+  en el 40% del alto y el resto era Lurigancho y mar. En cuartos el error máximo baja a 1,09.
+- **El mapa muestra solo de hoy en adelante, igual que la lista.** Un pin de un teatro cuyas
+  funciones ya pasaron no tiene tarjeta a la que llevar: su "Ver más" no haría nada, y en
+  silencio. Como efecto, un mes enteramente pasado no tiene mapa, y ahí entra `.sin-mapa`.
+- **El popup lo arma `vista.js`, no `mapa.js`.** Llega en el punto como `popupHtml`, ya
+  escapado. `mapa.js` no conoce obras ni precios y no puede empezar a conocerlos por un popup;
+  el id del "Ver más" viaja en el propio botón (`data-ver-mas`) para no tener que leer
+  `_source`, que es API privada de Leaflet.
 - **Una obra sin `duracion_min` se supone de 2 h, y la pantalla lo dice.** El código viejo usaba
   `?? 0`, con lo que la obra "terminaba" a la hora de empezar y `cocinaAbierta()` dejaba pasar
   sitios que ya iban a estar cerrados. `horaDeSalida()` devuelve `supuesta: true` para que la
@@ -152,8 +192,12 @@ Dos reglas que se rompen sin querer:
 ## Estado del proyecto
 
 Fases 0 y 1 terminadas y publicado; encima va el **reenfoque a teatro**: la unidad dejó de ser
-el "plan de dos con cena" y pasó a ser la función. Mapa arriba, calendario del mes, lista por
-día, precio de entrada y links. Los restaurantes viven dentro de un desplegable por tarjeta.
+el "plan de dos con cena" y pasó a ser la función. Mapa, calendario del mes, lista por día,
+precio de entrada y links. Los restaurantes viven dentro de un desplegable por tarjeta.
+
+Encima de eso va el **layout de escritorio**, que era el pendiente #1 de `DESIGN.md`: dos
+columnas desde 900×600, mapa protagonista con teselas teñidas y tarjeta al tocar un pin. Móvil
+no cambió.
 
 En los datos hay 5 teatros, 5 obras, 5 funciones para el sábado 22 de agosto y 53 lugares para
 cenar. **Ninguna función tiene `url_entradas` y ningún teatro tiene `web`**, así que el botón

@@ -3,17 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Teatro Lima</title>
+<title>Theater with her — cartelera de Lima</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- La cabecera es lo único de DOM que NO vive en vista.js, y a propósito:
+     es una constante, no un dato. Puesta acá se ve durante "Cargando
+     cartelera…" y sobrevive a los estados de error y de cartelera vencida,
+     que reemplazan todo #app. Además da el único <h1> de la página, así que
+     ninguna pantalla queda sin encabezado de primer nivel. -->
+<header class="sitio">
+  <h1>Theater with her <span class="corazon" aria-hidden="true"></span></h1>
+</header>
 
 <main id="app" class="app">
   <p class="cargando">Cargando cartelera…</p>
 </main>
 
-<!-- Toda la capa DOM vive en js/vista.js desde que la pantalla creció a
-     mapa + calendario + mes. Acá solo queda el arranque. -->
+<!-- Todo lo demás de la capa DOM vive en js/vista.js desde que la pantalla
+     creció a mapa + calendario + mes. Acá solo queda el arranque. -->
 <script type="module">
 import { arrancar } from './js/vista.js';
 arrancar(document.getElementById('app'));

@@ -25,6 +25,11 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
 
 const DIAS_CORTOS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
+// Topes de la tarjeta del mapa. Un popup que lista once funciones tapa el
+// mapa que lo explica; el resto está a un clic en la lista.
+const OBRAS_EN_POPUP = 3;
+const DIAS_EN_POPUP = 2;
+
 // ── estado de la pantalla ────────────────────────────────────
 let datos = null;
 let hoy = null;
@@ -69,19 +74,35 @@ export async function arrancar(app) {
 // ─────────────────────────────────────────────────────────────
 
 function pintarEsqueleto(app) {
+  // `pantalla` es lo que enciende el layout de dos columnas en escritorio.
+  // Va acá y no en index.html para que las pantallas de cartelera vencida
+  // y de error —que reemplazan todo #app— no la hereden: un aviso va
+  // centrado en una columna, no repartido en un grid con media pantalla
+  // vacía al lado.
+  app.classList.add('pantalla');
+
+  // El envoltorio .panel es la columna derecha del mockup: calendario fijo
+  // arriba y lista con scroll propio abajo. En móvil no hace nada.
   app.innerHTML = `
     ${datos.hayMuestras ? '<p class="andamio">Datos de andamiaje, no cartelera real</p>' : ''}
-    <div class="mapa-caja" hidden><div class="mapa" id="mapa"></div></div>
-    <nav class="mes-nav" aria-label="Navegación por mes">
-      <button type="button" class="mes-ir" data-ir="-1" aria-label="Mes anterior">&lsaquo;</button>
-      <h1 class="mes-nombre" aria-live="polite"></h1>
-      <button type="button" class="mes-ir" data-ir="1" aria-label="Mes siguiente">&rsaquo;</button>
-    </nav>
-    <div class="calendario">
-      <div class="semana" aria-hidden="true">${DIAS_CORTOS.map((d) => `<span>${d}</span>`).join('')}</div>
-      <div class="grilla" role="group" aria-label="Días con función"></div>
+    <div class="mapa-caja" hidden>
+      <div class="mapa" id="mapa"></div>
+      <p class="mapa-esperando">Cargando el mapa…</p>
     </div>
-    <section class="lista" aria-live="polite"></section>`;
+    <div class="panel">
+      <div class="calendario-caja">
+        <nav class="mes-nav" aria-label="Navegación por mes">
+          <button type="button" class="mes-ir" data-ir="-1" aria-label="Mes anterior">&lsaquo;</button>
+          <h2 class="mes-nombre" aria-live="polite"></h2>
+          <button type="button" class="mes-ir" data-ir="1" aria-label="Mes siguiente">&rsaquo;</button>
+        </nav>
+        <div class="calendario">
+          <div class="semana" aria-hidden="true">${DIAS_CORTOS.map((d) => `<span>${d}</span>`).join('')}</div>
+          <div class="grilla" role="group" aria-label="Días con función"></div>
+        </div>
+      </div>
+      <section class="lista" aria-live="polite"></section>
+    </div>`;
 
   app.querySelector('.mes-nav').addEventListener('click', (ev) => {
     const boton = ev.target.closest('.mes-ir');
@@ -154,7 +175,7 @@ function pintarLista(app, delMes) {
     lista.innerHTML = `
       <div class="vacio sin-resultados">
         <div class="marca"><i></i></div>
-        <h2>${huboAlgo ? 'Este mes ya pasó' : `Nada cargado en ${esc(nombreMes(mesVisible) ?? 'este mes')}`}</h2>
+        <h3>${huboAlgo ? 'Este mes ya pasó' : `Nada cargado en ${esc(nombreMes(mesVisible) ?? 'este mes')}`}</h3>
         <p>${huboAlgo
             ? `Las ${delMes.length} funciones de ${esc(nombreMes(mesVisible) ?? '')} quedaron atrás.`
             : 'La cartelera de este mes todavía no se investigó.'}</p>
@@ -167,7 +188,7 @@ function pintarLista(app, delMes) {
 
   lista.innerHTML = dias.map((d) => `
     <section class="dia" id="dia-${d.fecha}">
-      <h2 class="dia-titulo">${esc(etiquetaDia(d.fecha) ?? d.fecha)}</h2>
+      <h3 class="dia-titulo">${esc(etiquetaDia(d.fecha) ?? d.fecha)}</h3>
       <ul class="funciones">${d.funciones.map(tarjeta).join('')}</ul>
     </section>`).join('');
 }
@@ -184,7 +205,7 @@ function tarjeta(f) {
 
   return `
     <li class="funcion" data-teatro="${esc(f.teatro_id)}">
-      <h3>${esc(obra?.titulo ?? f.obra_id)}</h3>
+      <h4>${esc(obra?.titulo ?? f.obra_id)}</h4>
       <p class="meta">${esc(f.hora)} · ${esc(teatro?.nombre ?? '?')}${
         teatro?.distrito ? `, ${esc(teatro.distrito)}` : ''}${
         obra?.duracion_min ? ` · ${esc(obra.duracion_min)} min` : ''}${
@@ -282,18 +303,41 @@ async function pintarMapa(app, delMes) {
   // Si el mapa no se puede crear, la banda vuelve a esconderse abajo.
   caja.hidden = false;
 
+  // Y mientras Leaflet viaja por el CDN, la caja dice que está esperando.
+  // En la banda de móvil eran 260px en blanco un segundo; en la columna de
+  // escritorio es media pantalla, y un rectángulo vacío sin explicación se
+  // lee como "acá no hay nada", que es justo lo que este proyecto evita.
+  const esperando = caja.querySelector('.mapa-esperando');
+  esperando.hidden = false;
+
+  // El mapa muestra lo MISMO que la lista: de hoy en adelante. Un pin de un
+  // teatro cuyas funciones ya pasaron no tiene tarjeta a la que llevar, así
+  // que su "Ver más" no haría nada, y en silencio.
+  const proximas = delMes.filter((f) => f.fecha >= hoy);
+
   // Un teatro por marca, no una por función: cinco funciones en el mismo
-  // teatro son un solo pin con el conteo.
+  // teatro son un solo pin con el conteo y una sola tarjeta.
   const porTeatro = new Map();
-  for (const f of delMes) {
+  for (const f of proximas) {
     const t = datos.teatros[f.teatro_id];
     if (!t) continue;
-    const ya = porTeatro.get(t.id);
-    if (ya) ya.cantidad += 1;
-    else porTeatro.set(t.id, { id: t.id, nombre: t.nombre, lat: t.lat, lng: t.lng, cantidad: 1 });
+    if (!porTeatro.has(t.id)) porTeatro.set(t.id, { teatro: t, funciones: [] });
+    porTeatro.get(t.id).funciones.push(f);
   }
 
-  mapa = await crearMapa(caja.querySelector('.mapa'), [...porTeatro.values()], {
+  const puntos = [...porTeatro.values()].map(({ teatro, funciones }) => ({
+    id: teatro.id,
+    nombre: teatro.nombre,
+    lat: teatro.lat,
+    lng: teatro.lng,
+    cantidad: funciones.length,
+    // El HTML de la tarjeta se arma acá y no en mapa.js: toca obras,
+    // funciones y precios, y necesita esc(). mapa.js no conoce el dominio
+    // y no puede empezar a conocerlo por un popup.
+    popupHtml: popupTeatro(teatro, funciones),
+  }));
+
+  mapa = await crearMapa(caja.querySelector('.mapa'), puntos, {
     alSeleccionar: (id) => {
       const destino = app.querySelector(`.funcion[data-teatro="${CSS.escape(id)}"]`);
       if (!destino) return;
@@ -303,9 +347,69 @@ async function pintarMapa(app, delMes) {
     },
   });
 
+  esperando.hidden = true;
+
   // Si Leaflet no cargó, o no hay un solo teatro ubicable, la banda
   // desaparece y la lista queda intacta. Nunca un hueco gris.
   caja.hidden = !mapa;
+  // Y en escritorio se retira además la columna del grid. Esconder solo la
+  // caja dejaría su pista en pie: media pantalla vacía a la izquierda.
+  app.classList.toggle('sin-mapa', !mapa);
+}
+
+/**
+ * La tarjeta que se abre al tocar un pin: obra, género, teatro, fechas,
+ * horarios y un "Ver más" que lleva a la lista. Es el mockup, con una
+ * salvedad de la Regla 1 del dato — el género solo aparece si la fuente
+ * lo publicó; `tipo: "otro"` es literalmente "nadie lo dijo".
+ *
+ * Devuelve HTML ya escapado. Todo lo que entra pasa por esc().
+ */
+function popupTeatro(teatro, funciones) {
+  const porObra = new Map();
+  for (const f of funciones) {
+    if (!porObra.has(f.obra_id)) porObra.set(f.obra_id, []);
+    porObra.get(f.obra_id).push(f);
+  }
+
+  const obras = [...porObra.entries()].slice(0, OBRAS_EN_POPUP);
+  const otrasObras = porObra.size - obras.length;
+
+  const bloques = obras.map(([obraId, fs]) => {
+    const obra = datos.obras[obraId] ?? null;
+    // 'otro' es el valor que llevan las obras cuyo género no publicó ninguna
+    // fuente. Rellenarlo con algo plausible sería inventar; se omite.
+    const genero = obra?.tipo && obra.tipo !== 'otro' ? obra.tipo : null;
+
+    // agruparPorDia ya ordena por fecha y por hora. Ese orden no puede
+    // vivir en dos lados: si acá se ordenara distinto, el popup y la lista
+    // contarían la misma cartelera en dos secuencias.
+    const todos = agruparPorDia(fs);
+    const dias = todos.slice(0, DIAS_EN_POPUP);
+    const otrosDias = todos.length - dias.length;
+
+    return `
+      <div class="obra">
+        <p class="obra-titulo">${esc(obra?.titulo ?? obraId)}</p>
+        ${genero ? `<p class="meta">${esc(genero)}</p>` : ''}
+        ${dias.map((d) => `<p class="meta">${esc(etiquetaDia(d.fecha) ?? d.fecha)} · ${
+          d.funciones.map((f) => esc(f.hora)).join(', ')}</p>`).join('')}
+        ${otrosDias > 0
+          ? `<p class="mas">y ${otrosDias} ${otrosDias === 1 ? 'fecha más' : 'fechas más'}</p>`
+          : ''}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="popup-teatro">
+      <p class="teatro">${esc(teatro.nombre ?? '')}${
+        teatro.distrito ? ` · ${esc(teatro.distrito)}` : ''}</p>
+      ${bloques}
+      ${otrasObras > 0
+        ? `<p class="mas">y ${otrasObras} ${otrasObras === 1 ? 'obra más' : 'obras más'} en este teatro</p>`
+        : ''}
+      <button type="button" class="btn" data-ver-mas="${esc(teatro.id)}">Ver más</button>
+    </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────

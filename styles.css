@@ -18,6 +18,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
   -webkit-text-size-adjust:100%}
 .app{max-width:430px;margin:0 auto;padding:22px 20px 40px}
 
+/* ── cabecera ──────────────────────────────────────────────
+   Es el único DOM que no vive en vista.js, porque es constante y no
+   dato: así se ve durante la carga y sobrevive a los estados de error
+   y de cartelera vencida, que reemplazan todo #app. */
+.sitio{text-align:center;padding:18px 20px 0}
+.sitio h1{display:inline-flex;align-items:center;gap:13px;
+  font:600 12.5px/1 var(--sans);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent)}
+/* Corazón dibujado: un cuadrado girado 45° y dos círculos. Nunca un emoji
+   ni un "<3" de texto (regla 3 de DESIGN.md). */
+.corazon{position:relative;flex:0 0 9px;width:9px;height:9px;margin:-1px 5px 0 0;
+  background:var(--accent);transform:rotate(-45deg)}
+.corazon::before,.corazon::after{content:'';position:absolute;width:9px;height:9px;
+  border-radius:50%;background:var(--accent)}
+.corazon::before{top:-4.5px;left:0}
+.corazon::after{top:0;right:-4.5px}
+
 .cargando{color:var(--ink2);font-size:14px;padding:40px 0;text-align:center}
 .andamio{background:var(--accent-bg);color:var(--accent);font-size:11.5px;
   padding:7px 11px;border-radius:6px;margin-bottom:14px}
@@ -25,15 +42,32 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .meta a{color:var(--accent)}
 
 /* ── mapa ──────────────────────────────────────────────────
-   Banda compacta. Si Leaflet no carga, vista.js le pone [hidden]
-   y no queda ni un hueco gris: la lista sube y ocupa el lugar. */
-.mapa-caja{border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  margin-bottom:14px;background:var(--surface)}
+   Banda compacta en móvil, columna entera en escritorio. Si Leaflet no
+   carga, vista.js le pone [hidden] a la caja y .sin-mapa a .app: no queda
+   ni un hueco gris ni media pantalla vacía. */
+.mapa-caja{position:relative;border:1px solid var(--line);border-radius:12px;
+  overflow:hidden;margin-bottom:14px;background:var(--surface)}
+/* Se superpone en vez de ocupar sitio: el contenedor del mapa tiene que
+   conservar su caja completa, o Leaflet lo mide mal y encuadra a ciegas. */
+.mapa-esperando{position:absolute;inset:0;display:grid;place-items:center;
+  font-size:12.5px;color:var(--ink3);pointer-events:none}
+.mapa-esperando[hidden]{display:none}
 /* 260px, no 168. Los teatros de Lima caen casi en línea vertical: en una
    banda ancha y baja el grupo entero se aplastaba en 78px de alto. Más
    alto reparte mejor el eje que de verdad se usa. */
 .mapa{height:260px}
 .mapa-caja[hidden]{display:none}
+
+/* El tinte de las teselas.
+   Las de OpenStreetMap son el único bloque de verde y azul saturado en una
+   pantalla de rosa pastel y serif. El filtro las lleva a papel cálido.
+   Va en .leaflet-tile-pane y NO en el contenedor del mapa: Leaflet separa
+   teselas, marcadores, popups y controles en panes distintos, así que teñir
+   solo el de abajo deja los pines rosa, el popup y la atribución con sus
+   contrastes ya verificados. */
+.leaflet-tile-pane{filter:grayscale(.5) sepia(.2) saturate(.9) brightness(1.06) contrast(.94)}
+/* Si el sistema pide más contraste, el mapa se lee antes que combina. */
+@media (prefers-contrast:more){.leaflet-tile-pane{filter:none}}
 /* Pin dibujado, nunca emoji (regla 5 de DESIGN.md). */
 .pin-teatro{display:flex;align-items:center;gap:5px;white-space:nowrap}
 .pin-teatro i{width:11px;height:11px;border-radius:50%;background:var(--accent);
@@ -47,14 +81,53 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .pin-teatro span{font:600 10.5px var(--sans);color:var(--ink);background:rgba(255,255,255,.94);
   padding:1px 5px;border-radius:4px;box-shadow:0 1px 2px rgba(58,42,46,.18);
   opacity:0;transform:translateX(-4px);pointer-events:none}
-.pin-teatro:hover span,.pin-teatro:focus span,.pin-teatro:focus-visible span{opacity:1;transform:none}
+.pin-teatro:hover span,.pin-teatro:focus span,.pin-teatro:focus-visible span,
+.pin-teatro.activo span{opacity:1;transform:none}
 /* El pin con el cursor encima va al frente, o su nombre queda debajo del vecino. */
-.pin-teatro:hover{z-index:1000!important}
+.pin-teatro:hover,.pin-teatro.activo{z-index:1000!important}
+/* `activo` = su tarjeta está abierta. mapa.js la pone y la saca. */
+.pin-teatro.activo i{box-shadow:0 0 0 4px var(--accent-bg),0 1px 3px rgba(58,42,46,.4)}
 @media (prefers-reduced-motion:no-preference){
   .pin-teatro span{transition:opacity .12s ease,transform .12s ease}
 }
-/* Leaflet mete su propio tipo; que no le gane al sistema. */
-.leaflet-container{font-family:var(--sans)}
+
+/* ── el mapa por dentro ────────────────────────────────────
+   Todo lo de acá pisa el CSS de Leaflet. Funciona porque mapa.js inserta
+   la hoja del CDN ANTES de styles.css: si se agregara al final del <head>,
+   Leaflet ganaría todos los empates de especificidad y estas reglas no se
+   verían. Ver pedirCss() en js/mapa.js. */
+.leaflet-container{font-family:var(--sans);background:var(--bg)}
+/* Control de zoom: superficie de tarjeta y glifos de acento. */
+.leaflet-bar{border:0;box-shadow:0 1px 5px rgba(58,42,46,.16)}
+.leaflet-bar a{background:var(--surface);color:var(--accent);
+  border-bottom-color:var(--line)}
+.leaflet-bar a:hover{background:var(--accent-bg);color:var(--accent)}
+.leaflet-bar a.leaflet-disabled{background:var(--surface);color:var(--hair)}
+/* La atribución de OSM no es decorativa: es la condición de uso de las
+   teselas. Se atenúa, nunca se esconde, y --ink3 la deja legible. */
+.leaflet-control-attribution{background:rgba(255,255,255,.88);color:var(--ink3);
+  font:400 10px/1.6 var(--sans);padding:1px 7px}
+.leaflet-control-attribution a{color:var(--ink2)}
+
+/* La tarjeta del pin.
+   El ancho NO se toca desde acá: Leaflet lo mide y lo escribe inline en
+   .leaflet-popup-content. Pisarlo rompe su cálculo y el popup queda
+   descuadrado. Se configura en mapa.js con maxWidth/minWidth. */
+.leaflet-popup-content-wrapper{background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 8px 26px rgba(58,42,46,.14)}
+.leaflet-popup-content{margin:14px 16px}
+.leaflet-popup-tip{background:var(--surface);box-shadow:none}
+.leaflet-popup-close-button{width:var(--tap);height:var(--tap);padding:0;
+  font:400 17px/var(--tap) var(--sans);color:var(--ink3);text-align:center}
+.leaflet-popup-close-button:hover{color:var(--accent);background:none}
+.popup-teatro .teatro{font:600 10.5px var(--sans);letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink3);padding-right:26px;margin-bottom:9px}
+.popup-teatro .obra{padding:9px 0 0;margin-top:9px;border-top:1px solid var(--line)}
+.popup-teatro .obra:first-of-type{padding-top:0;margin-top:0;border-top:0}
+.popup-teatro .obra-titulo{font:400 17px/1.2 var(--serif);margin-bottom:3px}
+.popup-teatro .btn{margin-top:12px;width:100%;justify-content:center}
+.popup-teatro .mas{font-size:11.5px;color:var(--ink3);margin-top:9px}
 
 /* ── navegación de mes ─────────────────────────────────────
    Pegajosa arriba: al scrollear, el mapa y la grilla salen y esta
@@ -101,16 +174,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .funcion{background:var(--surface);border:1px solid var(--line);border-radius:12px;
   padding:15px;margin-bottom:10px;scroll-margin-top:96px}
 .funcion.resaltada{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
-.funcion h3{font:400 20px/1.18 var(--serif);margin-bottom:5px;overflow-wrap:break-word}
+.funcion h4{font:400 20px/1.18 var(--serif);margin-bottom:5px;overflow-wrap:break-word}
 /* El precio es escaneable sin leer: es la pregunta del producto. */
 .precio{margin-top:9px;font:400 24px/1 var(--serif)}
 .precio small{font:400 11.5px var(--sans);color:var(--ink3);margin-left:6px}
 
 .acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .acciones:empty{display:none}
-.btn{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 15px;
+/* Sirve para <a> y para <button> (el "Ver más" del popup lo es, porque
+   desplaza la lista y no navega a ninguna parte). */
+.btn{display:inline-flex;align-items:center;justify-content:center;
+  min-height:var(--tap);padding:0 15px;
   border-radius:9px;border:1px solid var(--hair);color:var(--accent);
-  font:600 12.5px var(--sans);text-decoration:none}
+  background:none;cursor:pointer;font:600 12.5px var(--sans);text-decoration:none}
 .btn.primario{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn:hover{background:var(--accent-bg)}
 .btn.primario:hover{background:#8e4459}
@@ -144,7 +220,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 /* Los dos vacíos son visualmente distintos a propósito. Si se
    parecieran, el modelo de confianza quedaría anulado en la práctica. */
 .vacio{text-align:center;padding:70px 26px}
-.vacio h2{font:400 22px/1.25 var(--serif);margin-bottom:9px}
+/* h2 en las pantallas que se renderizan solas (vencida, error) y h3 en el
+   vacío que vive dentro de la lista: el nivel sigue al lugar, no al estilo. */
+.vacio h2,.vacio h3{font:400 22px/1.25 var(--serif);margin-bottom:9px}
 .vacio p{font-size:13.5px;line-height:1.6;color:var(--ink2)}
 .vacio .nota{font-size:11.5px;color:var(--ink3);margin-top:14px}
 .vacio code{font-family:ui-monospace,monospace;font-size:11.5px;
@@ -170,6 +248,59 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 @media (prefers-reduced-motion:no-preference){
   .funcion{transition:border-color .15s ease,box-shadow .15s ease}
 }
+/* En escritorio la que scrollea es .lista, no el documento: la suavidad
+   tiene que declararse en las dos, y apagarse en las dos. */
 @media (prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
+  html,.lista{scroll-behavior:auto}
+}
+
+/* ── escritorio ────────────────────────────────────────────
+   A partir de acá la pantalla deja de ser una columna de 430px: mapa a la
+   izquierda a alto completo, y a la derecha el calendario fijo sobre la
+   lista, que es lo único que scrollea.
+
+   Pide alto además de ancho a propósito. En una ventana ancha y baja
+   (900x500, un portátil con la consola abierta) un layout de 100dvh deja
+   la lista sin sitio, y ahí la columna de siempre es mejor respuesta. */
+@media (min-width:900px) and (min-height:600px){
+  body{height:100vh;height:100dvh;display:flex;flex-direction:column}
+  .sitio{padding:20px 28px 14px}
+  .app{max-width:1320px;width:100%;flex:1;min-height:0;padding:0 28px 24px}
+
+  /* La clase `pantalla` la pone pintarEsqueleto(). Los estados de cartelera
+     vencida y de error reemplazan todo #app y por eso NO la heredan: siguen
+     siendo una columna centrada, que es lo que corresponde a un aviso. */
+  .app.pantalla{display:grid;gap:0 22px;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,420px);
+    grid-template-rows:auto minmax(0,1fr);
+    grid-template-areas:"aviso aviso" "mapa panel"}
+  /* Sin mapa se retira la columna entera, no solo su contenido: esconder
+     la caja y dejar la pista del grid deja media pantalla vacía. Pero la
+     columna que queda NO se estira a los 1300px: un mes de 42 celdas a ese
+     ancho no se lee, se recorre. Se acota y se centra.
+     Pasa de verdad, y no solo si se cae el CDN: un mes sin funciones no
+     tiene un solo pin, así que tampoco tiene mapa. */
+  .app.pantalla.sin-mapa{grid-template-columns:minmax(0,620px);
+    grid-template-areas:"aviso" "panel";justify-content:center}
+  .andamio{grid-area:aviso}
+  .mapa-caja{grid-area:mapa;display:flex;margin:0;border-radius:14px}
+  .mapa{flex:1;min-height:0;height:auto}
+
+  /* min-height:0 no es adorno. Por defecto un hijo de grid o de flex no
+     baja de su tamaño de contenido, así que el overflow de .lista nunca se
+     activaría: crecería la página entera y el mapa se iría de cuadro. */
+  .panel{grid-area:panel;display:flex;flex-direction:column;min-height:0}
+  /* La grilla de 42 celdas a 44px son 264px fijos, y no se tocan: el área
+     táctil mínima es regla de DESIGN.md. Así que el aire que gana la lista
+     sale de los márgenes de la caja, que es lo único negociable acá. */
+  .calendario-caja{background:var(--surface);border:1px solid var(--line);
+    border-radius:14px;padding:2px 14px 4px;margin-bottom:12px}
+  .mes-nav{position:static;margin:0;padding:0;background:none}
+  .calendario{border-bottom:0;padding:6px 0 0}
+  .lista{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;
+    scrollbar-gutter:stable;padding-right:10px}
+  /* Pegajoso dentro de .lista, que es el contenedor que scrollea ahora. */
+  .dia-titulo{top:0}
+  .funcion{scroll-margin-top:44px}
+  .vacio{padding:52px 22px}
 }
