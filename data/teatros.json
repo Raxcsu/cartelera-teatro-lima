@@ -156,6 +156,19 @@
       "fuente_url": "https://teleticket.com.pe/evento/guapotes-en-vivo-teatro-canout",
       "verificado_el": "2026-08-16",
       "_nota": "Coordenada de ficha OSM en mapcarta (Teatro Canout; dirección OSM 4542, misma cuadra que 4550)."
+    },
+    {
+      "id": "teatro-de-la-alianza-francesa-de-lima",
+      "nombre": "Teatro de la Alianza Francesa de Lima",
+      "direccion": "Avenida Arequipa 4595",
+      "distrito": "Miraflores",
+      "lat": -12.111416,
+      "lng": -77.030059,
+      "web": "https://www.alianzafrancesa.org.pe",
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Av. Arequipa 4595). Sala donde Éxodo Teatro presenta 'Las bodas de Fígaro'."
     }
   ]
 }
