@@ -259,7 +259,16 @@
       "titulo": "Las bodas de Fígaro",
       "sinopsis": "Clásico de Beaumarchais dirigido por Jean Pierre Gamarra (Éxodo Teatro). Un día de enredos en el castillo del Conde Almaviva: Fígaro y Susana están por casarse, pero el Conde intenta seducir a Susana y los sirvientes conspiran para desenmascararlo. Comedia sobre poder, deseo y enredos.",
       "tipo": "comedia",
-      "elenco": [],
+      "elenco": [
+        "Fernando Luque",
+        "María Grazia Gamarra",
+        "Óscar Yépez",
+        "Amaranta Kun",
+        "Alonso Cano",
+        "Denise Arregui",
+        "Alejandro Tagle",
+        "Martín Aliaga"
+      ],
       "idioma": "español",
       "duracion_min": null,
       "clasificacion": null,
@@ -269,7 +278,7 @@
       "imagen_credito": null,
       "fuente_url": "https://elcomercio.pe/luces/teatro/las-bodas-de-figaro-jean-pierre-gamarra-lleva-a-escena-una-comedia-sobre-poder-deseo-y-enredos-teatro-noticia/",
       "verificado_el": "2026-08-16",
-      "_nota": "Coproducción de Éxodo Teatro y la Alianza Francesa de Lima. Elenco: Fernando Luque, María Grazia Gamarra, entre otros."
+      "_nota": "Coproducción de Éxodo Teatro y la Alianza Francesa de Lima. Dirige Jean Pierre Gamarra. El elenco sale del mismo artículo de El Comercio que la sinopsis; antes vivía resumido en esta nota (\"Fernando Luque, María Grazia Gamarra, entre otros\") y por eso el campo iba vacío."
     },
     {
       "id": "la-logica-del-escorpion-2026",

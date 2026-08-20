@@ -10,6 +10,9 @@ Uso:
     python scripts/validar_datos.py            # valida y reporta
     python scripts/validar_datos.py --deploy   # ademas falla si quedan
                                                # registros de muestra
+    python scripts/validar_datos.py --permitir-regresion
+                                               # baja a aviso la perdida de
+                                               # campos investigados
 
 Codigo de salida != 0 si hay errores. Pensado para usarse como hook
 de pre-commit.
@@ -103,6 +106,68 @@ def fecha_valida(valor, ctx: str, campo: str, obligatorio: bool = True) -> date 
     except ValueError:
         err(f"{ctx}: '{campo}' = {valor!r} no es una fecha YYYY-MM-DD")
         return None
+
+
+# Campos que cuestan investigacion y que un refresco automatico no sabe
+# reproducir. Son los que se perdieron en 20c1888 sin que nadie lo notara.
+VIGILADOS = ("sinopsis", "elenco", "duracion_min", "clasificacion", "tipo")
+
+
+def _vacio(v) -> bool:
+    # "otro" no es un genero: es "nadie lo dijo". Cuenta como hueco.
+    return v in (None, "", [], {}) or v == "otro"
+
+
+def obras_en_head():
+    """La version de data/obras.json que hay en git, o None si no se puede leer.
+
+    Devolver None no es un error: un repo recien clonado sin commits, o un
+    entorno sin git, no tienen con que comparar y eso no invalida los datos.
+    """
+    import subprocess
+    try:
+        r = subprocess.run(["git", "show", "HEAD:data/obras.json"],
+                           cwd=RAIZ, capture_output=True, timeout=30)
+        if r.returncode != 0:
+            return None
+        return {o["id"]: o for o in json.loads(r.stdout.decode("utf-8"))["obras"]}
+    except Exception:
+        return None
+
+
+def regresion_de_datos(obras, permitir: bool) -> None:
+    """Falla si un campo investigado paso de tener dato a estar vacio.
+
+    El resto del validador comprueba que cada obra sea legal POR SI SOLA, y
+    por la regla 1 un hueco declarado (null, [], "otro") siempre lo es. Eso
+    deja un punto ciego: borrar es indistinguible de ser honesto. La unica
+    forma de ver la diferencia es comparar contra la version anterior.
+
+    Se compara obra por obra, NO el total. Una obra que sale de cartelera baja
+    la cobertura global sin que se haya perdido nada, y hacerla fallar por eso
+    entrenaria a saltarse el guardarrail.
+    """
+    antes = obras_en_head()
+    if antes is None:
+        avi("sin version en git con que comparar: no se pudo revisar regresion de datos.")
+        return
+
+    perdidas = []
+    for o in obras:
+        v = antes.get(o.get("id"))
+        if not v:
+            continue                      # obra nueva: no hay nada que perder
+        for campo in VIGILADOS:
+            if not _vacio(v.get(campo)) and _vacio(o.get(campo)):
+                perdidas.append(f"{o['id']}.{campo}")
+
+    if not perdidas:
+        return
+    detalle = ", ".join(perdidas[:8]) + (f" (+{len(perdidas) - 8} mas)" if len(perdidas) > 8 else "")
+    msg = (f"{len(perdidas)} campo(s) investigados quedaron vacios respecto de git: {detalle}. "
+           "Si fue un refresco que los piso, reponelos y ponelos en data/overrides.json. "
+           "Si el dato resulto falso y el hueco es correcto, corre con --permitir-regresion.")
+    avi(msg) if permitir else err(msg)
 
 
 def main() -> int:
@@ -294,6 +359,9 @@ def main() -> int:
             err(f"quedan {muestras} registros de andamiaje (_muestra:true). No se despliega con datos falsos.")
         else:
             avi(f"{muestras} registros de andamiaje (_muestra:true) todavia presentes.")
+
+    # ── regresion contra git ─────────────────────────────────
+    regresion_de_datos(obras, "--permitir-regresion" in sys.argv)
 
     # ── reporte de cobertura ─────────────────────────────────
     total = len(funciones)

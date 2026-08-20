@@ -13,6 +13,7 @@ npm run test:watch                # reejecuta al guardar
 
 npm run validar                   # valida los JSON, reporta cobertura de confianza
 python scripts/validar_datos.py --deploy   # además falla si quedan _muestra
+python scripts/validar_datos.py --permitir-regresion   # baja a aviso la pérdida de datos
 
 npm run serve                     # la app en http://127.0.0.1:8000
 ```
@@ -138,7 +139,19 @@ obras equivocadas y el `git diff` sería ilegible.
   distinto texto y distinta acción. Si se parecieran, el modelo de confianza quedaría anulado
   en la práctica: el usuario leería "no hay teatro" en los tres casos.
 - **`data/overrides.json` se aplica ENCIMA de todo refresco.** Ahí van las correcciones
-  humanas. Sin eso, verificás una coordenada a mano y el siguiente refresco la borra.
+  humanas. Sin eso, verificás una coordenada a mano y el siguiente refresco la borra. Dejó de
+  ser teoría: el refresco de `20c1888` regeneró `obras.json` y borró 8 sinopsis, 8 elencos y 4
+  géneros de un saque, con el archivo de overrides vacío. Hoy lleva **13 obras** con los campos
+  que la investigación ganó a mano. Va SOLO eso: si se le mete lo que trae el refresco, deja de
+  ser un archivo de correcciones y pasa a ser una segunda copia de los datos.
+- **El validador falla si un campo investigado se vacía respecto de git, y eso NO contradice la
+  regla 1.** Cada obra por separado siempre es legal —un hueco declarado (`null`, `[]`, `"otro"`)
+  es exactamente lo que la regla 1 pide—, así que el resto del validador no puede distinguir
+  "nadie lo publica" de "alguien lo borró". La única forma de ver la diferencia es comparar
+  contra la versión anterior: eso hace `regresion_de_datos()`. Compara **obra por obra y no el
+  total**, porque una obra que sale de cartelera baja la cobertura global sin que se haya
+  perdido nada, y hacerla fallar por eso enseñaría a saltarse el guardarraíl. Si el hueco es
+  correcto porque el dato resultó falso, `--permitir-regresion` lo baja a aviso.
 - **El precio no está en pantalla, pero sí en los JSON.** Se retiraron `rangoPrecio()`,
   `calcularCostoTotal()`, `PERSONAS`, `formatearSoles()` y el criterio `precioMax` de
   `filtrarFunciones()`: lo que se fue es la manera de mostrarlos, no el dato. Siguen con su
@@ -249,18 +262,19 @@ actual de la pantalla. La pregunta del producto dejó de ser *"¿cuánto sale?"*
   completo plegado detrás de `<details>`. Son ~180px menos, que es lo que sube la obra.
 - El mapa cambió a teselas **CARTO Positron** y el círculo de los teatros pasó de 11 a 20px.
 
-En los datos hay 11 teatros, 12 obras, 47 funciones repartidas en agosto y septiembre, y 53
-lugares para cenar. Las 47 funciones tienen `url_entradas`, así que el botón "Comprar entradas"
-ya sale en pantalla. Cobertura de la obra tras la investigación: **12/12 con sinopsis, 8/12 con
-género real, 8/12 con elenco**. Los 4 huecos de cada uno son huecos declarados —ninguna fuente
-los publica— y así tienen que quedarse hasta que alguna lo haga.
+En los datos hay 18 teatros, 20 obras, 122 funciones repartidas en agosto y septiembre, y 53
+lugares para cenar. **94 de las 122 funciones tienen `url_entradas`**, así que el botón "Comprar
+entradas" sale en esas y no en el resto. Cobertura de la obra: **13/20 con sinopsis, 12/20 con
+género real, 9/20 con elenco**. Casi todos los huecos son de las 7 obras que trajo el último
+refresco y que todavía no pasaron por investigación; el resto son huecos declarados —ninguna
+fuente los publica— y así tienen que quedarse hasta que alguna lo haga.
 
-**Los 11 teatros ya tienen coordenadas**, así que por primera vez todas las funciones aparecen
+**Los 18 teatros tienen coordenadas**, así que todas las funciones aparecen
 en el mapa y `npm run validar` sale con **cero avisos**. De paso se corrigió la dirección del
 Británico y se resolvió el conflicto de sede de *Noche de enredos*, que Teleticket titula
 "Centro Cultural Ricardo Palma" pero se da en el Teatro Auditorio Miraflores.
 
-Lo que sigue faltando: solo 4 de los 11 teatros tienen `web`.
+Lo que sigue faltando: solo 7 de los 18 teatros tienen `web`.
 
 **Se retiró el ranking.** `PESOS`, `puntuarFuncion()`, `proponerPlanes()` y `motivoDelPrimero()`
 ya no existen: en un calendario el orden lo manda la fecha, y buscar "qué hay el viernes 28" es
@@ -273,8 +287,10 @@ en pie y se acaba de repetir con la sinopsis: **esto es un proyecto de datos dis
 proyecto de interfaz**. La tarjeta nueva no valía nada mientras 9 de 12 obras no tuvieran de
 qué hablar; lo que la hizo funcionar fue la investigación, no el CSS.
 
-**20 de las 47 funciones están `confirmado`** (43%), y el resto `probable`. Ojo con la
-comparación histórica: hasta el reenfoque ninguna llegaba a `confirmado` porque el semáforo
+**25 de las 122 funciones están `confirmado`** (20%), 52 `probable` y 45 `sin_verificar`. El
+porcentaje cayó respecto del 43% anterior y no es que los datos hayan empeorado: el último
+refresco casi triplicó el total, y lo que entra nuevo entra sin confirmar. Ojo también con la
+comparación más vieja: hasta el reenfoque ninguna llegaba a `confirmado` porque el semáforo
 certificaba el precio y los precios salían de agregadores editoriales. Ahora certifica que la
 función existe y la prueba es `url_entradas`, que es un criterio distinto — no es que los datos
 hayan mejorado de golpe, es que se está midiendo otra cosa.

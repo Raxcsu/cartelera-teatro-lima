@@ -119,6 +119,21 @@
       ],
       "duracion_min": 60,
       "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "las-bodas-de-figaro-2026": {
+      "sinopsis": "Clásico de Beaumarchais dirigido por Jean Pierre Gamarra (Éxodo Teatro). Un día de enredos en el castillo del Conde Almaviva: Fígaro y Susana están por casarse, pero el Conde intenta seducir a Susana y los sirvientes conspiran para desenmascararlo. Comedia sobre poder, deseo y enredos.",
+      "tipo": "comedia",
+      "elenco": [
+        "Fernando Luque",
+        "María Grazia Gamarra",
+        "Óscar Yépez",
+        "Amaranta Kun",
+        "Alonso Cano",
+        "Denise Arregui",
+        "Alejandro Tagle",
+        "Martín Aliaga"
+      ],
+      "_motivo": "Elenco verificado contra el articulo de El Comercio el 2026-08-20 (8 interpretes, no los 2 que resumia la nota)."
     }
   },
   "funciones": {},
