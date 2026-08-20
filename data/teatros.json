@@ -169,6 +169,84 @@
       "fuente_url": "https://geocode.arcgis.com/",
       "verificado_el": "2026-08-16",
       "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Av. Arequipa 4595). Sala donde Éxodo Teatro presenta 'Las bodas de Fígaro'."
+    },
+    {
+      "id": "centro-cultural-cafae-se",
+      "nombre": "Centro Cultural CAFAE-SE",
+      "direccion": "Avenida Arequipa 2985",
+      "distrito": "San Isidro",
+      "lat": -12.095192,
+      "lng": -77.032622,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Av. Arequipa 2985)."
+    },
+    {
+      "id": "teatro-de-lucia",
+      "nombre": "Teatro de Lucía",
+      "direccion": "Calle Bellavista 512",
+      "distrito": "Miraflores",
+      "lat": -12.122914,
+      "lng": -77.032996,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Calle Bellavista 512)."
+    },
+    {
+      "id": "teatro-la-plaza",
+      "nombre": "Teatro La Plaza",
+      "direccion": "Larcomar, Malecón de la Reserva 610",
+      "distrito": "Miraflores",
+      "lat": -12.133992,
+      "lng": -77.028222,
+      "web": "https://www.teatrolaplaza.com",
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "En Larcomar. Coordenada geocodificada por ArcGIS a nivel de Malecón de la Reserva."
+    },
+    {
+      "id": "teatro-municipal-de-surco",
+      "nombre": "Teatro Municipal de Surco",
+      "direccion": "Calle Sacramento 236",
+      "distrito": "Santiago de Surco",
+      "lat": -12.130193,
+      "lng": -76.980342,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (Calle Sacramento 236, Las Gardenias). La dirección exacta del recinto varía entre fuentes (también citada Av. Caminos del Inca): VERIFICAR."
+    },
+    {
+      "id": "multiteatro-movistar",
+      "nombre": "Multiteatro Movistar",
+      "direccion": "Avenida Alfredo Benavides 4981",
+      "distrito": "Santiago de Surco",
+      "lat": -12.128274,
+      "lng": -76.985287,
+      "web": null,
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Av. Benavides 4981)."
+    },
+    {
+      "id": "club-de-teatro-de-lima",
+      "nombre": "Club de Teatro de Lima",
+      "direccion": "Avenida 28 de Julio 183",
+      "distrito": "Miraflores",
+      "lat": -12.125533,
+      "lng": -77.032421,
+      "web": "https://clubdeteatrodelima.com/",
+      "como_llegar": null,
+      "fuente_url": "https://geocode.arcgis.com/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Coordenada geocodificada por ArcGIS (match exacto de Av. 28 de Julio 183)."
     }
   ]
 }

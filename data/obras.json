@@ -4,6 +4,7 @@
     "titulo": "string",
     "sinopsis": "string | null",
     "tipo": "comedia | drama | musical | danza | infantil | otro",
+    "elenco": "array de strings — nombres TAL COMO los publica la fuente. [] si no publica ninguno. Nadie decide aca quien es 'conocido'.",
     "idioma": "string — importa: ICPNA y Británico montan obras en inglés",
     "duracion_min": "number | null",
     "clasificacion": "string | null — ej. '+14'",
@@ -19,8 +20,9 @@
     {
       "id": "cascaras-2026",
       "titulo": "Cáscaras",
-      "sinopsis": "De Eduardo Adrianzén (Dilectos Teatreros, dir. Giovanni Arce). Tres historias breves sobre cuerpo, mente e identidad: pregunta si la condición humana se limita al cuerpo o si algo sobrevive a la enfermedad, el tiempo o la muerte.",
+      "sinopsis": "De Eduardo Adrianzén (Dilectos Teatreros, dir. Giovanni Arce). ¿Qué queda de nosotros cuando el cuerpo cambia, enferma o desaparece? ¿Somos únicamente materia o existe algo capaz de trascenderla? Tres historias independientes, en distintos momentos del tiempo, que buscan qué nos hace humanos a través de la ciencia ficción, la violencia, la enfermedad y la amistad.",
       "tipo": "otro",
+      "elenco": [],
       "idioma": "español",
       "duracion_min": null,
       "clasificacion": null,
@@ -30,13 +32,21 @@
       "imagen_credito": null,
       "fuente_url": "https://enlima.pe/agenda-cultural/artes-escenicas/cascaras-de-eduardo-adrianzen",
       "verificado_el": "2026-08-16",
-      "_nota": "Género no publicado por la fuente."
+      "_nota": "Genero no publicado. Elenco no publicado ni por enlima ni por Joinnus. Duracion: la fuente dice 'tres historias de ~30 min cada una', que no es una duracion oficial — sumarlas seria calculo propio, asi que va null y la app declara el supuesto de 2 h."
     },
     {
       "id": "inmaduros-2026",
       "titulo": "Inmaduros",
-      "sinopsis": "Comedia sobre la amistad. Dos amigos se reencuentran con una condición: verse cada semana sin hablar del pasado. Elenco: Aldo Miyashiro, Lucho Cáceres, Ebelin Ortiz y otros.",
+      "sinopsis": "Dos amigos de mundos opuestos: Alfi, que vive sin frenos entre fiestas y tecnología, y Fideo, recién separado y sin rumbo. La condición para que Fideo se quede es acompañarlo en los legendarios «miércoles de diversión», hasta que un secreto explosivo pone a prueba la amistad.",
       "tipo": "comedia",
+      "elenco": [
+        "Aldo Miyashiro",
+        "Lucho Cáceres",
+        "Ebelin Ortiz",
+        "Fiorella Díaz",
+        "Gia Rosalino",
+        "Ximena Galiano"
+      ],
       "idioma": "español",
       "duracion_min": null,
       "clasificacion": null,
@@ -46,13 +56,17 @@
       "imagen_credito": null,
       "fuente_url": "https://www.infobae.com/peru/2026/08/13/agenda-cultural-en-lima-del-13-al-19-de-agosto-lo-ultimo-del-festival-de-cine-pucp-opera-y-ballet-salsa-teatro-y-exposiciones-gratuitas/",
       "verificado_el": "2026-08-16",
-      "_nota": "Segunda temporada. Infobae la describe como comedia."
+      "_nota": "Segunda temporada. Infobae la describe como comedia y publica el elenco completo. Duracion no publicada."
     },
     {
       "id": "ipacankure-2026",
       "titulo": "Ipacankure",
-      "sinopsis": "De César Vega Herrera, dir. Alberto Ísola. Dos personajes en un espacio precario se enfrentan a la pregunta por el origen y la construcción de la identidad.",
+      "sinopsis": "De César Vega Herrera (1968), dir. Alberto Ísola. El encuentro entre dos personajes de caminos opuestos: uno atado a su origen andino y atravesado por una enfermedad extraña, el otro de vida urbana y desarraigada. Una reflexión sobre la identidad, la memoria y la necesidad de reconciliarse con las raíces. Mención honrosa del Premio Casa de las Américas (1969).",
       "tipo": "otro",
+      "elenco": [
+        "Alaín Salinas",
+        "Herbert Corimanya"
+      ],
       "idioma": "español",
       "duracion_min": 80,
       "clasificacion": null,
@@ -62,15 +76,21 @@
       "imagen_credito": null,
       "fuente_url": "https://enlima.pe/agenda-cultural/artes-escenicas/ipacankure-de-cesa-vega-herrera",
       "verificado_el": "2026-08-16",
-      "_nota": "Duración 80 min según AAA. Género no publicado."
+      "_nota": "Duracion 80 min segun AAA. Elenco confirmado por enlima y El Peruano. Genero: NINGUNA fuente lo etiqueta — la llaman 'clasico del teatro peruano', que no es un genero. Queda 'otro' a proposito; leerle 'drama' a la palabra 'dramaturgia' seria inventar."
     },
     {
       "id": "noche-de-enredos-2026",
       "titulo": "Noche de enredos",
-      "sinopsis": null,
-      "tipo": "otro",
+      "sinopsis": "De Alberto Papa-Fragomén y Rodrigo Sopeña, dir. Carlos Bañuelos. Una marquesa ingenua, un cura encantador, un gasfitero sospechoso y un inspector astuto se cruzan en una trama de robos, confusiones y carcajadas.",
+      "tipo": "comedia",
+      "elenco": [
+        "Lia Camilo",
+        "Carlos Bañuelos",
+        "Pedro Olórtegui",
+        "Hugo Salazar"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 90,
       "clasificacion": null,
       "temporada_inicio": "2026-08-17",
       "temporada_fin": "2026-08-31",
@@ -78,15 +98,18 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/noche-de-enredos-centro-cultural-ricardo-palma",
       "verificado_el": "2026-08-16",
-      "_nota": "Sede real: Teatro Auditorio Miraflores (Av. Larco 1150), aunque Teleticket la titula 'Centro Cultural Ricardo Palma'. Teleticket no publica el calendario individual."
+      "_nota": "Sede real: Teatro Auditorio Miraflores (Av. Larco 1150), aunque Teleticket la titula 'Centro Cultural Ricardo Palma'. Teleticket no publica el calendario individual. La propia pagina la llama 'una comedia'."
     },
     {
       "id": "se-busca-marido-cama-afuera-2026",
       "titulo": "Se busca marido cama afuera",
-      "sinopsis": null,
-      "tipo": "otro",
+      "sinopsis": "Una comedia que demuestra que después de cada caída siempre aparece una versión más fuerte, más libre y mucho más auténtica de una misma.",
+      "tipo": "comedia",
+      "elenco": [
+        "Johanna San Miguel"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 90,
       "clasificacion": null,
       "temporada_inicio": "2026-08-20",
       "temporada_fin": "2026-09-24",
@@ -94,15 +117,16 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/sebuscamaridocamaafuera-bianca2026",
       "verificado_el": "2026-08-16",
-      "_nota": "Teleticket: 'todos los jueves', 8 únicas funciones, 8:00 p.m."
+      "_nota": "Teleticket: 'todos los jueves', 8 unicas funciones, 8:00 p.m. Nombra a Johanna San Miguel como protagonista y no publica mas elenco."
     },
     {
       "id": "los-hijos-de-bernarda-alba-2026",
       "titulo": "Los hijos de Bernarda Alba",
-      "sinopsis": null,
+      "sinopsis": "Tras la muerte de su segundo esposo, Bernarda impone un luto de ocho años a sus cuatro hijos: Augusto, Mariano, Martín y Abel. Bajo un régimen de normas estrictas y control absoluto, los hermanos viven atrapados entre el deber, el miedo y el deseo de libertad.",
       "tipo": "otro",
+      "elenco": [],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 60,
       "clasificacion": null,
       "temporada_inicio": "2026-08-19",
       "temporada_fin": "2026-08-27",
@@ -110,15 +134,18 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/LUM016",
       "verificado_el": "2026-08-16",
-      "_nota": "Género no publicado por la fuente."
+      "_nota": "Genero no publicado: Teleticket la clasifica bajo 'Teatro', que es categoria y no genero. Elenco no publicado. Duracion aproximada de 1 h segun la pagina."
     },
     {
       "id": "mujer-que-no-jode-es-hombre-2026",
       "titulo": "Mujer que no jode es hombre",
-      "sinopsis": null,
-      "tipo": "otro",
+      "sinopsis": "Show de humor que cuestiona, juega y desmonta una de las frases más repetidas y menos pensadas. Recorre distintas versiones femeninas con stand-up e ironía, y se pregunta por la identidad de la mujer en cada uno de esos roles.",
+      "tipo": "comedia",
+      "elenco": [
+        "Milagros Porturas"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 120,
       "clasificacion": null,
       "temporada_inicio": "2026-08-15",
       "temporada_fin": "2026-08-29",
@@ -126,15 +153,16 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/mujer-que-no-jode-es-hombre-edicion-2026-estacion-de-barranco-2026",
       "verificado_el": "2026-08-16",
-      "_nota": "Edición 2026 (monólogo/comedia). Género no etiquetado explícitamente por la fuente."
+      "_nota": "Edicion 2026. Teleticket solo dice 'Milagros'; el apellido (Porturas) esta verificado en https://peru21.pe/espectaculos/local/comediante-milagros-porturas-presenta-show-mujer-que-no-jode-es-hombre-teatro-stand-up-comedia-noticia/ y en Infobae. Genero: la pagina la llama 'show de humor' y 'stand-up'."
     },
     {
       "id": "nos-casamos-la-cagamos-2026",
       "titulo": "Nos casamos la cagamos",
-      "sinopsis": null,
+      "sinopsis": "¿Te parece que la vida en pareja es difícil? Pues estás en lo cierto, y por eso es mejor tomarse el amor con humor. Stand-up comedy en pareja: Maribel y Jaime, esposos, padres y comediantes, cuentan sus experiencias conyugales. Lleva ocho años en cartelera.",
       "tipo": "comedia",
+      "elenco": [],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 60,
       "clasificacion": null,
       "temporada_inicio": "2026-09-05",
       "temporada_fin": "2026-09-19",
@@ -142,15 +170,19 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/nos-casamos-la-cagamos-jazz-zone-2026",
       "verificado_el": "2026-08-16",
-      "_nota": "Teleticket lo titula 'Show de Comedia en Pareja'."
+      "_nota": "Teleticket lo titula 'Show de Comedia en Pareja' y lo describe como stand-up. Elenco vacio A PROPOSITO: la fuente solo publica 'Maribel y Jaime', sin apellidos, y no se encontro fuente citable que los complete. Un nombre de pila suelto no es un dato verificable."
     },
     {
       "id": "divorcio-y-tango-2026",
       "titulo": "Divorcio y tango",
-      "sinopsis": null,
+      "sinopsis": "¿El matrimonio es un romance eterno... o un tango mal bailado? Una comedia teatral sobre los enredos, los celos, la pasión y los reclamos cotidianos, con situaciones hilarantes, diálogos punzantes y clásicos del tango cantados en directo.",
       "tipo": "comedia",
+      "elenco": [
+        "Katherina Sánchez",
+        "Paco Varela"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 120,
       "clasificacion": null,
       "temporada_inicio": "2026-08-21",
       "temporada_fin": "2026-08-22",
@@ -158,15 +190,20 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/divorcio-y-tango-comedia-de-parejas-en-barranco-capital-restobar",
       "verificado_el": "2026-08-16",
-      "_nota": "Teleticket lo titula 'Comedia de parejas en Barranco'."
+      "_nota": "Teleticket la llama 'una comedia teatral'. Paco Varela es ademas el director."
     },
     {
       "id": "los-inoxidables-en-miraflores-2026",
       "titulo": "Los inoxidables en Miraflores",
-      "sinopsis": null,
-      "tipo": "otro",
+      "sinopsis": "Una comedia explosiva sobre la amistad, el paso del tiempo… y la dignidad con bastón. Tres grandes figuras del teatro peruano se juntan en escena para recordar que la vida no se mide en años sino en carcajadas.",
+      "tipo": "comedia",
+      "elenco": [
+        "Carlos Victoria",
+        "Carlos Thornton",
+        "Luis Menezes"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 60,
       "clasificacion": null,
       "temporada_inicio": "2026-08-21",
       "temporada_fin": "2026-08-29",
@@ -174,15 +211,16 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/los-inoxidables-miraflores-teatro-auditorio-miraflores-2026",
       "verificado_el": "2026-08-16",
-      "_nota": "Género no publicado por la fuente."
+      "_nota": "La propia pagina la llama 'una comedia explosiva'. Duracion aproximada de 1 h segun Teleticket."
     },
     {
       "id": "guapotes-en-vivo-2026",
       "titulo": "Guapotes en vivo",
-      "sinopsis": null,
-      "tipo": "otro",
+      "sinopsis": "Después de conquistar el streaming, Guapotes llega al escenario: una noche de humor, improvisación, ocurrencias y las locuras que hicieron crecer a esta comunidad, ahora completamente en vivo.",
+      "tipo": "comedia",
+      "elenco": [],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 120,
       "clasificacion": null,
       "temporada_inicio": "2026-08-28",
       "temporada_fin": "2026-08-29",
@@ -190,15 +228,23 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/guapotes-en-vivo-teatro-canout",
       "verificado_el": "2026-08-16",
-      "_nota": "Género no publicado por la fuente."
+      "_nota": "Genero tomado de la propia descripcion ('una noche de humor, improvisacion'), no de la categoria. Elenco no publicado: es un colectivo de streaming y Teleticket no nombra integrantes."
     },
     {
       "id": "la-herencia-2026",
       "titulo": "La herencia",
-      "sinopsis": null,
+      "sinopsis": "Abelardo, consciente de que le queda poco tiempo de vida, convoca a sus hijos a una reunión para comunicarles sus decisiones sobre la repartición de los bienes familiares.",
       "tipo": "otro",
+      "elenco": [
+        "Carlos Victoria",
+        "Paco Varela",
+        "Giselle Collao",
+        "Luis Menezes",
+        "Ena Luna",
+        "Sebastián Cavero"
+      ],
       "idioma": "español",
-      "duracion_min": null,
+      "duracion_min": 60,
       "clasificacion": null,
       "temporada_inicio": "2026-08-30",
       "temporada_fin": "2026-08-30",
@@ -206,13 +252,14 @@
       "imagen_credito": null,
       "fuente_url": "https://teleticket.com.pe/evento/obra-la-herencia-teatro-auditor",
       "verificado_el": "2026-08-16",
-      "_nota": "Género no publicado por la fuente."
+      "_nota": "Genero no publicado: solo la categoria 'Teatro'. Elenco completo publicado por Teleticket. Duracion aproximada de 1 h."
     },
     {
       "id": "las-bodas-de-figaro-2026",
       "titulo": "Las bodas de Fígaro",
       "sinopsis": "Clásico de Beaumarchais dirigido por Jean Pierre Gamarra (Éxodo Teatro). Un día de enredos en el castillo del Conde Almaviva: Fígaro y Susana están por casarse, pero el Conde intenta seducir a Susana y los sirvientes conspiran para desenmascararlo. Comedia sobre poder, deseo y enredos.",
       "tipo": "comedia",
+      "elenco": [],
       "idioma": "español",
       "duracion_min": null,
       "clasificacion": null,
@@ -223,6 +270,125 @@
       "fuente_url": "https://elcomercio.pe/luces/teatro/las-bodas-de-figaro-jean-pierre-gamarra-lleva-a-escena-una-comedia-sobre-poder-deseo-y-enredos-teatro-noticia/",
       "verificado_el": "2026-08-16",
       "_nota": "Coproducción de Éxodo Teatro y la Alianza Francesa de Lima. Elenco: Fernando Luque, María Grazia Gamarra, entre otros."
+    },
+    {
+      "id": "la-logica-del-escorpion-2026",
+      "titulo": "La lógica del escorpión",
+      "sinopsis": null,
+      "tipo": "otro",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-19",
+      "temporada_fin": "2026-08-27",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://diariocorreo.pe/cultura/obra-la-logica-del-escorpion-regresa-con-una-version-extendida-al-centro-cultural-cafae-se-noticia/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Regresa en versión extendida al CAFAE-SE. Género no etiquetado por la fuente."
+    },
+    {
+      "id": "i-d-i-o-t-a-2026",
+      "titulo": "I.D.I.O.T.A",
+      "sinopsis": null,
+      "tipo": "comedia",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-20",
+      "temporada_fin": "2026-09-20",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://diariocorreo.pe/cultura/sandra-bernasconi-y-armando-machuca-protagonizan-idiota-fechas-y-entradas-noticia/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Comedia con Sandra Bernasconi y Armando Machuca."
+    },
+    {
+      "id": "prima-facie-2026",
+      "titulo": "Prima Facie",
+      "sinopsis": null,
+      "tipo": "otro",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-12",
+      "temporada_fin": "2026-08-31",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://diariocorreo.pe/cultura/prima-facie-llega-al-teatro-la-plaza-con-wendy-vasquez-y-direccion-de-juan-carlos-fisher-noticia/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Con Wendy Vásquez, dir. Juan Carlos Fisher. Sin fecha de cierre publicada; se cargaron funciones hasta fin de agosto."
+    },
+    {
+      "id": "no-estoy-loca-2026",
+      "titulo": "No estoy loca",
+      "sinopsis": null,
+      "tipo": "musical",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-20",
+      "temporada_fin": "2026-09-06",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://puroteatro.pe/obra-teatral/no-estoy-loca-en-este-musical-la-locura-fue-dada-de-alta/2026-08-20/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Título completo: 'No estoy loca (en este musical, la locura fue dada de alta)'."
+    },
+    {
+      "id": "annie-2026",
+      "titulo": "Annie",
+      "sinopsis": null,
+      "tipo": "musical",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-09-25",
+      "temporada_fin": "2026-11-08",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://teleticket.com.pe/annie-2026",
+      "verificado_el": "2026-08-16",
+      "_nota": "Musical. Estreno 25 set; temporada hasta el 8 nov. Se cargó solo el fin de semana de estreno (dentro de la ventana)."
+    },
+    {
+      "id": "es-hora-de-hablar-2026",
+      "titulo": "Es hora de hablar",
+      "sinopsis": null,
+      "tipo": "otro",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-08-22",
+      "temporada_fin": "2026-08-22",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://teleticket.com.pe/es-hora-de-hablar-2026",
+      "verificado_el": "2026-08-16",
+      "_nota": "Género no etiquetado. Vigencia de precios hasta el 22 ago."
+    },
+    {
+      "id": "nosotros-lo-hicimos-bien-2026",
+      "titulo": "Nosotros lo hicimos bien",
+      "sinopsis": null,
+      "tipo": "otro",
+      "elenco": [],
+      "idioma": "español",
+      "duracion_min": null,
+      "clasificacion": null,
+      "temporada_inicio": "2026-09-06",
+      "temporada_fin": "2026-09-27",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://diariocorreo.pe/cultura/obra-teatral-nosotros-lo-hicimos-bien-se-estrena-en-lima-fechas-horario-y-entradas-noticia/",
+      "verificado_el": "2026-08-16",
+      "_nota": "Funciones dominicales. Género no etiquetado por la fuente."
     }
   ]
 }

@@ -12,7 +12,115 @@
     }
   },
   "teatros": {},
-  "obras": {},
+  "obras": {
+    "cascaras-2026": {
+      "sinopsis": "De Eduardo Adrianzén (Dilectos Teatreros, dir. Giovanni Arce). ¿Qué queda de nosotros cuando el cuerpo cambia, enferma o desaparece? ¿Somos únicamente materia o existe algo capaz de trascenderla? Tres historias independientes, en distintos momentos del tiempo, que buscan qué nos hace humanos a través de la ciencia ficción, la violencia, la enfermedad y la amistad.",
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "inmaduros-2026": {
+      "sinopsis": "Dos amigos de mundos opuestos: Alfi, que vive sin frenos entre fiestas y tecnología, y Fideo, recién separado y sin rumbo. La condición para que Fideo se quede es acompañarlo en los legendarios «miércoles de diversión», hasta que un secreto explosivo pone a prueba la amistad.",
+      "tipo": "comedia",
+      "elenco": [
+        "Aldo Miyashiro",
+        "Lucho Cáceres",
+        "Ebelin Ortiz",
+        "Fiorella Díaz",
+        "Gia Rosalino",
+        "Ximena Galiano"
+      ],
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "ipacankure-2026": {
+      "sinopsis": "De César Vega Herrera (1968), dir. Alberto Ísola. El encuentro entre dos personajes de caminos opuestos: uno atado a su origen andino y atravesado por una enfermedad extraña, el otro de vida urbana y desarraigada. Una reflexión sobre la identidad, la memoria y la necesidad de reconciliarse con las raíces. Mención honrosa del Premio Casa de las Américas (1969).",
+      "elenco": [
+        "Alaín Salinas",
+        "Herbert Corimanya"
+      ],
+      "duracion_min": 80,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "noche-de-enredos-2026": {
+      "sinopsis": "De Alberto Papa-Fragomén y Rodrigo Sopeña, dir. Carlos Bañuelos. Una marquesa ingenua, un cura encantador, un gasfitero sospechoso y un inspector astuto se cruzan en una trama de robos, confusiones y carcajadas.",
+      "tipo": "comedia",
+      "elenco": [
+        "Lia Camilo",
+        "Carlos Bañuelos",
+        "Pedro Olórtegui",
+        "Hugo Salazar"
+      ],
+      "duracion_min": 90,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "se-busca-marido-cama-afuera-2026": {
+      "sinopsis": "Una comedia que demuestra que después de cada caída siempre aparece una versión más fuerte, más libre y mucho más auténtica de una misma.",
+      "tipo": "comedia",
+      "elenco": [
+        "Johanna San Miguel"
+      ],
+      "duracion_min": 90,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "los-hijos-de-bernarda-alba-2026": {
+      "sinopsis": "Tras la muerte de su segundo esposo, Bernarda impone un luto de ocho años a sus cuatro hijos: Augusto, Mariano, Martín y Abel. Bajo un régimen de normas estrictas y control absoluto, los hermanos viven atrapados entre el deber, el miedo y el deseo de libertad.",
+      "duracion_min": 60,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "mujer-que-no-jode-es-hombre-2026": {
+      "sinopsis": "Show de humor que cuestiona, juega y desmonta una de las frases más repetidas y menos pensadas. Recorre distintas versiones femeninas con stand-up e ironía, y se pregunta por la identidad de la mujer en cada uno de esos roles.",
+      "tipo": "comedia",
+      "elenco": [
+        "Milagros Porturas"
+      ],
+      "duracion_min": 120,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "nos-casamos-la-cagamos-2026": {
+      "sinopsis": "¿Te parece que la vida en pareja es difícil? Pues estás en lo cierto, y por eso es mejor tomarse el amor con humor. Stand-up comedy en pareja: Maribel y Jaime, esposos, padres y comediantes, cuentan sus experiencias conyugales. Lleva ocho años en cartelera.",
+      "tipo": "comedia",
+      "duracion_min": 60,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "divorcio-y-tango-2026": {
+      "sinopsis": "¿El matrimonio es un romance eterno... o un tango mal bailado? Una comedia teatral sobre los enredos, los celos, la pasión y los reclamos cotidianos, con situaciones hilarantes, diálogos punzantes y clásicos del tango cantados en directo.",
+      "tipo": "comedia",
+      "elenco": [
+        "Katherina Sánchez",
+        "Paco Varela"
+      ],
+      "duracion_min": 120,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "los-inoxidables-en-miraflores-2026": {
+      "sinopsis": "Una comedia explosiva sobre la amistad, el paso del tiempo… y la dignidad con bastón. Tres grandes figuras del teatro peruano se juntan en escena para recordar que la vida no se mide en años sino en carcajadas.",
+      "tipo": "comedia",
+      "elenco": [
+        "Carlos Victoria",
+        "Carlos Thornton",
+        "Luis Menezes"
+      ],
+      "duracion_min": 60,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "guapotes-en-vivo-2026": {
+      "sinopsis": "Después de conquistar el streaming, Guapotes llega al escenario: una noche de humor, improvisación, ocurrencias y las locuras que hicieron crecer a esta comunidad, ahora completamente en vivo.",
+      "tipo": "comedia",
+      "duracion_min": 120,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    },
+    "la-herencia-2026": {
+      "sinopsis": "Abelardo, consciente de que le queda poco tiempo de vida, convoca a sus hijos a una reunión para comunicarles sus decisiones sobre la repartición de los bienes familiares.",
+      "elenco": [
+        "Carlos Victoria",
+        "Paco Varela",
+        "Giselle Collao",
+        "Luis Menezes",
+        "Ena Luna",
+        "Sebastián Cavero"
+      ],
+      "duracion_min": 60,
+      "_motivo": "Investigacion manual (commit 1068277). El refresco de 20c1888 borro estos campos; aca sobreviven al proximo."
+    }
+  },
   "funciones": {},
   "lugares": {}
 }
