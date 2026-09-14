@@ -9,49 +9,40 @@ export function pintarEscala(app) {
   app.className = 'app escala';
   app.innerHTML = `
     <article class="escala-articulo" aria-labelledby="escala-titulo">
-      <header class="escala-portada">
-        <p class="escala-kicker">Un experimento de metrología afectiva</p>
-        <h2 id="escala-titulo" tabindex="-1">Escala astronómica<br>del amor</h2>
-        <p class="escala-intro">¿Cuánto tomaría cruzar la Vía Láctea caminando por Valeria?</p>
-        <p class="escala-distancia"><strong>100 000</strong><span>años luz</span></p>
-        <p class="escala-apunte">Una sola galaxia como unidad candidata para una magnitud que no parece tener límite.</p>
-      </header>
+      <section class="resumen-paper" aria-label="Resumen del experimento">
+        <header class="resumen-cabecera">
+          <p class="escala-kicker">Un experimento de metrología afectiva</p>
+          <h2 id="escala-titulo" tabindex="-1">Escala astronómica<br>del amor</h2>
+          <p class="escala-intro">¿Cuánto tomaría cruzar la Vía Láctea caminando por Valeria?</p>
+        </header>
 
-      <section class="travesia" aria-labelledby="travesia-titulo">
-        <p class="escala-kicker">El recorrido</p>
-        <h3 id="travesia-titulo">Una marcha posible<br>en una distancia imposible</h3>
-        <p>El modelo concede un paso cómodo y constante: 5 km por hora, durante 8 horas cada día.</p>
-        <dl class="hitos" aria-label="Ritmo de la travesía">
-          <div class="hito">
-            <dt>cada día</dt>
-            <dd>40 <span>km</span></dd>
+        <dl class="resumen-cifras" aria-label="Magnitudes del experimento">
+          <div class="resumen-cifra">
+            <dt>Distancia</dt>
+            <dd>100 000 <span>años luz</span></dd>
           </div>
-          <div class="hito">
-            <dt>cada año</dt>
-            <dd>14 610 <span>km</span></dd>
+          <div class="resumen-cifra">
+            <dt>Ritmo</dt>
+            <dd>40 <span>km por día</span></dd>
+          </div>
+          <div class="resumen-cifra">
+            <dt>Duración</dt>
+            <dd>64.8 <span>billones de años</span></dd>
+          </div>
+          <div class="resumen-cifra">
+            <dt>Equivalencia</dt>
+            <dd>809 mil millones <span>de vidas</span></dd>
           </div>
         </dl>
-      </section>
 
-      <section class="resultado" aria-labelledby="resultado-titulo">
-        <p class="escala-kicker">El resultado</p>
-        <h3 id="resultado-titulo">La travesía pediría</h3>
-        <p class="cifra-principal">64.8 <span>billones<br>de años</span></p>
-        <p>Eso equivale a aproximadamente <strong>809 mil millones de vidas humanas</strong>, una detrás de otra, dedicadas a completar un único cruce.</p>
-      </section>
-
-      <section class="veredicto" aria-labelledby="veredicto-titulo">
-        <p class="escala-kicker">Lo que la cifra sí dice</p>
-        <h3 id="veredicto-titulo">La galaxia no mide el amor.</h3>
-        <p>Mide apenas el costo de intentar usarla como regla. Después de recorrerla una vez, la pregunta seguiría abierta.</p>
-        <p class="formula" aria-label="Coeficiente de Amor de Valeria mayor que uno">𝒱 &gt; 1</p>
-        <p class="formula-explicacion">El diámetro de la Vía Láctea no es la respuesta: es una cota inferior.</p>
-      </section>
-
-      <section class="escala-cierre" aria-labelledby="cierre-titulo">
-        <p class="escala-kicker">La conclusión</p>
-        <h3 id="cierre-titulo">Aunque cambiara el camino, el destino se mantiene.</h3>
-        <p>Si el experimento pudiera repetirse infinitas veces, en cada una volvería a encontrarte, a elegirte y a enamorarme de ti.</p>
+        <section class="resumen-veredicto" aria-labelledby="veredicto-titulo">
+          <div>
+            <p class="escala-kicker">La conclusión</p>
+            <h3 id="veredicto-titulo">La galaxia no mide el amor.</h3>
+          </div>
+          <p class="formula" aria-label="Coeficiente de Amor de Valeria mayor que uno">𝒱 &gt; 1</p>
+          <p class="resumen-conclusion">Si el experimento se repitiera infinitas veces, en cada una volvería a encontrarte, elegirte y enamorarme de ti.</p>
+        </section>
       </section>
 
       <section class="paper" aria-labelledby="paper-titulo">
