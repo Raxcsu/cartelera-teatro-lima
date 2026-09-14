@@ -286,36 +286,36 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
    La nueva vista no intenta competir con un afiche ni ilustrar el cosmos.
    El contraste entre cifras sobrias y aire en la composición hace que la
    distancia se sienta sin importar activos externos o un efecto llamativo. */
-.app.escala{max-width:820px;padding:30px 20px 56px}
-.escala-articulo{max-width:760px;margin:0 auto}
-.escala-portada{padding:28px 0 42px;border-bottom:1px solid var(--line)}
+.app.escala{max-width:820px;padding:24px 20px 48px}
+.escala-articulo{max-width:1180px;margin:0 auto}
+.escala-portada{padding:24px 0 36px;border-bottom:1px solid var(--line)}
 .escala-kicker{font:600 10.5px/1.4 var(--sans);letter-spacing:.12em;
   text-transform:uppercase;color:var(--ink3)}
 .escala h2,.escala h3{font-family:var(--serif);font-weight:400}
-.escala h2{font-size:clamp(37px,9vw,62px);line-height:.98;letter-spacing:-.035em;
+.escala h2{font-size:clamp(34px,6vw,50px);line-height:1;letter-spacing:-.035em;
   margin-top:14px}
-.escala-intro{max-width:480px;margin-top:19px;font-size:16px;line-height:1.55;color:var(--ink2)}
-.escala-distancia{display:flex;align-items:baseline;gap:9px;margin-top:31px;color:var(--accent)}
-.escala-distancia strong{font:400 clamp(42px,11vw,76px)/.9 var(--serif);letter-spacing:-.05em}
+.escala-intro{max-width:500px;margin-top:17px;font-size:15px;line-height:1.6;color:var(--ink2)}
+.escala-distancia{display:flex;align-items:baseline;gap:9px;margin-top:27px;color:var(--accent)}
+.escala-distancia strong{font:400 clamp(40px,7vw,62px)/.9 var(--serif);letter-spacing:-.05em}
 .escala-distancia span{font:600 11px/1.2 var(--sans);letter-spacing:.1em;text-transform:uppercase}
 .escala-apunte{max-width:470px;margin-top:13px;font-size:12.5px;line-height:1.55;color:var(--ink3)}
-.travesia,.resultado,.veredicto,.escala-cierre,.paper{padding:42px 0;border-bottom:1px solid var(--line)}
-.escala h3{font-size:clamp(27px,6.7vw,42px);line-height:1.05;letter-spacing:-.025em;margin-top:10px}
+.travesia,.resultado,.veredicto,.escala-cierre,.paper{padding:36px 0;border-bottom:1px solid var(--line)}
+.escala h3{font-size:clamp(25px,4.2vw,34px);line-height:1.08;letter-spacing:-.025em;margin-top:9px}
 .travesia>p:not(.escala-kicker),.resultado>p:not(.escala-kicker):not(.cifra-principal),
 .veredicto>p:not(.escala-kicker):not(.formula):not(.formula-explicacion),
 .escala-cierre>p:not(.escala-kicker){max-width:550px;margin-top:16px;font-size:14px;line-height:1.65;color:var(--ink2)}
 .hitos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:24px}
 .hito{min-height:126px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
 .hito dt{font:600 10.5px/1.3 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
-.hito dd{margin-top:21px;font:400 clamp(27px,6vw,40px)/.9 var(--serif);letter-spacing:-.04em;color:var(--accent)}
+.hito dd{margin-top:21px;font:400 clamp(27px,4vw,36px)/.9 var(--serif);letter-spacing:-.04em;color:var(--accent)}
 .hito dd span{font:600 10.5px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase}
 .resultado{background:var(--accent-bg);border:0;border-radius:14px;margin:28px -8px;padding:38px 22px}
 .cifra-principal{display:flex;align-items:baseline;gap:11px;margin-top:18px;color:var(--accent)}
-.cifra-principal{font:400 clamp(58px,15vw,104px)/.8 var(--serif);letter-spacing:-.065em}
+.cifra-principal{font:400 clamp(50px,8.5vw,78px)/.82 var(--serif);letter-spacing:-.055em}
 .cifra-principal span{font:600 11px/1.25 var(--sans);letter-spacing:.1em;text-transform:uppercase}
 .veredicto{padding-top:54px}
-.veredicto h3{font-size:clamp(33px,8vw,50px)}
-.formula{margin-top:27px;font:400 clamp(55px,14vw,90px)/.8 var(--serif);letter-spacing:.02em;color:var(--accent)}
+.veredicto h3{font-size:clamp(29px,4.6vw,38px)}
+.formula{margin-top:24px;font:400 clamp(48px,7vw,66px)/.82 var(--serif);letter-spacing:.02em;color:var(--accent)}
 .formula-explicacion{font-size:12.5px!important;color:var(--ink3)!important;margin-top:12px!important}
 .escala-cierre{border-bottom:0;padding-bottom:48px}
 .escala-cierre h3{max-width:600px}
@@ -323,7 +323,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .paper-cabecera{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
 .paper h3{font-size:23px;line-height:1.1;margin-top:7px}
 .paper-cabecera .btn{flex:0 0 auto}
-.lector-pdf{display:block;width:100%;height:72dvh;min-height:530px;border:1px solid var(--hair);border-radius:8px;background:var(--bg)}
+.lector-pdf{display:block;width:100%;height:72dvh;min-height:520px;border:1px solid var(--hair);border-radius:8px;background:var(--bg)}
 .lector-pdf p{padding:24px;font-size:13.5px;line-height:1.6;color:var(--ink2)}
 .lector-pdf a{color:var(--accent)}
 
@@ -386,11 +386,44 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
   .sitio{padding:20px 28px 14px}
   .app{max-width:1320px;width:100%;flex:1;min-height:0;padding:0 28px 24px}
   .pestanas{margin-top:16px}
-  /* La cartelera es una aplicación de alto fijo; esta lectura necesita
-     recorrer su propio documento sin hacer crecer el body fuera del viewport. */
-  .app.escala{max-width:920px;overflow-y:auto;padding:30px 32px 46px;scrollbar-gutter:stable}
-  .escala-portada{padding-top:20px}
-  .lector-pdf{height:760px}
+  /* La cartelera es una aplicación de alto fijo; esta lectura usa todo el
+     ancho disponible y recorre su propio documento dentro del viewport. */
+  .app.escala{max-width:none;overflow-y:auto;
+    padding:18px clamp(32px,5vw,72px) 32px;scrollbar-gutter:stable}
+  .escala-articulo{width:100%}
+  .escala-portada{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
+    grid-template-rows:auto auto auto;column-gap:clamp(48px,7vw,96px);align-items:end;
+    padding:18px 0 34px}
+  .escala-portada>.escala-kicker{grid-column:1/-1;grid-row:1}
+  .escala-portada>h2{grid-column:1;grid-row:2}
+  .escala-portada>.escala-intro{grid-column:1;grid-row:3}
+  .escala-portada>.escala-distancia{grid-column:2;grid-row:2;margin-top:0}
+  .escala-portada>.escala-apunte{grid-column:2;grid-row:3}
+
+  .travesia,.resultado,.veredicto,.escala-cierre{display:grid;
+    grid-template-columns:minmax(260px,.8fr) minmax(420px,1.2fr);
+    column-gap:clamp(48px,7vw,96px);align-items:start;padding:34px 0}
+  .travesia>.escala-kicker,.resultado>.escala-kicker,
+  .veredicto>.escala-kicker,.escala-cierre>.escala-kicker{grid-column:1;grid-row:1}
+  .travesia>h3,.resultado>h3,.veredicto>h3,.escala-cierre>h3{grid-column:1;grid-row:2}
+  .travesia>p:not(.escala-kicker){grid-column:2;grid-row:1;margin-top:0}
+  .travesia>.hitos{grid-column:2;grid-row:2;margin-top:14px}
+
+  .resultado{margin:22px 0;padding:32px clamp(24px,3vw,40px)}
+  .resultado>.cifra-principal{grid-column:2;grid-row:1;margin-top:0}
+  .resultado>p:not(.escala-kicker):not(.cifra-principal){grid-column:2;grid-row:2}
+
+  .veredicto{padding-top:38px}
+  .veredicto>p:not(.escala-kicker):not(.formula):not(.formula-explicacion){grid-column:2;grid-row:1;margin-top:0}
+  .veredicto>.formula{grid-column:2;grid-row:2;margin-top:10px}
+  .veredicto>.formula-explicacion{grid-column:2;grid-row:3}
+
+  .escala-cierre{padding-bottom:38px}
+  .escala-cierre>p:not(.escala-kicker){grid-column:2;grid-row:1/3;
+    align-self:center;margin-top:0}
+
+  .paper{padding:22px;margin-top:0}
+  .lector-pdf{height:calc(100dvh - 180px);min-height:560px;max-height:900px}
 
   /* La clase `pantalla` la pone pintarEsqueleto(). Los estados de cartelera
      vencida y de error reemplazan todo #app y por eso NO la heredan: siguen
