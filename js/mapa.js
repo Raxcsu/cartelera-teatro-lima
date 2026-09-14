@@ -17,25 +17,15 @@ const CDN_JS  = `https://unpkg.com/leaflet@${VERSION}/dist/leaflet-src.esm.js`;
 const CDN_CSS = `https://unpkg.com/leaflet@${VERSION}/dist/leaflet.css`;
 
 /**
- * Las teselas: CARTO Positron, un mapa base gris claro hecho para que lo
- * que se dibuja encima resalte. Reemplazó al OSM estándar, cuyos verdes y
- * rutas amarillas competían con los pines y obligaban a un filtro CSS
- * para calmarlos.
+ * OpenStreetMap es el único mapa base. Su servidor público no necesita
+ * clave para este sitio personal y la atribución es condición de uso.
  *
- * Es una SEGUNDA dependencia externa, y su modo de falla NO es el de
- * Leaflet. Si cae el CDN de la librería, crearMapa() devuelve null y la
- * banda desaparece limpia. Si caen solo las teselas, Leaflet vive y deja
- * un rectángulo gris con pines flotando sobre nada: el hueco sin
- * explicación que este proyecto evita. Por eso OSM se queda como
- * RESPALDO y no como reliquia — ver el manejo de 'tileerror'.
- *
- * La atribución no es decorativa en ninguno de los dos: es la condición
- * de uso. Positron va sobre datos de OSM, así que se acreditan los dos.
+ * Si las teselas fallan de forma sostenida, la vista recibe una señal para
+ * retirar el mapa entero. Así la cartelera conserva la lista útil en vez de
+ * dejar un rectángulo vacío con pines flotando sobre nada.
  */
 const OSM = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
-const TESELAS = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-const CREDITO = `${OSM} &copy; <a href="https://carto.com/attributions">CARTO</a>`;
-const TESELAS_RESPALDO = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TESELAS = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 /**
  * Lado del círculo del pin, en píxeles.
@@ -89,7 +79,10 @@ function pedirLeaflet() {
  * @param {Array<{id,nombre,lat,lng,cantidad,popupHtml?}>} puntos
  *        `popupHtml` lo arma vista.js, ya escapado: este módulo no conoce
  *        obras ni precios y no puede empezar a conocerlos por un popup.
- * @param {{alSeleccionar?: (id:string)=>void}} opciones
+ * @param {{
+ *   alSeleccionar?: (id:string)=>void,
+ *   alFallarTeselas?: ()=>void,
+ * }} opciones
  * @returns {Promise<{destruir:()=>void}|null>} null si no hay mapa que mostrar
  */
 export async function crearMapa(contenedor, puntos = [], opciones = {}) {
@@ -116,34 +109,24 @@ export async function crearMapa(contenedor, puntos = [], opciones = {}) {
       zoomSnap: 0.25,
     });
 
-    // `{r}` solo se sustituye por '@2x' si detectRetina está encendido;
-    // sin eso quedaría literal en la URL y las teselas darían 404.
     const base = L.tileLayer(TESELAS, {
-      attribution: CREDITO, maxZoom: 19, subdomains: 'abcd', detectRetina: true,
+      attribution: OSM,
+      maxZoom: 19,
     }).addTo(mapa);
 
     /**
-     * Respaldo de teselas.
-     *
      * Que fallen unas pocas es ruido de red normal y no justifica cambiar
-     * de proveedor a mitad de camino. Un fallo sostenido significa que
-     * CARTO no está, y ahí el mapa se queda gris con los pines flotando
-     * sobre nada. Pasado el umbral se pasa a OSM UNA sola vez.
-     *
-     * El orden importa: primero se agrega la capa nueva y recién después
-     * se saca la vieja, o entre las dos operaciones se ve el fondo pelado.
+     * toda la interfaz. Solo se notifica tras un fallo sostenido y una única
+     * vez; vista.js decide cómo degradar sin mapa.
      */
-    const FALLOS_PARA_CAMBIAR = 6;
+    const FALLOS_PARA_OCULTAR = 6;
     let fallos = 0;
-    let yaSeCambio = false;
+    let falloNotificado = false;
     base.on('tileerror', () => {
-      if (yaSeCambio || (fallos += 1) < FALLOS_PARA_CAMBIAR) return;
-      yaSeCambio = true;
-      console.warn('Las teselas de CARTO no responden; se pasa a OpenStreetMap.');
-      try {
-        L.tileLayer(TESELAS_RESPALDO, { attribution: OSM, maxZoom: 19 }).addTo(mapa);
-        mapa.removeLayer(base);
-      } catch { /* si tampoco se puede, queda el mapa gris y la lista entera */ }
+      if (falloNotificado || (fallos += 1) < FALLOS_PARA_OCULTAR) return;
+      falloNotificado = true;
+      console.warn('Las teselas de OpenStreetMap no responden; la app sigue sin mapa.');
+      try { opciones.alFallarTeselas?.(); } catch { /* un callback no puede romper el mapa */ }
     });
 
     for (const p of conCoords) {

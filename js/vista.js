@@ -421,6 +421,17 @@ async function pintarMapa(app, delMes) {
   // lee como "acá no hay nada", que es justo lo que este proyecto evita.
   const esperando = caja.querySelector('.mapa-esperando');
   esperando.hidden = false;
+  let fallaronTeselas = false;
+
+  const ocultarMapaFallido = () => {
+    if (ciclo !== cicloMapa || !app.classList.contains('pantalla')) return;
+    fallaronTeselas = true;
+    if (mapa) mapa.destruir();
+    mapa = null;
+    esperando.hidden = true;
+    caja.hidden = true;
+    app.classList.add('sin-mapa');
+  };
 
   // El mapa muestra lo MISMO que la lista: de hoy en adelante. Un pin de un
   // teatro cuyas funciones ya pasaron no tiene tarjeta a la que llevar, así
@@ -457,11 +468,20 @@ async function pintarMapa(app, delMes) {
       destino.classList.add('resaltada');
       setTimeout(() => destino.classList.remove('resaltada'), 1600);
     },
+    alFallarTeselas: ocultarMapaFallido,
   });
 
   // Un cambio de ruta o de mes mientras Leaflet cargaba invalida este mapa.
   // Destruirlo acá evita dejar listeners y un contenedor huérfano en memoria.
   if (ciclo !== cicloMapa || !app.classList.contains('pantalla')) {
+    nuevoMapa?.destruir();
+    return;
+  }
+
+  // La red puede fallar antes de que la promesa de crearMapa() vuelva a
+  // esta función. En ese caso se destruye el resultado recién creado y no
+  // se vuelve a revelar una caja que el callback ya había ocultado.
+  if (fallaronTeselas) {
     nuevoMapa?.destruir();
     return;
   }
