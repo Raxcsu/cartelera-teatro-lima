@@ -38,22 +38,33 @@ let hoy = null;
 let mesVisible = null;
 let meses = [];
 let mapa = null;
+// Al cambiar de pestaña puede quedar un import dinámico de Leaflet en vuelo.
+// Estos contadores impiden que una vista ya desmontada vuelva a escribir en
+// el DOM o conserve un mapa oculto cuando su promesa finalmente resuelva.
+let cicloVista = 0;
+let cicloMapa = 0;
 
 // ─────────────────────────────────────────────────────────────
 //  Arranque
 // ─────────────────────────────────────────────────────────────
 
 export async function arrancar(app) {
+  const ciclo = ++cicloVista;
   try {
     hoy = hoyLima();
-    datos = await cargarTodo();
+    // Los JSON no cambian al alternar pestañas durante una misma sesión. Se
+    // guardan para que volver a Cartelera preserve además el mes elegido.
+    if (!datos) datos = await cargarTodo();
   } catch (e) {
     // Un fetch que revienta sin capturar deja la pantalla en blanco, y
     // eso es peor que un error: el usuario cree que no hay teatro.
+    if (ciclo !== cicloVista) return;
     pintarError(app, e);
     console.error(e);
     return;
   }
+
+  if (ciclo !== cicloVista) return;
 
   const estado = estadoCartelera(datos.funciones, hoy);
   if (estado.vencida) {
@@ -62,10 +73,24 @@ export async function arrancar(app) {
   }
 
   meses = mesesConFunciones(datos.funciones);
-  mesVisible = mesInicial(meses, hoy);
+  // No se reinicia el mes al volver desde la lectura astronómica. Si no hay
+  // una elección previa (o los datos cambiaron y ya no existe), se conserva
+  // la decisión de mesInicial().
+  const rango = rangoNavegable(meses);
+  if (!mesVisible || !rango || mesVisible < rango.desde || mesVisible > rango.hasta) {
+    mesVisible = mesInicial(meses, hoy);
+  }
 
   pintarEsqueleto(app);
   refrescar(app);
+}
+
+/** Libera el único recurso externo de la cartelera antes de pintar otra ruta. */
+export function desmontar() {
+  cicloVista += 1;
+  cicloMapa += 1;
+  if (mapa) mapa.destruir();
+  mapa = null;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -373,6 +398,7 @@ function cerca(f, obra, teatro) {
 // ─────────────────────────────────────────────────────────────
 
 async function pintarMapa(app, delMes) {
+  const ciclo = ++cicloMapa;
   const caja = app.querySelector('.mapa-caja');
   if (mapa) { mapa.destruir(); mapa = null; }
 
@@ -423,7 +449,7 @@ async function pintarMapa(app, delMes) {
     popupHtml: popupTeatro(teatro, funciones),
   }));
 
-  mapa = await crearMapa(caja.querySelector('.mapa'), puntos, {
+  const nuevoMapa = await crearMapa(caja.querySelector('.mapa'), puntos, {
     alSeleccionar: (id) => {
       const destino = app.querySelector(`.funcion[data-teatro="${CSS.escape(id)}"]`);
       if (!destino) return;
@@ -432,6 +458,15 @@ async function pintarMapa(app, delMes) {
       setTimeout(() => destino.classList.remove('resaltada'), 1600);
     },
   });
+
+  // Un cambio de ruta o de mes mientras Leaflet cargaba invalida este mapa.
+  // Destruirlo acá evita dejar listeners y un contenedor huérfano en memoria.
+  if (ciclo !== cicloMapa || !app.classList.contains('pantalla')) {
+    nuevoMapa?.destruir();
+    return;
+  }
+
+  mapa = nuevoMapa;
 
   esperando.hidden = true;
 

@@ -8,24 +8,28 @@
 </head>
 <body>
 
-<!-- La cabecera es lo único de DOM que NO vive en vista.js, y a propósito:
+<!-- La cabecera es lo único de DOM que NO vive en los módulos de vista, y a propósito:
      es una constante, no un dato. Puesta acá se ve durante "Cargando
      cartelera…" y sobrevive a los estados de error y de cartelera vencida,
-     que reemplazan todo #app. Además da el único <h1> de la página, así que
-     ninguna pantalla queda sin encabezado de primer nivel. -->
+     que reemplazan todo #app. La navegación también vive acá: la vista
+     astronómica no depende de que la cartelera pueda cargar. -->
 <header class="sitio">
   <h1>Theater with her <span class="corazon" aria-hidden="true"></span></h1>
+  <nav class="pestanas" aria-label="Secciones principales">
+    <a class="pestana" href="#cartelera" data-ruta="cartelera">Cartelera</a>
+    <a class="pestana" href="#escala-astronomica" data-ruta="escala-astronomica">Escala astronómica</a>
+  </nav>
 </header>
 
 <main id="app" class="app">
   <p class="cargando">Cargando cartelera…</p>
 </main>
 
-<!-- Todo lo demás de la capa DOM vive en js/vista.js desde que la pantalla
-     creció a mapa + calendario + mes. Acá solo queda el arranque. -->
+<!-- app.js decide la ruta. Cada vista conserva su propio DOM: la cartelera
+     tiene mapa y datos dinámicos; la escala astronómica es una lectura estática. -->
 <script type="module">
-import { arrancar } from './js/vista.js';
-arrancar(document.getElementById('app'));
+import { arrancarApp } from './js/app.js';
+arrancarApp(document.getElementById('app'));
 </script>
 </body>
 </html>
