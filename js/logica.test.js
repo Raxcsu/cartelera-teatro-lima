@@ -9,6 +9,7 @@ import {
   filtrarFunciones,
   agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones, desplazarMes,
   mesInicial, rangoNavegable,
+  tallosDelRamo, RAMO_DESDE, RAMO_MAX,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -569,5 +570,40 @@ describe('lugaresCercanos: la cena dejó de ser el plan, sigue siendo el criteri
 
   it('sin hora de fin no propone nada: "cenamos después" sería ficción', () => {
     expect(lugaresCercanos(teatro, lugares, null)).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+describe('ramo', () => {
+  it('la noche de la cita lleva 29 tallos', () => {
+    expect(tallosDelRamo(RAMO_DESDE, '2026-09-24')).toBe(29);
+  });
+
+  it('el día del mes cumplido lleva 31', () => {
+    expect(tallosDelRamo(RAMO_DESDE, '2026-09-26')).toBe(31);
+  });
+
+  it('el primer día ya tiene su flor: 1, no 0', () => {
+    expect(tallosDelRamo(RAMO_DESDE, RAMO_DESDE)).toBe(1);
+  });
+
+  it('una fecha anterior no produce un ramo negativo ni vacío', () => {
+    expect(tallosDelRamo(RAMO_DESDE, '2026-08-01')).toBe(1);
+  });
+
+  it('el tope frena el crecimiento: la pestaña se queda como recuerdo', () => {
+    expect(tallosDelRamo(RAMO_DESDE, '2027-08-26')).toBe(RAMO_MAX);
+    expect(tallosDelRamo(RAMO_DESDE, '2030-01-01')).toBe(RAMO_MAX);
+  });
+
+  it('el tope es configurable y se respeta el borde exacto', () => {
+    expect(tallosDelRamo(RAMO_DESDE, '2026-09-24', 10)).toBe(10);
+    expect(tallosDelRamo(RAMO_DESDE, '2026-10-25', RAMO_MAX)).toBe(RAMO_MAX);
+  });
+
+  it('sin fecha devuelve un tallo en vez de romper la invitación', () => {
+    expect(tallosDelRamo(null, '2026-09-24')).toBe(1);
+    expect(tallosDelRamo(RAMO_DESDE, null)).toBe(1);
+    expect(tallosDelRamo(RAMO_DESDE, 'no-es-fecha')).toBe(1);
   });
 });

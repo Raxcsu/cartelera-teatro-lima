@@ -35,16 +35,30 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .corazon::before{top:-4.5px;left:0}
 .corazon::after{top:0;right:-4.5px}
 
-/* Dos destinos, no dos versiones de la misma pantalla. La barra se queda
-   arriba aun cuando la cartelera falle: la lectura astronómica es estática. */
+/* Tres destinos, no tres versiones de la misma pantalla. La barra se queda
+   arriba aun cuando la cartelera falle: ni la lectura astronómica ni la
+   invitación dependen de que los JSON carguen.
+
+   El `font` decía `10.5px/var(--sans)`: eso pone la familia en la posición
+   de line-height y deja el shorthand sin font-family, que es obligatoria,
+   así que la declaración entera se descartaba y las pestañas salían a 16px.
+   Con dos entraban raspando; la tercera desbordaba la barra. */
 .pestanas{display:flex;justify-content:center;gap:3px;margin:16px auto 0;
   border-bottom:1px solid var(--line);max-width:430px}
 .pestana{display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap);
   padding:0 13px;border-bottom:2px solid transparent;margin-bottom:-1px;
-  color:var(--ink3);font:600 10.5px/var(--sans);letter-spacing:.08em;
-  text-decoration:none;text-transform:uppercase}
+  color:var(--ink3);font:600 10.5px var(--sans);letter-spacing:.08em;
+  text-decoration:none;text-transform:uppercase;white-space:nowrap}
 .pestana:hover{color:var(--accent);background:var(--accent-bg)}
 .pestana[aria-current="page"]{border-bottom-color:var(--accent);color:var(--accent)}
+/* En un teléfono angosto las tres no entran con el aire pensado para dos.
+   Cede el padding lateral y el tracking; el alto táctil de 44px no. */
+@media (max-width:400px){
+  .pestana{padding:0 8px;letter-spacing:.05em}
+}
+@media (max-width:340px){
+  .pestana{padding:0 5px}
+}
 
 .cargando{color:var(--ink2);font-size:14px;padding:40px 0;text-align:center}
 .andamio{background:var(--accent-bg);color:var(--accent);font-size:11.5px;
@@ -323,6 +337,87 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 .lector-pdf p{padding:24px;font-size:13.5px;line-height:1.6;color:var(--ink2)}
 .lector-pdf a{color:var(--accent)}
 
+/* ── una pregunta ──────────────────────────────────────────
+   La invitación. Es la primera pantalla del proyecto con animación, así que
+   TODA ella vive dentro de prefers-reduced-motion:no-preference, igual que
+   las dos transition que ya existían. Con el movimiento apagado el ramo
+   aparece entero y quieto — nunca vacío, que sería el peor de los fallos.
+
+   Los rosas salen de la familia del acento. El verde es PROPIO y no --ok:
+   ese es el verde del semáforo de confianza y DESIGN.md prohíbe reusarlo
+   para decorar, que es la misma razón por la que el acento es rosa vino y
+   no dorado. Todo va scoped acá; :root no se toca. */
+.app.pregunta{
+  --flor-1:#e3b9c1; --flor-2:#c77e90; --flor-3:#a35267; --flor-4:#854052;
+  --hoja:#93a38c; --hoja-2:#7c8f77;
+  max-width:560px;padding:18px 20px 44px;
+}
+.pregunta-articulo{display:flex;flex-direction:column;
+  gap:clamp(13px,3.2vw,20px);text-align:center}
+.pregunta-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink3)}
+.pregunta h2{margin-top:9px;font-family:var(--serif);font-weight:400;
+  font-size:clamp(29px,7.4vw,41px);line-height:1.04;
+  letter-spacing:-.035em;color:var(--ink)}
+
+/* el ramo — la geometría la calcula js/pregunta.js */
+/* La altura la manda el CSS y el ancho se acomoda: el viewBox lo calcula
+   js/pregunta.js sobre el dibujo real, así que sus proporciones cambian con
+   el número de flores. Fijando el alto, el ramo crece a lo ancho sin empujar
+   el texto hacia abajo un poco más cada día. */
+.ramo{width:100%;margin:0 auto}
+.ramo svg{display:block;width:100%;height:clamp(196px,29vh,260px)}
+.tallo-vara{fill:none;stroke:var(--hoja-2);stroke-width:1.5;
+  stroke-linecap:round;opacity:.72}
+.tallo-hoja{fill:var(--hoja);opacity:.8}
+.flor-t1{color:var(--flor-1)}
+.flor-t2{color:var(--flor-2)}
+.flor-t3{color:var(--flor-3)}
+.flor-t4{color:var(--flor-4)}
+.ramo-lazo{fill:var(--flor-3);opacity:.92}
+.ramo-cinta{fill:var(--flor-4)}
+
+/* el texto */
+.pregunta-cuerpo{display:flex;flex-direction:column;gap:13px;
+  font-size:14.5px;line-height:1.62;color:var(--ink2)}
+.pregunta-alusion{font-size:15px;color:var(--ink)}
+
+/* la respuesta */
+.pregunta-pide{font-family:var(--serif);font-size:21px;color:var(--ink)}
+.pregunta-botones{display:flex;justify-content:center;gap:9px;margin-top:11px}
+/* .btn trae min-height:44px pero no min-width, y con un rótulo de dos letras
+   el padding lateral deja el blanco en 42px. DESIGN.md pide 44 en los DOS
+   lados, así que acá la medida se pide explícita. */
+.pregunta-botones .btn{min-width:var(--tap)}
+.pregunta-dicho{display:flex;flex-direction:column;gap:12px;
+  padding:19px 16px;border:1px solid var(--hair);border-radius:11px;
+  background:var(--accent-bg);font-size:14.5px;line-height:1.6;color:var(--ink)}
+.pregunta-firma{font-family:var(--serif);font-size:17px;color:var(--accent)}
+
+@keyframes brotar{
+  from{transform:scale(.06);opacity:0}
+  62%{opacity:1}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes aparecer{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  /* Todos los tallos nacen del MISMO punto, y ese punto llega desde
+     js/pregunta.js en --origen-x/--origen-y: el viewBox se calcula del
+     contenido, así que un transform-origin escrito acá a mano apuntaría a
+     otro sitio en cuanto cambiara el número de flores. Se anima solo
+     transform y opacity, las dos que no fuerzan layout; nada de
+     will-change, que con 29 tallos serían 29 capas en un teléfono. */
+  .pregunta .tallo{transform-box:view-box;
+    transform-origin:var(--origen-x) var(--origen-y);
+    animation:brotar .66s cubic-bezier(.22,.9,.3,1) backwards;
+    animation-delay:calc(var(--i) * 55ms)}
+  .pregunta .ramo-lazo{animation:aparecer .5s ease-out backwards;animation-delay:.22s}
+  .pregunta-dicho{animation:aparecer .45s ease-out}
+}
+
 /* Foco de teclado visible en todo lo tocable (DESIGN.md, accesibilidad). */
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
@@ -403,6 +498,16 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .paper-cabecera{flex:0 0 auto;margin-bottom:10px}
   .paper h3{font-size:18px}
   .lector-pdf{flex:1 1 auto;height:auto;min-height:0}
+
+  /* La invitación no es una sola pantalla como la escala: si el ramo y el
+     texto no entran, tiene que poder scrollear. Por eso overflow-y:auto y
+     no el overflow:hidden de al lado, y por eso NO se centra vertical con
+     justify-content: con contenido más alto que el hueco, el centrado deja
+     el título arriba, fuera de alcance y sin forma de subir. */
+  .app.pregunta{max-width:660px;overflow-y:auto;padding:6px 28px 36px}
+  .pregunta-articulo{gap:22px}
+  .pregunta h2{font-size:clamp(32px,5.2dvh,44px)}
+  .ramo{max-width:430px}
 
   /* La clase `pantalla` la pone pintarEsqueleto(). Los estados de cartelera
      vencida y de error reemplazan todo #app y por eso NO la heredan: siguen

@@ -10,3 +10,8 @@ TODOS.md
 
 # Maquetas y bocetos: el repo publico es solo codigo y datos.
 layout.png
+
+# Las entradas reales: llevan DNI, numero de compra y los QR de acceso.
+# Este repo es publico y cada push despliega, asi que no entran nunca.
+docs/bodas_figaro_entradas.pdf
+docs/entrada_valeria.png

@@ -65,6 +65,27 @@ export function diasEntre(desde, hasta) {
 }
 
 /**
+ * El ramo de la invitación: un tallo por cada día juntos.
+ *
+ * Vive acá y no en la vista por la misma razón que `mesInicial()` o
+ * `diaCorto()`: parece cosa de interfaz, pero es la regla del dato. El
+ * número de flores ES la fecha en que empezaron, así que decidirlo dentro
+ * de un template lo dejaría sin prueba y sin un solo sitio donde mirarlo.
+ *
+ * El tope no es decorativo: la pestaña se queda como recuerdo, y sin él
+ * dentro de un año el ramo serían 365 tallos sobre 430px de ancho.
+ */
+export const RAMO_DESDE = '2026-08-26';
+export const RAMO_MAX = 60;
+
+export function tallosDelRamo(desde, hoy, max = RAMO_MAX) {
+  const dias = diasEntre(desde, hoy);
+  if (dias === null) return 1;
+  // El primer día ya merece su flor, y una fecha anterior no resta.
+  return Math.max(1, Math.min(max, dias));
+}
+
+/**
  * La confianza mostrada se CALCULA, no se lee del JSON.
  *
  * Guardar `verificado_el` y después nunca mirarlo produce confianza

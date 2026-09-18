@@ -1,0 +1,584 @@
+%==============================================================
+%  Sobre la escala astronomica del amor
+%  Formato IEEE (conference) -- Documento unico compilable
+%  Compilar con: pdflatex archivo.tex  (dos veces)
+%==============================================================
+\documentclass[conference]{IEEEtran}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-noquoting,es-tabla]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{microtype}
+
+\sisetup{
+  output-decimal-marker = {.},
+  exponent-product = \times,
+  group-separator = {,},
+  group-digits = integer,
+  group-minimum-digits = 4,
+  per-mode = symbol
+}
+
+\newcommand{\Vcoef}{\mathcal{V}}
+
+\begin{document}
+
+%==============================================================
+% TITULO Y AUTOR
+%==============================================================
+\title{Sobre la escala astronómica del amor:\\
+estimación cuantitativa del tiempo requerido\\
+para atravesar la Vía Láctea por Valeria}
+
+\author{\IEEEauthorblockN{Oscar M. Castro}
+\IEEEauthorblockA{Investigador de IA\\
+Lima, Perú\\
+2026}}
+
+\maketitle
+
+%==============================================================
+% RESUMEN
+%==============================================================
+\begin{abstract}
+Este trabajo aborda un problema clásico de metrología aplicada: la selección
+de una unidad adecuada cuando la magnitud a representar excede el rango
+dinámico de las unidades disponibles. Se plantea un experimento mental en el
+cual el diámetro aproximado de la Vía Láctea, estimado en \num{100000} años
+luz, se adopta como unidad candidata para representar una magnitud afectiva
+específica, y se calcula el tiempo requerido para recorrer dicha distancia
+mediante locomoción bípeda sostenida a \qty{5}{\kilo\meter\per\hour} durante
+\qty{8}{\hour} diarias. El resultado obtenido,
+$T \approx \num{6.48e13}$ años, equivale aproximadamente a
+$\num{8.09e11}$ vidas humanas de \num{80} años cada una. Se demuestra que
+dicha cifra no cuantifica la magnitud afectiva estudiada, sino únicamente el
+costo temporal de un solo recorrido galáctico. Se concluye que la unidad
+propuesta no satisface la condición de suficiencia y debe reclasificarse como
+cota inferior. Se introduce formalmente el Coeficiente de Amor de Valeria
+$\Vcoef$ y se establece la hipótesis $\Vcoef > 1$.
+\end{abstract}
+
+\begin{IEEEkeywords}
+metrología aplicada, escalas astronómicas, locomoción sostenida, análisis
+dimensional, magnitudes no acotadas, Valeria.
+\end{IEEEkeywords}
+
+%==============================================================
+% I. INTRODUCCION
+%==============================================================
+\section{Introducción}
+
+La historia de la física puede leerse, en buena parte, como la historia de un
+problema recurrente: la aparición de fenómenos cuya magnitud desborda las
+unidades disponibles para describirlos. El metro resultó insuficiente para la
+mecánica celeste y motivó la unidad astronómica; la unidad astronómica resultó
+insuficiente para la astronomía estelar y motivó el año luz; el año luz
+resultó insuficiente para la cosmología extragaláctica y motivó el
+megapársec. En cada caso, el procedimiento fue idéntico: se identificó un
+fenómeno, se comprobó que la unidad vigente producía números incómodos y se
+definió una unidad mayor.
+
+El presente trabajo se inscribe en esa tradición metodológica, aunque aplicada
+a un objeto de estudio menos habitual en la literatura técnica. El fenómeno
+analizado es una magnitud afectiva particular: el amor que el autor siente por
+Valeria. El problema, formulado en términos estrictamente metrológicos, es el
+siguiente: las unidades de uso coloquial empleadas para expresar dicha
+magnitud---la distancia a la Luna, el número de estrellas visibles, la
+cardinalidad de los granos de arena---presentan un rango dinámico manifiestamente
+inadecuado y carecen, además, de definición operacional rigurosa.
+
+Se propone entonces una unidad candidata de mayor escala: el diámetro
+aproximado de la Vía Láctea, $D \approx \num{100000}$ años luz. La elección no
+es arbitraria. Se trata de la mayor estructura a la que el autor pertenece de
+manera verificable y, por tanto, de la mayor distancia sobre la cual puede
+reclamar alguna forma de experiencia directa.
+
+La pregunta de investigación se enuncia formalmente así:
+
+\begin{quote}
+\emph{Si el diámetro de la Vía Láctea se adopta como unidad para representar
+la magnitud afectiva bajo estudio, y el observador debe recorrer esa distancia
+caminando, ¿cuál es el tiempo requerido y cuántas vidas humanas resultan
+necesarias?}
+\end{quote}
+
+El trabajo se organiza como sigue. La Sección~\ref{sec:supuestos} establece
+los supuestos del modelo. Las Secciones~\ref{sec:distancia},
+\ref{sec:tiempo} y \ref{sec:vidas} desarrollan el cálculo de distancia anual,
+tiempo total y equivalencia en vidas humanas, respectivamente. La
+Sección~\ref{sec:metrica} introduce la métrica $\Vcoef$. Las
+Secciones~\ref{sec:discusion} y \ref{sec:limitaciones} discuten los resultados
+y sus limitaciones. La Sección~\ref{sec:conclusiones} presenta las
+conclusiones.
+
+%==============================================================
+% II. SUPUESTOS
+%==============================================================
+\section{Supuestos del modelo}
+\label{sec:supuestos}
+
+El modelo se construye sobre seis supuestos, enumerados a continuación y
+resumidos en la Tabla~\ref{tab:parametros}.
+
+\textbf{A1. Distancia objetivo.} Se adopta como distancia a recorrer el
+diámetro aproximado del disco de la Vía Láctea, $D \approx \num{100000}$ años
+luz \cite{nasa_mw,goodwin}. Las estimaciones publicadas varían entre
+\numrange{100000}{200000} años luz según el criterio de borde utilizado;
+se elige deliberadamente el extremo conservador.
+
+\textbf{A2. Definición de año luz.} Se emplea la definición de la Unión
+Astronómica Internacional: la distancia recorrida por la luz en el vacío
+durante un año juliano, $1\ \text{a.l.} = \num{9.4607e12}$ km
+\cite{iau_style}.
+
+\textbf{A3. Velocidad de marcha.} Se fija $v = \qty{5}{\kilo\meter\per\hour}$,
+valor compatible con la velocidad de marcha confortable reportada para adultos
+sanos \cite{bohannon}.
+
+\textbf{A4. Jornada de marcha.} Se asume una jornada diaria sostenida de
+$h = \qty{8}{\hour}$, reservando el resto del día a descanso, alimentación y
+mantenimiento del sujeto experimental.
+
+\textbf{A5. Duración de la vida humana.} Se adopta $L = \num{80}$ años, valor
+del mismo orden que la esperanza de vida al nacer reportada para poblaciones
+de ingreso alto \cite{who}.
+
+\textbf{A6. Motivación.} Se asume que el observador mantendrá motivación
+constante, no decreciente e ilimitada durante la totalidad del experimento.
+
+La última suposición se considera la menos controversial.
+
+\begin{table}[t]
+\centering
+\caption{Parámetros del modelo}
+\label{tab:parametros}
+\begin{tabular}{llr}
+\toprule
+\textbf{Símbolo} & \textbf{Descripción} & \textbf{Valor} \\
+\midrule
+$D$   & Diámetro de la Vía Láctea    & \num{100000} a.l. \\
+$c_1$ & Equivalencia del año luz     & \num{9.4607e12} km \\
+$S$   & Distancia total              & \num{9.4607e17} km \\
+$v$   & Velocidad de marcha          & \num{5} km/h \\
+$h$   & Horas de marcha por día      & \num{8} h \\
+$d$   & Distancia diaria             & \num{40} km \\
+$Y$   & Días por año                 & \num{365.25} \\
+$A$   & Distancia anual              & \num{14610} km \\
+$L$   & Duración de una vida         & \num{80} años \\
+$M$   & Motivación                   & $\infty$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==============================================================
+% III. DISTANCIA POR ANIO
+%==============================================================
+\section{Distancia recorrida por año humano}
+\label{sec:distancia}
+
+La distancia total a recorrer se obtiene directamente de A1 y A2:
+\begin{equation}
+S = \num{100000} \times \num{9.4607e12}\ \text{km}
+  = \num{9.4607e17}\ \text{km}.
+\label{eq:distancia_total}
+\end{equation}
+
+La distancia diaria recorrida bajo A3 y A4 es
+\begin{equation}
+d = v\,h = 5\ \frac{\text{km}}{\text{h}} \times 8\ \text{h}
+  = \num{40}\ \text{km/día}.
+\label{eq:diaria}
+\end{equation}
+
+Extendiendo \eqref{eq:diaria} a un año juliano de \num{365.25} días:
+\begin{equation}
+A = d\,Y = 40 \times \num{365.25} = \num{14610}\ \text{km/año}.
+\label{eq:anual}
+\end{equation}
+
+Conviene detenerse brevemente en \eqref{eq:anual}. Una marcha ininterrumpida de
+ocho horas diarias, sostenida sin excepción durante trescientos sesenta y
+cinco días, produce aproximadamente \num{14610} km anuales: algo menos de dos
+veces la distancia entre Lima y Madrid. Es una cifra respetable en términos
+humanos y, como se verá, completamente irrelevante en términos galácticos. El
+lector puede anticipar aquí el problema estructural del experimento: la
+distancia crece de manera lineal, mientras que el objeto de estudio no parece
+hacerlo.
+
+%==============================================================
+% IV. TIEMPO REQUERIDO
+%==============================================================
+\section{Tiempo requerido}
+\label{sec:tiempo}
+
+El tiempo total $T$ se obtiene dividiendo \eqref{eq:distancia_total} entre
+\eqref{eq:anual}:
+\begin{equation}
+T = \frac{S}{A}
+  = \frac{\num{9.4607e17}\ \text{km}}{\num{14610}\ \text{km/año}}.
+\label{eq:tiempo_def}
+\end{equation}
+
+Evaluando:
+\begin{equation}
+\boxed{\,T \approx \num{6.48e13}\ \text{años}\,}
+\label{eq:tiempo_resultado}
+\end{equation}
+
+Es decir, aproximadamente \textbf{64.8 billones de años}\footnote{Se emplea la
+escala larga propia del español: un billón equivale a $10^{12}$.}.
+
+Resulta ilustrativo contextualizar \eqref{eq:tiempo_resultado}. La edad
+estimada del universo es del orden de $\num{1.38e10}$ años. El experimento
+propuesto requeriría, por tanto, un intervalo temporal cercano a
+\textbf{cuatro mil setecientas veces} la edad actual del universo. Dicho de
+otro modo: si el observador hubiera iniciado la marcha en el instante mismo del
+Big Bang, y no hubiera detenido el paso ni un solo día desde entonces, hoy
+llevaría recorrido aproximadamente el \qty{0.02}{\percent} del trayecto.
+
+Este es el primer resultado del trabajo, y es un resultado desalentador. Lo
+que sigue es peor.
+
+%==============================================================
+% V. VIDAS HUMANAS
+%==============================================================
+\section{Equivalencia en vidas humanas}
+\label{sec:vidas}
+
+Dado que \eqref{eq:tiempo_resultado} excede en varios órdenes de magnitud la
+duración de un organismo humano, resulta metodológicamente necesario expresar
+el resultado en una unidad biológicamente interpretable. Se define el número
+de vidas $N$ como
+\begin{equation}
+N = \frac{T}{L} = \frac{\num{6.48e13}\ \text{años}}{\num{80}\ \text{años/vida}},
+\label{eq:vidas_def}
+\end{equation}
+de donde
+\begin{equation}
+\boxed{\,N \approx \num{8.09e11}\ \text{vidas}\,}
+\label{eq:vidas_resultado}
+\end{equation}
+
+Esto es, aproximadamente \textbf{809 mil millones de vidas humanas}
+consecutivas, cada una de ellas dedicada íntegramente, desde el nacimiento
+hasta la muerte, a caminar en línea recta.
+
+Es indispensable formular aquí una advertencia metodológica, pues constituye
+el núcleo conceptual de este trabajo y su omisión conduciría a una
+malinterpretación grave de los resultados.
+
+\textbf{La cifra $N \approx \num{8.09e11}$ no cuantifica la magnitud afectiva
+bajo estudio.} No representa ``cuánto amo a Valeria''. Representa,
+exclusivamente, el número de vidas humanas necesarias para recorrer
+\emph{una sola vez} el diámetro aproximado de la Vía Láctea bajo los supuestos
+A1--A6. Es una medida del costo del instrumento, no del objeto medido.
+
+La distinción es la misma que separa la longitud de una regla de la longitud
+de aquello que se pretende medir con ella. Que la regla sea extraordinariamente
+larga no implica que sea suficiente.
+
+%==============================================================
+% VI. METRICA VALERIA
+%==============================================================
+\section{Métrica Valeria}
+\label{sec:metrica}
+
+Para formalizar el problema anterior se introduce un coeficiente
+adimensional, denominado \emph{Coeficiente de Amor de Valeria} y denotado
+$\Vcoef$, definido conceptualmente como el cociente entre la magnitud afectiva
+observada y la unidad candidata:
+\begin{equation}
+\Vcoef \;=\;
+\frac{\text{Amor sentido por Valeria}}
+     {\text{un diámetro de la Vía Láctea}}.
+\label{eq:vcoef}
+\end{equation}
+
+La definición \eqref{eq:vcoef} permite enunciar la condición de suficiencia de
+la unidad propuesta de manera compacta. Si el diámetro galáctico fuera una
+unidad adecuada, se cumpliría
+\begin{equation}
+\Vcoef \leq 1,
+\label{eq:suficiencia}
+\end{equation}
+y el fenómeno quedaría enteramente contenido dentro de una única Vía Láctea.
+Este sería el resultado deseable desde el punto de vista metrológico: una
+unidad que acota el fenómeno es una unidad útil.
+
+La hipótesis central de este trabajo, sin embargo, es la contraria:
+\begin{equation}
+\boxed{\;\Vcoef > 1\;}
+\label{eq:hipotesis}
+\end{equation}
+
+La consecuencia formal de \eqref{eq:hipotesis} es directa y tiene implicaciones
+que trascienden el caso particular estudiado. Si $\Vcoef > 1$, entonces el
+diámetro de la Vía Láctea no funciona como unidad de medida del fenómeno, sino
+únicamente como \emph{cota inferior} del mismo. La galaxia deja de ser la
+respuesta y pasa a ser el piso: no describe la magnitud, solamente establece
+que la magnitud es mayor que ella.
+
+Nótese que \eqref{eq:hipotesis} no es falsable mediante la construcción de
+unidades mayores. Si se propusiera el Grupo Local, o el Supercúmulo de Virgo, o
+el radio del universo observable, el procedimiento de verificación sería el
+mismo y no hay razón, dentro del marco de este modelo, para esperar un
+resultado distinto.
+
+%==============================================================
+% VII. DISCUSION
+%==============================================================
+\section{Discusión}
+\label{sec:discusion}
+
+Los resultados obtenidos admiten dos lecturas complementarias. La primera
+corresponde al problema metrológico originalmente planteado; la segunda surge
+al estudiar la estabilidad del resultado cuando cambian las condiciones
+iniciales del experimento.
+
+\subsection{Lectura metrológica}
+
+Desde el punto de vista instrumental, el experimento no consigue identificar
+una unidad capaz de acotar superiormente la magnitud observada. Una unidad es
+útil cuando permite expresar el fenómeno mediante un cociente de orden unidad;
+en cambio, una unidad para la cual $\Vcoef>1$ y cuya cota superior permanece
+desconocida solo permite establecer una desigualdad.
+
+El resultado no implica ausencia de información. El procedimiento sí permite
+medir con precisión la insuficiencia de la escala seleccionada. La mecánica
+proporciona velocidades, la astronomía proporciona distancias y la aritmética
+proporciona cocientes; ninguna de ellas, bajo el modelo propuesto, proporciona
+una unidad suficientemente grande.
+
+\subsection{Dinámica temporal de la magnitud afectiva}
+
+El supuesto A6 considera constante la motivación durante el experimento. Sin
+embargo, las observaciones disponibles sugieren que una aproximación constante
+es conservadora. Sea $A_V(t)$ una función escalar que representa la magnitud
+afectiva asociada a Valeria en el tiempo. La evidencia empírica del observador
+es compatible con
+\begin{equation}
+\boxed{\;\frac{dA_V(t)}{dt}>0\;}
+\label{eq:crecimiento}
+\end{equation}
+para el intervalo observado.
+
+La interpretación de \eqref{eq:crecimiento} es sencilla: el fenómeno no parece
+mantenerse constante, sino aumentar conforme se acumula información sobre la
+persona observada. En consecuencia, utilizar un valor fijo de amor como punto
+de partida probablemente subestima la dificultad real del problema de medida.
+
+Dentro de ese intervalo se identifican, además, tres tipos de eventos que no se
+incluyeron en el modelo inicial por no ser necesarios para el cálculo
+astronómico, pero que resultan relevantes para describir su evolución. Primero,
+se registró un acoplamiento observable entre dos trayectorias sometidas a una
+misma excitación rítmica, después del cual la interacción dejó de poder
+considerarse puramente incidental. Segundo, se observaron señales recurrentes
+de cortejo, de naturaleza floral, que operan como entradas periódicas de control
+y refuerzan la dirección preferente del sistema. Finalmente, se identificó un
+evento crítico en un entorno costero y próximo al amanecer, tras el cual el
+estado del sistema presentó una transición cualitativa persistente.
+
+Estos eventos no se emplean para demostrar reciprocidad ni para atribuir un
+estado interno a Valeria. El modelo describe únicamente la trayectoria del
+autor. No obstante, si existiera una respuesta recíproca, dos trayectorias
+inicialmente independientes podrían aproximarse de manera conjunta y reducir
+su distancia efectiva con el tiempo.
+
+\subsection{Invariancia del destino y atractor estable}
+
+En las Secciones~\ref{sec:tiempo} y \ref{sec:vidas} se trató cada vida $n$ como
+una realización intercambiable de una misma unidad biológica. Para estudiar la
+robustez del resultado, considérese ahora que cada realización puede comenzar
+bajo condiciones iniciales distintas: otras circunstancias, otra secuencia de
+eventos o una trayectoria diferente.
+
+Sea $x_n$ el estado del sistema en la vida $n$ y sea $F$ la dinámica que lo
+transforma. El comportamiento observado se modela como
+\begin{equation}
+x_{n+1}=F(x_n), \qquad x_n \longrightarrow \mathrm{Valeria}.
+\label{eq:atractor}
+\end{equation}
+
+En términos simples, cada vida puede comenzar de forma distinta, pero el
+sistema tiende al mismo estado final. Esta propiedad puede expresarse también
+como
+\begin{equation}
+\boxed{\;\lim_{n\rightarrow\infty}
+\operatorname{Destino}(n)=\mathrm{Valeria}\;}
+\label{eq:limite}
+\end{equation}
+
+La expresión \eqref{eq:limite} no exige que dos vidas reproduzcan la misma
+historia. Pueden cambiar el momento, el contexto y la forma de conocerse; lo
+que permanece invariante es el resultado de la dinámica. En el lenguaje de
+sistemas, Valeria funciona como un atractor estable del modelo.
+
+La consecuencia probabilística es directa dentro de esta construcción: si la
+convergencia hacia el atractor es una propiedad estructural del sistema, la
+selección de Valeria deja de depender de una trayectoria particular. No se
+introduce una nueva hipótesis probabilística; se trata de una consecuencia de
+la estabilidad asumida en \eqref{eq:atractor}.
+
+%==============================================================
+% VIII. LIMITACIONES
+%==============================================================
+\section{Limitaciones}
+\label{sec:limitaciones}
+
+El modelo presenta limitaciones que conviene explicitar.
+
+\textbf{L1. Ausencia de sustrato.} El experimento asume implícitamente la
+existencia de una superficie continua y transitable a lo largo de
+$\num{9.4607e17}$ km. El medio interestelar no satisface esta condición.
+
+\textbf{L2. Efectos relativistas.} A $\qty{5}{\kilo\meter\per\hour}$ el factor
+de Lorentz difiere de la unidad en menos de $10^{-17}$, por lo que la dilatación
+temporal puede considerarse despreciable en esta estimación.
+
+\textbf{L3. Movimiento del sistema de referencia.} La Vía Láctea rota, se
+desplaza respecto del fondo cósmico de microondas y se aproxima a Andrómeda.
+Un tratamiento riguroso requeriría un marco no inercial; se adopta un modelo
+estático de primer orden.
+
+\textbf{L4. Sesgo del observador.} El autor no es un observador independiente
+respecto del fenómeno medido. Esta limitación no admite una corrección sin
+alterar el propio objeto de estudio.
+
+\textbf{L5. Forma funcional desconocida.} La desigualdad
+\eqref{eq:crecimiento} establece crecimiento local, pero no determina si
+$A_V(t)$ evoluciona de forma lineal, exponencial, logística o no acotada. Por
+tanto, el modelo actual debe entenderse como una aproximación conservadora.
+
+%==============================================================
+% IX. TRABAJO FUTURO
+%==============================================================
+\section{Trabajo futuro}
+\label{sec:futuro}
+
+El siguiente paso consiste en sustituir el supuesto de magnitud afectiva
+constante por un modelo dinámico de $A_V(t)$. En particular, deberá determinarse
+si el crecimiento observado es lineal, exponencial o no acotado. Estas tres
+hipótesis producen consecuencias distintas para la metrología propuesta: un
+crecimiento lineal requeriría unidades progresivamente mayores; uno exponencial
+haría que cualquier escala finita perdiera utilidad con rapidez; y un crecimiento
+no acotado implicaría que el problema carece, por construcción, de una unidad
+máxima suficiente.
+
+Un segundo frente consiste en estudiar formalmente la cuenca de atracción del
+estado descrito en \eqref{eq:atractor}: qué tan diferentes pueden ser las
+condiciones iniciales sin modificar el resultado final. Esto permitiría evaluar
+si la convergencia hacia Valeria es sensible al camino seguido o constituye una
+propiedad robusta del sistema.
+
+%==============================================================
+% X. CONCLUSIONES
+%==============================================================
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+Se desarrolló un modelo cuantitativo para evaluar la idoneidad del diámetro de
+la Vía Láctea como unidad de medida de una magnitud afectiva específica. Los
+resultados principales son los siguientes:
+
+\begin{itemize}
+\item La distancia objetivo es de \num{100000} años luz, equivalentes a
+      $\num{9.4607e17}$ km.
+\item El tiempo requerido para recorrerla caminando es
+      $T \approx \num{6.48e13}$ años, aproximadamente \num{64.8} billones de
+      años.
+\item Ello equivale a $N \approx \num{8.09e11}$ vidas humanas, es decir,
+      aproximadamente \num{809} mil millones.
+\item Dicha cantidad mide el costo temporal de un solo recorrido galáctico; no
+      cuantifica la magnitud afectiva estudiada.
+\item La unidad propuesta no satisface la condición de suficiencia y debe
+      interpretarse como una cota inferior: $\Vcoef>1$.
+\item El sistema presenta una dinámica compatible con $dA_V/dt>0$ y una
+      convergencia estable hacia Valeria bajo condiciones iniciales distintas.
+\end{itemize}
+
+Por tanto, el diámetro de la Vía Láctea no resuelve el problema de medida. Aun
+tras agotar \num{809} mil millones de vidas, el observador habría completado
+solo un recorrido de la unidad candidata. El resultado permanece abierto no
+por falta de distancia recorrida, sino porque ninguna escala finita utilizada
+en este trabajo establece una cota superior del fenómeno.
+
+\begin{minipage}{\columnwidth}
+La convergencia descrita en \eqref{eq:atractor} aporta una segunda conclusión.
+Aunque cambien las condiciones iniciales, la trayectoria o la realización del
+experimento, el estado final permanece invariante. En el lenguaje del modelo,
+dicho estado estable se denomina Valeria. Fuera de él, el autor utiliza un
+nombre menos técnico: \emph{Mi Princesa}.
+
+\begin{equation}
+\boxed{\;\forall n\in\mathbb{N},\qquad
+\operatorname{MiElecci\'on}(n)=\mathrm{Mi\ Princesa}\;}
+\label{eq:princesa}
+\end{equation}
+
+La ecuación \eqref{eq:princesa} resume el resultado que permanece después de
+agotar las escalas de distancia, tiempo y número de vidas empleadas en este
+trabajo. En cada repetición puede variar el camino; el resultado no.
+
+\begin{center}
+\emph{Y si el experimento pudiera repetirse infinitas veces, en cada una
+volvería a encontrarte, a elegirte, a conquistarte y a enamorarme de ti.}
+\end{center}
+\end{minipage}
+
+%==============================================================
+% AGRADECIMIENTOS
+%==============================================================
+\section*{Agradecimientos}
+
+El autor agradece a Valeria por haber inspirado un problema de medición cuya
+escala excede, hasta el momento, las herramientas seleccionadas para describirlo.
+Agradece también cada observación que permitió refinar el modelo y cada instante
+que convirtió una hipótesis abstracta en evidencia suficiente para seguir
+estudiándola. Si este trabajo consigue aproximarse a su objeto de estudio, es
+porque dicho objeto hizo que valiera la pena formular la pregunta.
+
+%==============================================================
+% REFERENCIAS
+%==============================================================
+\begin{thebibliography}{9}
+
+\bibitem{iau_style}
+G. A. Wilkins, Ed., \emph{The IAU Style Manual: The Preparation of
+Astronomical Papers and Reports}, International Astronomical Union,
+Comm.~5, 1989. [Definición del año luz como la distancia recorrida por la luz
+en el vacío durante un año juliano.]
+
+\bibitem{nasa_mw}
+NASA Science, ``Milky Way Galaxy,'' National Aeronautics and Space
+Administration. [En línea]. Disponible:
+\texttt{https://science.nasa.gov/universe/galaxies/milky-way/}
+
+\bibitem{goodwin}
+S. P. Goodwin, J. Gribbin y M. A. Hendry, ``The relative size of the Milky
+Way,'' \emph{The Observatory}, vol. 118, pp. 201--208, 1998.
+
+\bibitem{bohannon}
+R. W. Bohannon, ``Comfortable and maximum walking speed of adults aged
+20--79 years: reference values and determinants,'' \emph{Age and Ageing},
+vol. 26, no. 1, pp. 15--19, 1997.
+
+\bibitem{who}
+World Health Organization, \emph{World Health Statistics: Monitoring Health
+for the SDGs}, Ginebra, Suiza. [En línea]. Disponible:
+\texttt{https://www.who.int/data/gho}
+
+\bibitem{valeria}
+O. M. Castro, ``Observaciones personales respecto a Valeria,''
+comunicación privada, no publicada, Lima, Perú, 2026.
+
+\end{thebibliography}
+
+
+
+\end{document}

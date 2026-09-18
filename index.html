@@ -4,20 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Theater with her — cartelera de Lima</title>
-<link rel="stylesheet" href="styles.css?v=20260914-split">
+<link rel="stylesheet" href="styles.css?v=20260918-pregunta">
 </head>
 <body>
 
 <!-- La cabecera es lo único de DOM que NO vive en los módulos de vista, y a propósito:
      es una constante, no un dato. Puesta acá se ve durante "Cargando
      cartelera…" y sobrevive a los estados de error y de cartelera vencida,
-     que reemplazan todo #app. La navegación también vive acá: la vista
-     astronómica no depende de que la cartelera pueda cargar. -->
+     que reemplazan todo #app. La navegación también vive acá: ni la vista
+     astronómica ni la invitación dependen de que la cartelera pueda cargar. -->
 <header class="sitio">
   <h1>Theater with her <span class="corazon" aria-hidden="true"></span></h1>
   <nav class="pestanas" aria-label="Secciones principales">
     <a class="pestana" href="#cartelera" data-ruta="cartelera">Cartelera</a>
     <a class="pestana" href="#escala-astronomica" data-ruta="escala-astronomica">Escala astronómica</a>
+    <a class="pestana" href="#una-pregunta" data-ruta="una-pregunta">Una pregunta</a>
   </nav>
 </header>
 
