@@ -13,8 +13,6 @@
 import { tallosDelRamo, RAMO_DESDE } from './logica.js';
 import { hoyLima } from './datos.js';
 
-const CLAVE_RESPUESTA = 'teatro.pregunta.respondida';
-
 // El punto del que sale el ramo. No hay viewBox fijo: se calcula del
 // contenido, porque el ramo se ensancha al crecer y un marco fijo le
 // dejaría un margen distinto cada día.
@@ -167,23 +165,53 @@ const ACEPTADA = `
     <p class="pregunta-firma">— Para Mi Princesa</p>
   </div>`;
 
-function yaAcepto() {
-  try {
-    return localStorage.getItem(CLAVE_RESPUESTA) === 'si';
-  } catch {
-    return false;   // modo privado no puede romper la invitación
-  }
-}
+/**
+ * La celebración: el ramo vuelve a abrirse y caen pétalos sobre la página.
+ *
+ * Acá SÍ va Math.random(), y no contradice la regla del ramo: aquel tiene
+ * que ser idéntico en cada visita porque su forma y su número son un dato.
+ * Esto dura tres segundos, no se compara con nada y no vuelve.
+ */
+function celebrar(app) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-function guardarRespuesta() {
-  try {
-    localStorage.setItem(CLAVE_RESPUESTA, 'si');
-  } catch { /* si no se puede guardar, el sí igual vale */ }
+  // Rearranca el brote. Va con un @keyframes propio y no reusando `brotar`:
+  // cambiar solo la duración no reinicia una animación que ya terminó.
+  const svg = app.querySelector('.ramo svg');
+  if (svg) {
+    svg.classList.remove('rebrote');
+    void svg.offsetWidth;          // fuerza el reflow entre quitar y poner
+    svg.classList.add('rebrote');
+  }
+
+  const lluvia = document.createElement('div');
+  lluvia.className = 'petalos';
+  lluvia.setAttribute('aria-hidden', 'true');   // es adorno, no información
+  let ultimo = 0;
+  for (let i = 0; i < 22; i++) {
+    const dur = 2.6 + Math.random() * 2.2;
+    const ret = Math.random() * 1.5;
+    ultimo = Math.max(ultimo, dur + ret);
+    const p = document.createElement('i');
+    p.style.cssText = `left:${(Math.random() * 100).toFixed(1)}%;`
+      + `--dur:${dur.toFixed(2)}s;--ret:${ret.toFixed(2)}s;`
+      + `--giro:${(Math.random() * 720 - 360).toFixed(0)}deg;`
+      + `--vaiven:${(Math.random() * 60 - 30).toFixed(0)}px`;
+    p.className = `petalo petalo-t${1 + Math.floor(Math.random() * 4)}`;
+    lluvia.appendChild(p);
+  }
+  document.body.appendChild(lluvia);
+  // Se va sola: un overlay fijo que quede colgado se come los clics de la
+  // página aunque no se vea. pointer-events:none ya lo evita, pero dejar
+  // 22 nodos animándose para siempre no es gratis.
+  setTimeout(() => lluvia.remove(), (ultimo + 0.4) * 1000);
 }
 
 export function pintarPregunta(app, hoy = hoyLima()) {
-  const aceptada = yaAcepto();
-  app.className = `app pregunta${aceptada ? ' aceptada' : ''}`;
+  // La respuesta no se guarda: cada carga vuelve a preguntar. Recordarla
+  // dejaba los botones muertos para siempre después del primer clic, y no
+  // había nada del otro lado esperando ese dato.
+  app.className = 'app pregunta';
   app.innerHTML = `
     <article class="pregunta-articulo" aria-labelledby="pregunta-titulo">
       <header class="pregunta-cabecera">
@@ -199,18 +227,16 @@ export function pintarPregunta(app, hoy = hoyLima()) {
         <p class="pregunta-cierre">No siempre puedo consentirte,<br>pero cuando lo hago<br>me gusta que sea especial.</p>
       </div>
 
-      <div class="pregunta-respuesta" aria-live="polite">${aceptada ? ACEPTADA : BOTONES}</div>
+      <div class="pregunta-respuesta" aria-live="polite">${BOTONES}</div>
     </article>`;
-
-  if (aceptada) return;
 
   // Delegación, como los tres listeners de vista.js: el contenedor
   // sobrevive al reemplazo de los botones por el mensaje.
   const respuesta = app.querySelector('.pregunta-respuesta');
   respuesta.addEventListener('click', (e) => {
     if (!e.target.closest('[data-acepta]')) return;
-    guardarRespuesta();
     app.classList.add('aceptada');
     respuesta.innerHTML = ACEPTADA;
+    celebrar(app);
   });
 }

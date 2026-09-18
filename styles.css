@@ -347,8 +347,11 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
    ese es el verde del semáforo de confianza y DESIGN.md prohíbe reusarlo
    para decorar, que es la misma razón por la que el acento es rosa vino y
    no dorado. Todo va scoped acá; :root no se toca. */
-.app.pregunta{
+.app.pregunta,
+.petalos{
   --flor-1:#e3b9c1; --flor-2:#c77e90; --flor-3:#a35267; --flor-4:#854052;
+}
+.app.pregunta{
   --hoja:#93a38c; --hoja-2:#7c8f77;
   max-width:560px;padding:18px 20px 44px;
 }
@@ -403,6 +406,31 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   from{opacity:0;transform:translateY(6px)}
   to{opacity:1;transform:none}
 }
+/* Gemelo de `brotar`, con nombre propio a propósito: cambiarle la duración
+   a una animación que ya terminó no la reinicia, cambiarle el nombre sí. */
+@keyframes rebrotar{
+  from{transform:scale(.06);opacity:0}
+  62%{opacity:1}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes caer{
+  0%{opacity:0;transform:translate3d(0,-14vh,0) rotate(0)}
+  9%{opacity:.92}
+  82%{opacity:.92}
+  100%{opacity:0;transform:translate3d(var(--vaiven),106vh,0) rotate(var(--giro))}
+}
+
+/* La lluvia de pétalos del "sí". La crea y la retira js/pregunta.js; con
+   movimiento reducido no llega a crearse. pointer-events:none es lo que
+   impide que un overlay a pantalla completa se coma los clics de abajo. */
+.petalos{position:fixed;inset:0;z-index:5;overflow:hidden;pointer-events:none}
+.petalo{position:absolute;top:0;width:11px;height:14px;opacity:0;
+  border-radius:60% 60% 60% 60% / 70% 70% 40% 40%;
+  animation:caer var(--dur) linear forwards;animation-delay:var(--ret)}
+.petalo-t1{background:var(--flor-1)}
+.petalo-t2{background:var(--flor-2)}
+.petalo-t3{background:var(--flor-3)}
+.petalo-t4{background:var(--flor-4)}
 @media (prefers-reduced-motion:no-preference){
   /* Todos los tallos nacen del MISMO punto, y ese punto llega desde
      js/pregunta.js en --origen-x/--origen-y: el viewBox se calcula del
@@ -415,6 +443,9 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
     animation:brotar .66s cubic-bezier(.22,.9,.3,1) backwards;
     animation-delay:calc(var(--i) * 55ms)}
   .pregunta .ramo-lazo{animation:aparecer .5s ease-out backwards;animation-delay:.22s}
+  /* El ramo se vuelve a abrir al aceptar, más rápido que la primera vez. */
+  .pregunta .rebrote .tallo{animation:rebrotar .55s cubic-bezier(.22,.9,.3,1) backwards;
+    animation-delay:calc(var(--i) * 30ms)}
   .pregunta-dicho{animation:aparecer .45s ease-out}
 }
 
