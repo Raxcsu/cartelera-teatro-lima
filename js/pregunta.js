@@ -196,7 +196,7 @@ export function pintarPregunta(app, hoy = hoyLima()) {
       <div class="pregunta-cuerpo">
         <p>Este jueves paso por ti a las 7:15.<br>Despeja la noche entera.</p>
         <p>No te voy a decir a dónde vamos.<br>Solo que hay que llegar a una hora exacta<br>y que después la noche sigue.</p>
-        <p class="pregunta-alusion">No es el día.<br>Faltan dos para el día.<br>Pero el jueves me quedaba mejor.</p>
+        <p class="pregunta-cierre">No siempre puedo consentirte,<br>pero cuando lo hago<br>me gusta que sea especial.</p>
       </div>
 
       <div class="pregunta-respuesta" aria-live="polite">${aceptada ? ACEPTADA : BOTONES}</div>

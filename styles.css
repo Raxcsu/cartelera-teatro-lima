@@ -380,7 +380,7 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 /* el texto */
 .pregunta-cuerpo{display:flex;flex-direction:column;gap:13px;
   font-size:14.5px;line-height:1.62;color:var(--ink2)}
-.pregunta-alusion{font-size:15px;color:var(--ink)}
+.pregunta-cierre{font-size:15px;color:var(--ink)}
 
 /* la respuesta */
 .pregunta-pide{font-family:var(--serif);font-size:21px;color:var(--ink)}
