@@ -7,12 +7,13 @@ leer el resto del código: todo lo que hace falta está acá.
 de qué género es y quién actúa**; cada función con su fecha y hora reales y el link para comprar
 entradas.
 
-**Lo que hay hoy:** 12 obras, 11 teatros y 47 funciones en agosto y septiembre, todas con link de
-compra y 20 en `confirmado`. Cobertura de la obra: 12/12 con sinopsis, 8/12 con género, 8/12 con
-elenco.
+**Lo que hay hoy:** 20 obras, 18 teatros y 122 funciones en agosto y septiembre, 94 con link de
+compra y 25 en `confirmado`. Cobertura de la obra: 13/20 con sinopsis, 12/20 con género, 9/20
+con elenco.
 
-**Lo que falta:** solo 4 de los 11 teatros tienen `web`. Las coordenadas ya están completas en
-los 11. Y el mes que viene hay que volver a correr todo esto.
+**Lo que falta:** solo 7 de los 18 teatros tienen `web`. Las coordenadas ya están completas en
+los 18. Los huecos de obra se concentran en las 7 obras que trajo el último refresco y que
+todavía no pasaron por investigación. Y el mes que viene hay que volver a correr todo esto.
 
 > **Ojo si venís de una versión anterior de este documento.** El precio dejó de mostrarse en
 > pantalla. Se sigue cargando, con su fuente y su fecha, y el validador lo sigue revisando —
@@ -95,7 +96,7 @@ link de compra es la prueba más fuerte de que la función existe, así que el v
 sin él, es `probable`. El precio ya **no** entra en esta decisión.
 
 **Vale la pena el clic extra.** Es la diferencia entre que la app muestre ámbar ("verificar
-antes de ir") o verde. En la ronda de agosto quedaron 20 de 47 en `confirmado`.
+antes de ir") o verde. En la ronda vigente quedaron 25 de 122 en `confirmado`.
 
 ---
 
@@ -142,7 +143,7 @@ referencia canónica; esto es la versión legible.
 }
 ```
 
-- `web` — **hoy lo tienen 4 de 11 teatros.** Llenarlo es parte del encargo.
+- `web` — **hoy lo tienen 7 de 18 teatros.** Llenarlo es parte del encargo.
 - `lat` / `lng` — geocodificar con Nominatim y **verificar contra la dirección**. Una coordenada
   fuera de la caja de Lima (lat −12.60 a −11.60, lng −77.35 a −76.60) hace fallar el validador.
 - Ojo con las sedes múltiples: "el Británico" tiene varias en Miraflores y no todas tienen
@@ -291,16 +292,20 @@ python scripts/validar_datos.py
 ```
 
 Sale con código distinto de cero si hay errores y los lista uno por uno. Además imprime **dos**
-tablas de cobertura, que son las métricas reales del encargo. Así quedó la ronda de agosto:
+tablas de cobertura, que son las métricas reales del encargo. Así queda hoy:
 
 ```
   COBERTURA DE CONFIANZA          COBERTURA DE LA OBRA
   ------------------------        ------------------------
-  confirmado     20   43%         sin sinopsis    0    0%
-  probable       27   57%         sin genero      4   33%
-  sin_verificar   0    0%         sin elenco      4   33%
-  TOTAL          47               TOTAL          12
+  confirmado     25   20%         sin sinopsis    7   35%
+  probable       52   43%         sin genero      8   40%
+  sin_verificar  45   37%         sin elenco     11   55%
+  TOTAL         122               TOTAL          20
 ```
+
+El porcentaje de `confirmado` bajó del 43% al 20% y **no es que los datos hayan empeorado**: el
+último refresco casi triplicó el total de funciones, y lo que entra nuevo entra sin confirmar.
+Cerrar esa brecha es el trabajo del próximo encargo.
 
 La segunda tabla es la nueva, y es la que dice si la pantalla tiene algo que mostrar: una obra
 sin sinopsis, sin género y sin elenco produce una tarjeta que solo sabe decir el título y la

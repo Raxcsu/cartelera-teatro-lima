@@ -59,6 +59,7 @@ el reenfoque a la obra.
 | Uso | Regla |
 |---|---|
 | Nombre de la app | sans 12.5px, `letter-spacing:.24em`, mayúsculas, `--accent` |
+| Pestaña de sección | sans 10.5px, `letter-spacing:.08em`, mayúsculas, `--ink3`; la activa en `--accent` con borde inferior de 2px |
 | Nombre del mes | serif 22px / 1.1, capitalizado |
 | Título de obra | serif 20px / 1.18 |
 | Elenco | sans 12.5px / 1.5, color `--ink`; el "y N más" en `--ink3` |
@@ -111,6 +112,7 @@ de otros.
 ```
 ┌────────────────────────────────────────────────┐
 │              THEATER WITH HER ♥                │  <header> en index.html
+│   [Cartelera] Escala astronómica  Una pregunta │  <nav class="pestanas">
 ├──────────────────────────┬─────────────────────┤
 │                          │  ‹  agosto 2026  ›  │
 │                          │ [17][18][19][20]→   │  .calendario-caja
@@ -163,16 +165,26 @@ Ver el mes completo
 - El día de hoy va en `--accent` con borde de acento. **No se usa el ámbar del semáforo**, que
   es la regla de la paleta.
 
-### El mapa base: CARTO Positron
+### El mapa base: OpenStreetMap
 
-Las teselas de OpenStreetMap eran el único bloque de verde y azul saturado en una pantalla de
-rosa pastel y serif, y se corregían con un filtro sobre `.leaflet-tile-pane`. **Ese filtro se
-retiró**: Positron ya es un mapa base gris claro y de bajo contraste, hecho para que lo que se
-dibuja encima resalte, y filtrarlo solo lo lavaba más.
+Pasó por dos proveedores y volvió al primero. OSM era el único bloque de verde y azul saturado
+en una pantalla de rosa pastel y serif, y se corregía con un filtro sobre `.leaflet-tile-pane`.
+Se probó CARTO Positron, que ya es gris claro y de bajo contraste, y con él el filtro se retiró
+porque solo lo lavaba más. Hoy el mapa base **volvió a OpenStreetMap y el filtro no volvió con
+él**: una segunda dependencia externa que hay que acreditar aparte no se paga solo por bajar la
+saturación, y el pin de 20px con anillo blanco ya resuelve la legibilidad que el filtro
+buscaba.
 
-Si algún día vuelve un mapa base saturado, el filtro vuelve en el *pane* de teselas y **nunca**
+Si algún día se decide corregir la saturación, el filtro va en el *pane* de teselas y **nunca**
 en el contenedor: Leaflet separa teselas, marcadores, popups y controles en capas distintas, así
 que teñir solo la de abajo deja los pines rosa y los contrastes ya verificados sin tocar.
+
+**El modo de falla de las teselas cambió, y es una decisión de diseño.** Antes, seis
+`tileerror` seguidos cambiaban la capa al otro proveedor. Ahora avisan a `vista.js`, que retira
+el mapa entero: destruye la instancia, esconde la caja y aplica `sin-mapa`. Degradar a la lista
+completa es más honesto que degradar a un segundo proveedor, que además puede estar caído por
+el mismo motivo. La regla de fondo no cambió: **un rectángulo gris con pines flotando sobre
+nada es peor que no tener mapa.**
 
 **El pin pasó de 11 a 20px** de diámetro, con anillo blanco de 3px. A 11 el círculo se perdía
 sobre las teselas y había que buscarlo. El número está duplicado en la constante `PIN` de
@@ -195,10 +207,70 @@ puede — *"¿está cerca?"* — sin que haya que abrir nada.
 Se conserva lo bueno de la decisión anterior: Leaflet sigue entrando por `import()` dinámico y
 su fallo no toca el resto de la pantalla.
 
+## Las otras dos vistas
+
+La app dejó de ser una sola pantalla: la cabecera lleva tres pestañas y `app.js` despacha por
+hash. Las dos vistas nuevas son personales y no producto, pero se rigen por la misma paleta y
+las mismas reglas de área táctil.
+
+**Las pestañas.** Sans en mayúsculas, en la familia del nombre de la app pero un escalón por
+debajo: `10.5px` con `letter-spacing:.08em` contra los `12.5px` / `.24em` del `<h1>`, para que
+la navegación no compita con el nombre. Alto `44px` por la regla de área táctil. La activa
+lleva `aria-current="page"`, el acento y un borde inferior de 2px; las otras van en `--ink3`.
+Por debajo de 400px y de 340px el padding se reduce en dos escalones, en vez de achicar la
+letra o envolver a dos líneas.
+
+**La escala astronómica** es una lectura, así que compone como una lectura: una cifra por
+bloque en `<dl>`, el kicker de sección en 10px con `letter-spacing`, y la fórmula en serif
+grande (`clamp(44px,7vw,58px)`) porque es el remate visual del argumento. En escritorio se
+parte en dos columnas —resumen a la izquierda, PDF embebido a la derecha— y **la página no
+scrollea**: `.app.escala` lleva `overflow:hidden` y el `<object>` del PDF se estira con `flex`
+y scrollea por dentro.
+
+**La barra de scroll se esconde en esta ruta, y es la única del proyecto donde pasa.**
+`html:has(.app.escala)` la retira para que la mesa de lectura de escritorio no tenga un canal
+vertical al lado de un PDF que ya trae el suyo. Ojo con el efecto en móvil: ahí `.app.escala`
+**no** lleva `overflow:hidden`, así que la página sí se desplaza — con la barra escondida. Si
+alguna vez alguien no encuentra el final del texto en el celular, empezá por acá.
+
+**La invitación define su propia paleta, y eso es la excepción que confirma la regla.**
+
+```css
+.app.pregunta, .petalos{
+  --flor-1:#e3b9c1; --flor-2:#c77e90; --flor-3:#a35267; --flor-4:#854052;
+}
+.app.pregunta{ --hoja:#93a38c; --hoja-2:#7c8f77; }
+```
+
+Los cuatro rosas salen de la familia del acento (`--flor-3` **es** `--accent`). El verde es
+**propio y no `--ok`**: ese es el verde del semáforo de confianza y la paleta prohíbe reusarlo
+para decorar, que es la misma razón por la que el acento es rosa vino y no dorado. Todo va
+declarado en `.app.pregunta`, no en `:root`, para que un ramo no pueda teñir la cartelera.
+
+**Es la primera pantalla del proyecto con animación, y toda ella vive dentro de
+`prefers-reduced-motion: no-preference`.** No es una animación atenuada: con el movimiento
+apagado el ramo aparece **entero y quieto**. Un ramo que no brota es aceptable; un ramo que no
+está es el peor fallo posible de esta pantalla. La lluvia de pétalos directamente no ocurre.
+
+El SVG del ramo no tiene `viewBox` fijo: se calcula del contenido, porque el ramo se ensancha
+al crecer y un marco fijo le dejaría un margen distinto cada día. Por eso el origen de la
+animación viaja como custom property (`--origen-x`/`--origen-y`) desde `js/pregunta.js` en vez
+de estar copiado en el CSS — un `transform-origin` fijo apuntaría a otro sitio cada día y las
+flores brotarían del aire.
+
+**Cuatro keyframes y dos juegos de custom properties escritas desde JS.** Los keyframes son
+`brotar` (el ramo al entrar), `rebrotar` (la celebración; es propio y no reusa `brotar` porque
+cambiar la duración no reinicia una animación que ya terminó), `aparecer` (lazo y mensaje
+final) y `caer` (los pétalos). El escalonado de los tallos entra por `--i`; cada pétalo recibe
+`--dur`, `--ret`, `--giro` y `--vaiven`. **Ninguna de las seis se declara en el CSS**: son
+valores por elemento, y declararlas ahí sería fijar un solo ramo y una sola lluvia.
+
 ## Accesibilidad, verificada no supuesta
 
 - Todo texto sobre `--bg` mide **4.5:1 o más**. Comprobado por cálculo, no a ojo.
-- **Área táctil mínima 44×44px**, vía `--tap`. Los chips de filtro estaban en 33px y suben a 44.
+- **Área táctil mínima 44×44px**, vía `--tap`. Se respeta también en lo nuevo: las pestañas
+  llevan `min-height:var(--tap)` y los dos botones de la invitación `min-width:var(--tap)`.
+  Los chips de filtro estaban en 33px y suben a 44.
   Las celdas del calendario cayeron en el mismo error (estaban en 34px) y también suben: es
   el defecto que más se repite, así que medí antes de dar por buena una grilla. Cuando hubo que
   achicar el calendario, la tentación fue bajar la celda a 36px; se rechazó y se cambió la
@@ -211,7 +283,16 @@ su fallo no toca el resto de la pantalla.
 - **Foco de teclado visible en todo lo tocable.** Implementado: `:focus-visible` con contorno
   de acento y `outline-offset`, en `styles.css`.
 - El movimiento reducido se respeta por media query, y el scroll suave se declara en CSS a
-  propósito: pedirlo desde JS no desplaza nada con las animaciones del sistema apagadas.
+  propósito: pedirlo desde JS no desplaza nada con las animaciones del sistema apagadas. Con
+  la invitación la regla se puso a prueba de verdad: **toda** su animación vive dentro de
+  `prefers-reduced-motion: no-preference`, y apagada el ramo se ve entero y quieto.
+- **Al cambiar de pestaña el foco salta al encabezado de la vista nueva**, con `tabIndex = -1`
+  y `preventScroll`. Sin eso, el foco se queda en la pestaña y un lector de pantalla no anuncia
+  que la pantalla cambió entera. En la cartelera el salto espera a que resuelvan los JSON,
+  porque hasta entonces el encabezado no existe.
+- **El `aria-label` del ramo describe el dibujo y no cuenta las flores**, a propósito: la cifra
+  es la pista que lleva a una fecha y cantarla la regala. La lluvia de pétalos va
+  `aria-hidden`: es adorno, no información.
 
 ## La tarjeta compartible
 
@@ -237,12 +318,12 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Estado de carga | **Hecho.** `.cargando` en `index.html` y `styles.css`. |
 | Estado de error visual | **Hecho.** `.error` con fondo y marca propios en `styles.css`. |
 | Estado de mes vacío | **Hecho y ALCANZABLE.** `.sin-resultados` se ve navegando a un mes sin funciones. Dejó de ser inalcanzable porque `rangoNavegable()` permite un mes más allá del rango cargado — exactamente para que este estado exista de verdad. Verificado en navegador. |
-| Mapa | **Hecho, con un límite geométrico atenuado.** Banda de 260px en móvil, columna a alto completo en escritorio; pines de 20px dibujados con CSS, nombre al pasar por encima y tarjeta al tocar. Mapa base CARTO Positron, sin filtro. **Los dos modos de falla verificados provocándolos de verdad:** con el CDN de Leaflet caído la banda se va a 0px, la columna se retira y la lista queda entera; con solo las teselas caídas la capa cambia sola a OpenStreetMap y la atribución lo refleja. **Los tres teatros de Miraflores estaban a 3px unos de otros** en la banda: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m, una razón de 39 a 1. En los ~620px de la columna de escritorio esa distancia pasa a unos 15px. La lista es la navegación real; el mapa contesta "¿está cerca?". |
+| Mapa | **Hecho, con un límite geométrico atenuado.** Banda de 260px en móvil, columna a alto completo en escritorio; pines de 20px dibujados con CSS, nombre al pasar por encima y tarjeta al tocar. Mapa base OpenStreetMap, sin filtro. **Los dos modos de falla se verificaron provocándolos de verdad** cuando el respaldo era CARTO: con el CDN de Leaflet caído la banda se va a 0px, la columna se retira y la lista queda entera. El segundo modo cambió de comportamiento desde entonces —las teselas caídas ahora retiran el mapa en vez de cambiar de capa— y **falta volver a provocarlo** para verificarlo. **Los tres teatros de Miraflores estaban a 3px unos de otros** en la banda: el conjunto abarca 11,7 km (Cercado a Barranco) y esos tres están a 300 m, una razón de 39 a 1. En los ~620px de la columna de escritorio esa distancia pasa a unos 15px. La lista es la navegación real; el mapa contesta "¿está cerca?". |
 | Presupuesto vertical | **Hecho.** Era el pendiente más viejo. La grilla de 42 celdas pasó a una tira horizontal con el mes plegado detrás de `<details>`: la caja del calendario cayó de ~340px a ~115px en escritorio y ~161px en móvil. Medido en navegador a 386×840 y a 1041×703. En móvil la primera tarjeta ahora empieza a 534px en vez de ~706px. **No se tocó el área táctil**: los chips siguen en 44px. |
 | Calendario del mes | **Hecho.** Tira horizontal de los días que quedan del mes; las 42 celdas fijas siguen existiendo, plegadas en "Ver el mes completo". Lunes primero, punto en los días con función. |
-| Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 12/12 con sinopsis, 8/12 con género, 8/12 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
+| Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 13/20 con sinopsis, 12/20 con género, 9/20 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
-| Primera vez | **Parcial.** La app ya se presenta con su nombre en la cabecera, y el mapa avisa mientras carga. Sigue sin haber nada que explique qué es la pantalla. |
+| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus tres pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
-| Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 12 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
-| Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (8 obras con dato) y distrito. |
+| Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 20 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
+| Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (12 obras con dato) y distrito. |
