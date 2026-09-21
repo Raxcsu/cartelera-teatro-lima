@@ -35,23 +35,53 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .corazon::before{top:-4.5px;left:0}
 .corazon::after{top:0;right:-4.5px}
 
-/* Tres destinos, no tres versiones de la misma pantalla. La barra se queda
-   arriba aun cuando la cartelera falle: ni la lectura astronómica ni la
-   invitación dependen de que los JSON carguen.
+/* Cuatro destinos, no cuatro versiones de la misma pantalla. La barra se
+   queda arriba aun cuando la cartelera falle: ninguna de las otras tres
+   vistas depende de que los JSON carguen.
 
    El `font` decía `10.5px/var(--sans)`: eso pone la familia en la posición
    de line-height y deja el shorthand sin font-family, que es obligatoria,
    así que la declaración entera se descartaba y las pestañas salían a 16px.
-   Con dos entraban raspando; la tercera desbordaba la barra. */
-.pestanas{display:flex;justify-content:center;gap:3px;margin:16px auto 0;
-  border-bottom:1px solid var(--line);max-width:430px}
+   Con dos entraban raspando; la tercera desbordaba la barra.
+
+   Con la cuarta ya no entran de ninguna manera sin romper algo: bajar de los
+   44px táctiles está prohibido y partir en dos filas engorda la cabecera
+   justo donde el proyecto peleó por 180px. Así que la barra scrollea. El
+   costo conocido es que esconde destinos, y los degradados laterales son lo
+   único que lo dice: por eso no son adorno. Las clases `desborda-antes` y
+   `desborda-despues` las pone app.js según lo que quede a cada lado, y
+   `safe center` mantiene la barra
+   centrada mientras todo entra; si un navegador no lo soporta descarta la
+   declaración y quedan a la izquierda, que es una diferencia cosmética y no
+   un layout roto. Esa es la prueba que hay que pasar antes de usar algo
+   reciente. */
+.pestanas-caja{position:relative;max-width:520px;margin:16px auto 0;
+  border-bottom:1px solid var(--line)}
+.pestanas-caja::before,.pestanas-caja::after{content:'';position:absolute;z-index:2;
+  top:0;bottom:0;
+  width:28px;pointer-events:none;opacity:0;transition:opacity .15s ease;
+  /* var(--bg) a var(--bg) transparente. En hexadecimal de 8 dígitos porque
+     un degradado a `transparent` pasa por negro en algunos motores. */
+  background:linear-gradient(90deg,#fdf8f700,#fdf8f7)}
+.pestanas-caja::before{left:0;transform:scaleX(-1)}
+.pestanas-caja::after{right:0}
+.pestanas-caja.desborda-antes::before,
+.pestanas-caja.desborda-despues::after{opacity:1}
+.pestanas{display:flex;justify-content:safe center;gap:3px;
+  overflow-x:auto;scrollbar-width:none}
+.pestanas::-webkit-scrollbar{display:none}
 .pestana{display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap);
   padding:0 13px;border-bottom:2px solid transparent;margin-bottom:-1px;
   color:var(--ink3);font:600 10.5px var(--sans);letter-spacing:.08em;
   text-decoration:none;text-transform:uppercase;white-space:nowrap}
 .pestana:hover{color:var(--accent);background:var(--accent-bg)}
 .pestana[aria-current="page"]{border-bottom-color:var(--accent);color:var(--accent)}
-/* En un teléfono angosto las tres no entran con el aire pensado para dos.
+/* El anillo de foco va hacia adentro SOLO acá: la barra es un contenedor con
+   scroll y recorta en su caja de relleno, así que el outline-offset:2px de
+   uso general se comería el anillo por arriba y por abajo. Adentro se ve
+   entero y no hace falta inflar el alto de la barra. */
+.pestana:focus-visible{outline-offset:-2px}
+/* En un teléfono angosto las cuatro no entran con el aire pensado para dos.
    Cede el padding lateral y el tracking; el alto táctil de 44px no. */
 @media (max-width:400px){
   .pestana{padding:0 8px;letter-spacing:.05em}
@@ -449,6 +479,146 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .pregunta-dicho{animation:aparecer .45s ease-out}
 }
 
+/* ── flores amarillas ──────────────────────────────────────
+   La única pantalla oscura del proyecto, y es deliberado: son flores
+   encendidas, y sin cielo negro no se encienden.
+
+   El negro NO se declara acá. Lo escribe flores.js desde la misma constante
+   con la que pinta el canvas, para no dejar el mismo color en dos archivos
+   que después hay que mover juntos — el problema que ya documenta PIN contra
+   el width de .pin-teatro i.
+
+   Acá vive solo lo que es DOM: encabezado, controles, diálogo y pista. Las
+   tintas claras van scoped, igual que los rosas de la invitación; :root no
+   se toca. */
+.app.flores{
+  --cielo-tinta:#f7ecd8;
+  --cielo-tinta2:rgba(247,236,216,.68);
+  --cielo-borde:rgba(247,236,216,.26);
+  --cielo-oro:#ffd75d;
+  max-width:760px;padding:18px 20px 26px;overflow:hidden;
+}
+.flores-articulo{display:flex;flex-direction:column;text-align:center}
+.flores-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink3)}
+.flores h2{margin-top:9px;font-family:var(--serif);font-weight:400;
+  font-size:clamp(29px,7.4vw,41px);line-height:1.04;
+  letter-spacing:-.035em;color:var(--ink)}
+/* El alto lo escribe flores.js: es lo que queda bajo la cabecera, y eso no
+   se puede declarar en CSS sin un :has() que sostenga el layout. El
+   min-height es el respaldo para el instante anterior a esa medida. */
+.flores-caja{position:relative;margin-top:14px;min-height:300px;
+  border-radius:14px;overflow:hidden}
+.flores-cielo{display:block;position:absolute;inset:0;width:100%;height:100%;
+  touch-action:manipulation}
+.flores-cielo[hidden],.flores-controles[hidden],.flores-leyenda[hidden]{display:none}
+/* Viñeta: apaga los bordes para que el cielo no termine en un corte recto.
+   Va en CSS y no en el canvas porque es presentación pura, y así no cuesta
+   un gradiente por cuadro. */
+.flores-caja::after{content:'';position:absolute;z-index:1;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 46%,
+    rgba(0,0,0,.14) 74%,rgba(0,0,0,.5) 100%)}
+/* Los botones son la capa accesible del dibujo: el canvas sigue siendo una
+   imagen, y ninguna coordenada suya se convierte en API de interacción. */
+.flores-controles{position:absolute;z-index:3;inset:0;pointer-events:none}
+.flor-mensaje,.corazon-mensaje{position:absolute;display:grid;place-items:center;
+  width:44px;height:44px;padding:0;border:1px solid rgba(255,240,138,.4);
+  border-radius:50%;background:rgba(3,2,8,.24);color:var(--cielo-tinta);
+  box-shadow:0 0 0 5px rgba(255,215,93,.05),0 0 20px rgba(255,215,93,.14);
+  transform:translate(-50%,-50%);cursor:pointer;pointer-events:auto}
+.flor-mensaje:hover,.flor-mensaje:focus-visible,
+.corazon-mensaje:hover,.corazon-mensaje:focus-visible{
+  border-color:var(--cielo-oro);background:rgba(255,215,93,.12);
+  box-shadow:0 0 0 6px rgba(255,215,93,.09),0 0 28px rgba(255,215,93,.3)}
+.corazon-mensaje{left:50%;top:53%;width:82px;height:82px;
+  border-color:rgba(217,143,160,.34);background:rgba(3,2,8,.08);
+  box-shadow:0 0 24px rgba(217,143,160,.12)}
+.flor-etiqueta,.corazon-etiqueta{display:none}
+.flores-leyenda{position:absolute;z-index:4;right:18px;bottom:46px;left:18px;
+  min-height:20px;margin:0;text-align:center;pointer-events:none;
+  font:400 17px/1.2 var(--serif);color:var(--cielo-tinta);
+  text-shadow:0 2px 12px #120800}
+/* La copia flota sobre el cielo y deja pasar el toque. Si capturara, el
+   cuarto de abajo dejaría de encender estrellas sin que se vea por qué. */
+.flores-copia{position:absolute;right:0;bottom:0;left:0;z-index:1;
+  display:flex;justify-content:center;padding:64px 18px 16px;pointer-events:none;
+  background:linear-gradient(to top,rgba(3,2,8,.86),rgba(3,2,8,.55) 52%,rgba(3,2,8,0))}
+.flores .btn{border-color:var(--cielo-borde);color:var(--cielo-tinta)}
+.flores .btn:hover{background:rgba(247,236,216,.12)}
+/* El rosa vino del anillo de foco general queda corto contra el negro. */
+.flores :focus-visible{outline-color:var(--cielo-tinta)}
+.flores-pista{font:600 9.5px/1.4 var(--sans);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--cielo-tinta2)}
+@media (max-width:699px){.flores-pista-elige{display:none}}
+
+/* Si el contexto 2D no existe, los siete textos siguen siendo contenido y
+   controles normales. El alto medido deja de mandar para que la lista pueda
+   crecer y la página recupere su scroll natural. */
+.flores-fallback[hidden]{display:none}
+.flores-caja.sin-canvas{height:auto!important;min-height:0;padding:26px 18px;
+  overflow:visible;border:1px solid var(--cielo-borde);color:var(--cielo-tinta)}
+.flores-caja.sin-canvas::after{display:none}
+.flores-caja.sin-canvas .flores-copia{display:none}
+.flores-fallback{position:relative;z-index:2;max-width:620px;margin:auto}
+.flores-fallback h3{font:400 clamp(24px,6vw,32px)/1.15 var(--serif)}
+.flores-fallback>p{margin-top:8px;color:var(--cielo-tinta2);font-size:13px;line-height:1.55}
+.flores-fallback-lista{display:grid;gap:8px;margin-top:22px}
+.flores-fallback-boton{min-height:44px;padding:10px 14px;border:1px solid var(--cielo-borde);
+  border-radius:8px;background:rgba(247,236,216,.06);color:var(--cielo-tinta);
+  font:600 12px/1.35 var(--sans);letter-spacing:.04em;cursor:pointer}
+.flores-fallback-boton:hover{background:rgba(247,236,216,.12)}
+
+/* Una sola carta sirve a las flores y al corazón. El papel es claro para
+   sentirse como un objeto dentro del cielo, no como otro panel de la app. */
+.carta-dialogo{width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);
+  margin:auto;padding:0;border:0;border-radius:16px;background:transparent;color:#34251f;
+  box-shadow:0 24px 90px rgba(0,0,0,.52)}
+.carta-dialogo::backdrop{background:rgba(3,2,8,.78);backdrop-filter:blur(4px)}
+.carta-papel{padding:clamp(28px,7vw,48px);border:1px solid #c99b3e;
+  border-radius:16px;background:#fffaf0;
+  box-shadow:inset 0 0 70px rgba(255,215,93,.13)}
+.carta-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.15em;
+  text-transform:uppercase;color:#8b6728}
+.carta-papel h3{margin-top:10px;font:400 clamp(28px,7vw,38px)/1.08 var(--serif);
+  letter-spacing:-.025em;color:#4a252d}
+.carta-cuerpo{margin-top:20px;font:400 clamp(16px,4vw,19px)/1.65 var(--serif)}
+.carta-cuerpo p+p{margin-top:12px}
+.carta-firma{margin-top:20px;text-align:right;font:italic 18px/1.4 var(--serif);
+  color:#6d3d47}
+.carta-papel form{display:flex;justify-content:center;margin-top:28px}
+.flores .carta-cerrar{min-width:112px;border-color:#b88931;color:#5e4520;background:transparent}
+.flores .carta-cerrar:hover{background:#f5e8c9}
+
+@media (min-width:700px){
+  .flores-leyenda{display:none}
+  .flor-etiqueta,.corazon-etiqueta{display:block;position:absolute;width:max-content;
+    max-width:160px;padding:5px 8px;border:1px solid rgba(247,236,216,.16);
+    border-radius:999px;background:rgba(3,2,8,.72);color:var(--cielo-tinta);
+    font:600 10px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;
+    pointer-events:none;text-shadow:0 1px 8px #000}
+  .flor-mensaje[data-etiqueta="derecha"] .flor-etiqueta{left:52px;top:50%;transform:translateY(-50%)}
+  .flor-mensaje[data-etiqueta="izquierda"] .flor-etiqueta{right:52px;top:50%;transform:translateY(-50%)}
+  .flor-mensaje[data-etiqueta="arriba"] .flor-etiqueta{bottom:50px;left:50%;transform:translateX(-50%)}
+  .flor-mensaje[data-etiqueta="abajo"] .flor-etiqueta{top:50px;left:50%;transform:translateX(-50%)}
+  .corazon-etiqueta{top:90px;left:50%;transform:translateX(-50%)}
+}
+
+/* El movimiento se declara opt-in, igual que el ramo. Con las animaciones
+   apagadas flores.js dibuja un cuadro final y no arranca el bucle. */
+@media (prefers-reduced-motion:no-preference){
+  .flor-mensaje,.corazon-mensaje{animation:entrar-control .4s ease-out backwards}
+  .flor-mensaje:nth-child(1){animation-delay:.5s}
+  .flor-mensaje:nth-child(2){animation-delay:.58s}
+  .flor-mensaje:nth-child(3){animation-delay:.66s}
+  .flor-mensaje:nth-child(4){animation-delay:.74s}
+  .flor-mensaje:nth-child(5){animation-delay:.82s}
+  .flor-mensaje:nth-child(6){animation-delay:.9s}
+  .corazon-mensaje{animation-delay:.98s}
+  .carta-dialogo[open]{animation:entrar-carta .28s ease-out}
+}
+@keyframes entrar-control{from{opacity:0;transform:translate(-50%,-50%) scale(.72)}}
+@keyframes entrar-carta{from{opacity:0;transform:translateY(12px) scale(.98)}}
+
 /* Foco de teclado visible en todo lo tocable (DESIGN.md, accesibilidad). */
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
@@ -507,7 +677,7 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   body{height:100vh;height:100dvh;display:flex;flex-direction:column}
   .sitio{padding:20px 28px 14px}
   .app{max-width:1320px;width:100%;flex:1;min-height:0;padding:0 28px 24px}
-  .pestanas{margin-top:16px}
+  .pestanas-caja{margin-top:16px}
   /* Una sola pantalla: el resumen y el documento comparten el alto que
      queda bajo la cabecera. No hay scroll en la vista exterior. */
   .app.escala{max-width:none;overflow:hidden;padding:0 clamp(24px,3vw,42px) 22px}
@@ -539,6 +709,14 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .pregunta-articulo{gap:22px}
   .pregunta h2{font-size:clamp(32px,5.2dvh,44px)}
   .ramo{max-width:430px}
+
+  /* El cielo ya ocupa lo que queda bajo la cabecera, porque flores.js lo
+     mide en los dos layouts. Acá solo se suelta el ancho —un cosmos
+     acotado a 1320px deja dos franjas crema a los costados— y se baja el
+     título, que en una ventana baja le come alto al cielo. */
+  .app.flores{max-width:none;padding:0 clamp(24px,3vw,42px) 24px}
+  .flores h2{font-size:clamp(30px,4.6dvh,38px)}
+  .flores-caja{margin-top:12px}
 
   /* La clase `pantalla` la pone pintarEsqueleto(). Los estados de cartelera
      vencida y de error reemplazan todo #app y por eso NO la heredan: siguen

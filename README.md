@@ -40,23 +40,24 @@ npm run validar                # valida los JSON y reporta cobertura de confianz
 
 ```
 index.html   styles.css
-js/  app.js      router por hash — decide cuál de las tres vistas se pinta
+js/  app.js      router por hash — decide cuál de las cuatro vistas se pinta
      datos.js    red, localStorage, overrides
      logica.js   100% funciones puras — todas las pruebas viven acá
      vista.js    la capa DOM de la cartelera
      mapa.js     Leaflet por CDN — el único trato con red externa
      escala.js   la lectura estática
      pregunta.js la invitación
+     flores.js   el cielo de flores amarillas — el único canvas del proyecto
 data/*.json  fuente de verdad, editable a mano
 data/paper_cientifico/   el paper de la vista de lectura: .tex fuente, .pdf compilado
 docs/        encargo-cartelera.md — el pedido de investigación de datos
 scripts/     validar_datos.py — la única puerta de calidad de los datos
 ```
 
-Las tres vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`),
-y no por rutas reales, porque GitHub Pages sirve archivos estáticos: `/una-pregunta` daría 404
-al recargar. Con hash, entrar directo a cada vista funciona y los botones de atrás y adelante
-del navegador son navegación de verdad.
+Las cuatro vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`
+y `#flores-amarillas`), y no por rutas reales, porque GitHub Pages sirve archivos estáticos:
+`/una-pregunta` daría 404 al recargar. Con hash, entrar directo a cada vista funciona y los
+botones de atrás y adelante del navegador son navegación de verdad.
 
 Los datos de la cartelera son archivos JSON. Se editan a mano, se revisan con `git diff` y se
 publican con `git push`. GitHub Pages sirve exactamente los archivos del repo: no hay build.
@@ -127,7 +128,7 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 ## Estado
 
-Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en tres vistas.
+Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en cuatro vistas.
 
 - Lógica pura con 87 pruebas, validador y esquemas de datos.
 - Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,

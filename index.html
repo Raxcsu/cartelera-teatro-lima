@@ -4,22 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Theater with her — cartelera de Lima</title>
-<link rel="stylesheet" href="styles.css?v=20260918-petalos">
+<link rel="stylesheet" href="styles.css?v=20260921-cartas">
 </head>
 <body>
 
 <!-- La cabecera es lo único de DOM que NO vive en los módulos de vista, y a propósito:
      es una constante, no un dato. Puesta acá se ve durante "Cargando
      cartelera…" y sobrevive a los estados de error y de cartelera vencida,
-     que reemplazan todo #app. La navegación también vive acá: ni la vista
-     astronómica ni la invitación dependen de que la cartelera pueda cargar. -->
+     que reemplazan todo #app. La navegación también vive acá: ninguna de las
+     otras tres vistas depende de que la cartelera pueda cargar. -->
 <header class="sitio">
   <h1>Theater with her <span class="corazon" aria-hidden="true"></span></h1>
-  <nav class="pestanas" aria-label="Secciones principales">
-    <a class="pestana" href="#cartelera" data-ruta="cartelera">Cartelera</a>
-    <a class="pestana" href="#escala-astronomica" data-ruta="escala-astronomica">Escala astronómica</a>
-    <a class="pestana" href="#una-pregunta" data-ruta="una-pregunta">Una pregunta</a>
-  </nav>
+  <!-- La caja existe para el degradado del borde: un ::after sobre la barra
+       se desplazaría con ella y no marcaría nada. La barra scrollea; la caja
+       se queda quieta y sostiene la línea y el aviso de que hay más. -->
+  <div class="pestanas-caja">
+    <nav class="pestanas" aria-label="Secciones principales">
+      <a class="pestana" href="#cartelera" data-ruta="cartelera">Cartelera</a>
+      <a class="pestana" href="#escala-astronomica" data-ruta="escala-astronomica">Escala astronómica</a>
+      <a class="pestana" href="#una-pregunta" data-ruta="una-pregunta">Una pregunta</a>
+      <a class="pestana" href="#flores-amarillas" data-ruta="flores-amarillas">Flores amarillas</a>
+    </nav>
+  </div>
 </header>
 
 <main id="app" class="app">
@@ -27,7 +33,7 @@
 </main>
 
 <!-- app.js decide la ruta. Cada vista conserva su propio DOM: la cartelera
-     tiene mapa y datos dinámicos; la escala astronómica es una lectura estática. -->
+     tiene mapa y datos dinámicos; las otras tres son autosuficientes. -->
 <script type="module">
 import { arrancarApp } from './js/app.js';
 arrancarApp(document.getElementById('app'));

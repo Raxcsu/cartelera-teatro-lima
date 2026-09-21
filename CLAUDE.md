@@ -44,6 +44,7 @@ vista.js    DOM de la cartelera                                            [exis
 mapa.js     Leaflet por CDN                  ← único trato con red externa  [existe]
 escala.js   DOM de la escala astronómica     ← estático, no pide datos      [existe]
 pregunta.js DOM de la invitación             ← SVG del ramo + celebración   [existe]
+flores.js   canvas del cielo de flores       ← único bucle de rAF del repo  [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
@@ -53,12 +54,12 @@ ya estaba separada, que era exactamente la apuesta. **La única excepción es el
 el nombre de la app y su `<nav>`**, y está ahí a propósito: es constante y no dato, así se ve
 durante "Cargando cartelera…" y sobrevive a los estados de error y de cartelera vencida, que
 reemplazan todo `#app`. De paso es el único `<h1>` de la página, así que ninguna pantalla queda
-sin encabezado de primer nivel. Que la navegación viva ahí tiene su propio motivo: **ni la
-escala astronómica ni la invitación pueden depender de que la cartelera logre cargar.**
+sin encabezado de primer nivel. Que la navegación viva ahí tiene su propio motivo: **ninguna
+de las otras tres vistas puede depender de que la cartelera logre cargar.**
 
-## Las tres vistas
+## Las cuatro vistas
 
-La app dejó de ser una sola pantalla. `app.js` despacha por hash a tres vistas que **no
+La app dejó de ser una sola pantalla. `app.js` despacha por hash a cuatro vistas que **no
 comparten datos ni estados de error**:
 
 | Ruta | Módulo | Qué es |
@@ -66,6 +67,15 @@ comparten datos ni estados de error**:
 | `#cartelera` | `vista.js` | La cartelera: mapa, calendario y lista. La única que hace `fetch`. |
 | `#escala-astronomica` | `escala.js` | Lectura estática: el resumen del paper y el PDF embebido. |
 | `#una-pregunta` | `pregunta.js` | La invitación: el ramo en SVG y la celebración. |
+| `#flores-amarillas` | `flores.js` | El cielo: galaxia, girasoles y corazón en `<canvas>`. |
+
+**`RUTAS` ganó una columna, `desmontar`, y ese es el cambio de fondo que trajo la cuarta
+vista.** Antes era una llamada suelta a `desmontarCartelera()` en `pintarRuta()`, porque la
+cartelera era la única con algo que liberar. `flores.js` tiene un bucle de
+`requestAnimationFrame`: dejarlo vivo es pintar para siempre una pantalla que ya no está —el
+mismo defecto que `cicloVista` y `cicloMapa` evitan dentro de la cartelera, pero a nivel de
+router. Ahora `pintarRuta()` apaga la ruta **saliente** (`RUTAS[rutaActual]?.desmontar?.()`) y
+las vistas que no ensucian nada siguen sin la columna.
 
 **`escala.js` no importa `datos.js` y `pregunta.js` sí, pero ninguna de las dos hace `fetch`.**
 De `datos.js`, `pregunta.js` solo toma `hoyLima()`, que lee el reloj y nada más. Y lo toma como
@@ -96,7 +106,7 @@ alcanzaba un ternario; con tres, esas cadenas crecen en cada pantalla nueva y el
 de estar en un solo sitio.
 
 **Solo la cartelera devuelve una promesa.** Sus JSON tardan y el encabezado al que va el foco no
-existe hasta que resuelva; las otras dos pintan sincrónicamente. Por eso `pintarRuta()` mira si
+existe hasta que resuelva; las otras tres pintan sincrónicamente. Por eso `pintarRuta()` mira si
 `pintar()` devolvió algo antes de mover el foco.
 
 **Hay dos layouts, no uno responsive a medias.** Debajo de 900×600 es la columna de 430px de
@@ -378,10 +388,19 @@ sale?"* y pasó a ser *"¿qué obra es y vale la pena?"*:
   Positron y **volvieron a OpenStreetMap**, que hoy es el único mapa base.
 
 Y encima de todo eso, lo último: la app **dejó de ser una sola pantalla**. `app.js` despacha
-por hash a tres vistas —`#cartelera`, `#escala-astronomica` y `#una-pregunta`— y la cabecera
-lleva la navegación. La cartelera es la única que pide datos; las otras dos son autosuficientes
-a propósito, así que siguen en pie aunque los JSON estén caídos o la cartelera vencida. Ver
-"Las tres vistas".
+por hash a cuatro vistas —`#cartelera`, `#escala-astronomica`, `#una-pregunta` y
+`#flores-amarillas`— y la cabecera lleva la navegación. La cartelera es la única que pide
+datos; las otras tres son autosuficientes a propósito, así que siguen en pie aunque los JSON
+estén caídos o la cartelera vencida. Ver "Las cuatro vistas".
+
+La última en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
+vista: un cielo en `<canvas>` con una galaxia, seis girasoles y un corazón de partículas. Es
+la única pantalla oscura del proyecto y el único módulo con un bucle de `requestAnimationFrame`
+—de ahí la columna `desmontar` en `RUTAS`—. Cada flor tiene un mensaje y un botón DOM de 44px;
+el corazón abre la carta final. Los siete contenidos reutilizan un solo `<dialog>`, y si el
+contexto 2D falla aparecen como lista en vez de desaparecer con el dibujo. Las semillas se
+precalculan, las chispas tienen tope y el cambio de `prefers-reduced-motion` detiene o reanuda
+el bucle durante la sesión.
 
 En los datos hay 18 teatros, 20 obras, 122 funciones repartidas en agosto y septiembre, y 53
 lugares para cenar. **94 de las 122 funciones tienen `url_entradas`**, así que el botón "Comprar

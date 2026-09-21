@@ -207,10 +207,10 @@ puede — *"¿está cerca?"* — sin que haya que abrir nada.
 Se conserva lo bueno de la decisión anterior: Leaflet sigue entrando por `import()` dinámico y
 su fallo no toca el resto de la pantalla.
 
-## Las otras dos vistas
+## Las otras tres vistas
 
-La app dejó de ser una sola pantalla: la cabecera lleva tres pestañas y `app.js` despacha por
-hash. Las dos vistas nuevas son personales y no producto, pero se rigen por la misma paleta y
+La app dejó de ser una sola pantalla: la cabecera lleva cuatro pestañas y `app.js` despacha por
+hash. Las tres vistas nuevas son personales y no producto, pero se rigen por la misma paleta y
 las mismas reglas de área táctil.
 
 **Las pestañas.** Sans en mayúsculas, en la familia del nombre de la app pero un escalón por
@@ -219,6 +219,18 @@ la navegación no compita con el nombre. Alto `44px` por la regla de área táct
 lleva `aria-current="page"`, el acento y un borde inferior de 2px; las otras van en `--ink3`.
 Por debajo de 400px y de 340px el padding se reduce en dos escalones, en vez de achicar la
 letra o envolver a dos líneas.
+
+**Con la cuarta pestaña la barra pasó a scrollear, y las dos alternativas se descartaron por
+motivos que conviene dejar escritos.** Bajar la celda táctil está prohibido por la regla de
+44px. Partir en dos filas engorda la cabecera unos 44px, justo donde el calendario peleó por
+ganar 180px. Queda el scroll horizontal, cuyo costo es real: esconde destinos enteros sin
+decirlo. Lo compensan los degradados de ambos bordes —`.desborda-antes` y
+`.desborda-despues`, puestos desde `app.js`—, que aparecen solo si queda contenido oculto en
+ese lado. La barra se centra con
+`justify-content:safe center`; sin soporte, las pestañas quedan a la izquierda, que es una
+diferencia cosmética y no un layout roto. El anillo de foco de las pestañas va con
+`outline-offset:-2px` porque un contenedor con scroll recorta en su caja de relleno y el
+anillo de 2px hacia afuera se perdía.
 
 **La escala astronómica** es una lectura, así que compone como una lectura: una cifra por
 bloque en `<dl>`, el kicker de sección en 10px con `letter-spacing`, y la fórmula en serif
@@ -264,6 +276,59 @@ cambiar la duración no reinicia una animación que ya terminó), `aparecer` (la
 final) y `caer` (los pétalos). El escalonado de los tallos entra por `--i`; cada pétalo recibe
 `--dur`, `--ret`, `--giro` y `--vaiven`. **Ninguna de las seis se declara en el CSS**: son
 valores por elemento, y declararlas ahí sería fijar un solo ramo y una sola lluvia.
+
+**Flores amarillas es la única pantalla oscura del proyecto, y es una excepción deliberada.**
+Son flores encendidas: sin cielo negro no se encienden. La excepción se contiene sola porque
+la vista entera vive dentro de una caja con `border-radius:14px` bajo la cabecera, que sigue
+siendo clara; la app no cambia de tema, cambia de pantalla.
+
+**Los colores del cielo NO están en `styles.css`.** Los pinta un `<canvas>`, así que viven en
+la constante `CIELO` de `js/flores.js`, y de ahí sale también el fondo de la caja —lo escribe
+el JS— para que el mismo negro no quede en dos archivos que después hay que mover juntos. Es
+la misma precaución que `PIN` contra el `width` de `.pin-teatro i`. En CSS queda solo el DOM:
+encabezado, controles, diálogo y pista, con las tintas claras declaradas en `.app.flores` y
+nunca en `:root`.
+
+```js
+oro: '#ffd75d', oroClaro: '#fff08a', oroHondo: '#e49d0a',   // el contenido
+rosa: '#c77e90', corazon: '#d98fa0',                        // familia del acento
+tallo: '#55741c', hoja: '#6e9527',                          // verde PROPIO, no --ok
+```
+
+Los dorados se quedan porque la vista se llama flores amarillas: son el tema, no decoración.
+El violeta y el azul del original se fueron; el frío de la galaxia es ahora el rosa de la
+familia del acento, el mismo de la invitación. El verde de las hojas es propio y **no `--ok`**,
+por la misma regla de siempre: el verde del semáforo no decora.
+
+**El alto del cielo se mide, no se declara.** Ocupa lo que queda bajo la cabecera, y eso no se
+puede escribir en CSS sin un `:has()` que sostenga el layout — y la regla dice que `:has()`
+puede fallar en cosmética, nunca en estructura. Lo mide `js/flores.js` en el mismo handler de
+`resize` que ya necesita el canvas. El `min-height:300px` del CSS es el respaldo del instante
+previo a esa medida.
+
+**Cada flor es contenido, no una coordenada secreta del canvas.** Sobre las seis posiciones
+hay botones DOM de 44×44px y sobre el corazón otro control disponible desde el inicio. En
+escritorio los títulos acompañan a las flores; por debajo de 700px solo aparece una leyenda al
+enfocar o tocar, para no tapar el cielo. Todos abren el mismo `<dialog>`: papel marfil, borde
+dorado, cierre por botón o Escape y foco devuelto al control que lo abrió. El texto se coloca
+con `textContent`; no hay rotación automática ni `aria-live` anunciando cambios no pedidos.
+
+**El canvas no es una dependencia del contenido.** Si no entrega un contexto 2D se oculta y
+la caja pasa a una lista oscura con los seis mensajes y la carta. La galaxia animada tiene dos
+capas espirales y una entrada escalonada que termina antes de 1,4s. Sus semillas se calculan
+una vez al sembrar —no 126 veces por cuadro—, las chispas se limitan a 240 y los cambios de
+tamaño se agrupan en un solo `requestAnimationFrame`; el DPR sigue topado en 2.
+
+El alfa de los girasoles se **declara** en `0,62` dentro de `girasol()`: opacos quedan de
+calcomanía sobre el cielo, y heredados del último punto dibujado salían fantasmales — pasó, y
+se vio como flores amarillas sin amarillo.
+
+**Con el movimiento apagado el cielo se dibuja una vez y se queda quieto**, entero. Es la
+misma regla del ramo: una galaxia que no gira es aceptable, una galaxia que no está es el peor
+fallo de esta pantalla. Por eso `medir()` vuelve a dibujar ese cuadro al redimensionar; sin
+eso, girar el teléfono dejaba el cielo en blanco. El `MediaQueryList` se escucha durante la
+sesión: al activar movimiento reducido se detiene el bucle, se borran las chispas y se dibuja
+el estado final; al desactivarlo se reanuda sin repetir la entrada.
 
 ## Accesibilidad, verificada no supuesta
 
@@ -323,7 +388,7 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Calendario del mes | **Hecho.** Tira horizontal de los días que quedan del mes; las 42 celdas fijas siguen existiendo, plegadas en "Ver el mes completo". Lunes primero, punto en los días con función. |
 | Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 13/20 con sinopsis, 12/20 con género, 9/20 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
-| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus tres pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
+| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus cuatro pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
 | Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 20 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
 | Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (12 obras con dato) y distrito. |
