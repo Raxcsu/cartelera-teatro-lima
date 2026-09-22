@@ -313,15 +313,49 @@ enfocar o tocar, para no tapar el cielo. Todos abren el mismo `<dialog>`: papel 
 dorado, cierre por botón o Escape y foco devuelto al control que lo abrió. El texto se coloca
 con `textContent`; no hay rotación automática ni `aria-live` anunciando cambios no pedidos.
 
-**El canvas no es una dependencia del contenido.** Si no entrega un contexto 2D se oculta y
-la caja pasa a una lista oscura con los seis mensajes y la carta. La galaxia animada tiene dos
-capas espirales y una entrada escalonada que termina antes de 1,4s. Sus semillas se calculan
-una vez al sembrar —no 126 veces por cuadro—, las chispas se limitan a 240 y los cambios de
-tamaño se agrupan en un solo `requestAnimationFrame`; el DPR sigue topado en 2.
+**Las seis flores rodean el corazón, y no están exactamente sobre los brazos.** Cada una lleva
+un `desvio` angular que la corre de su brazo hasta su sitio en la composición. Puestas
+estrictamente sobre dos brazos, seis flores caen en dos racimos de tres con dos cuadrantes
+vacíos, y el corazón queda disputado. La jerarquía manda sobre la fidelidad geométrica: el
+brazo sugiere de dónde sale la flor, el polvo ya lo dice, y la posición sirve a la lectura.
+
+**El corazón tiene que ganar la primera mirada.** Es el control que abre la carta, así que
+todo lo demás le cede el centro. Su blanco táctil es transparente en reposo —un anillo encima
+le cortaba la silueta— y lo que hace de afordance es el latido, con amplitud alta a propósito,
+más la pista que lo nombra. En un teléfono no hay hover que lo revele: si alguna vez se calma
+ese latido, hay que poner otra cosa en su lugar.
+
+**El canvas no es una dependencia del contenido.** Si no entrega un contexto 2D se oculta y la
+caja pasa a una lista oscura con los seis mensajes y la carta. La galaxia tiene **dos brazos
+espirales de verdad** —antes eran cuatro que se solapaban hasta formar un disco uniforme con
+anillos que se leían como un átomo— y una entrada escalonada que termina antes de 1,4s. Gira
+**rígida**: la rotación diferencial es correcta en física y enrolla los brazos hasta borrarlos.
+Sus semillas se calculan una vez al sembrar —no 126 veces por cuadro—, cada grano guarda su
+radio y su ángulo base para que el bucle no asigne ni un objeto por cuadro, las chispas se
+limitan a 240 y los cambios de tamaño se agrupan en un solo `requestAnimationFrame`; el DPR
+sigue topado en 2.
+
+**El aplanado del disco se adapta a la caja, y ese número no es decorativo.** Vale 0,58 en una
+caja ancha (la galaxia de canto) y sube hasta 0,95 en una angosta y alta (casi de frente). Con
+0,58 fijo, en un teléfono el disco medía 316×174 dentro de una caja de 556 de alto: el universo
+ocupaba un tercio de la pantalla y el resto era negro. Medido, no estimado.
+
+**La geometría vive en `js/cielo.js` y está probada.** Es puro —entran y salen números— y no
+está en `logica.js` a propósito: ese módulo es lógica de negocio. La galaxia estuvo rota en la
+única capa que nadie lee, y tres rondas de revisión sobre el texto no lo vieron. Las reglas que
+no se ven leyendo están en "cosas que parecen bugs y no lo son" de `CLAUDE.md`.
 
 El alfa de los girasoles se **declara** en `0,62` dentro de `girasol()`: opacos quedan de
 calcomanía sobre el cielo, y heredados del último punto dibujado salían fantasmales — pasó, y
-se vio como flores amarillas sin amarillo.
+se vio como flores amarillas sin amarillo. El resplandor del corazón repite ese reset por el
+mismo motivo: se dibuja justo después de las estrellas, que dejan el alfa sucio.
+
+**El tamaño de las flores se mide contra el disco, no contra `escala`.** Las dos medidas
+divergen 1,7× entre escritorio y móvil, así que con `escala` las flores pesaban 1,7× más
+dentro del cuadro en un teléfono: "flores gigantes, universo chico" volviendo por la puerta de
+atrás. Y el recorte que las mantiene dentro de la caja usa la extensión **real** del dibujo
+(`FLOR_EXT`), no un círculo: el tallo baja hasta `tam*2.1` y tratarlo como radio `tam`
+subestimaba el alto por más del doble.
 
 **Con el movimiento apagado el cielo se dibuja una vez y se queda quieto**, entero. Es la
 misma regla del ramo: una galaxia que no gira es aceptable, una galaxia que no está es el peor

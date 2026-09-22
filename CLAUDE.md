@@ -7,7 +7,7 @@ Proyecto en español: código, comentarios y datos van en español.
 ## Comandos
 
 ```bash
-npm test                          # Vitest, 87 pruebas sobre logica.js
+npm test                          # Vitest, 108 pruebas: 87 de logica.js + 21 de cielo.js
 npx vitest run -t "confianza"     # un solo grupo de pruebas por nombre
 npm run test:watch                # reejecuta al guardar
 
@@ -40,6 +40,7 @@ decisión de arquitectura más importante del proyecto:
 app.js      router por hash                  ← decide qué vista se pinta    [existe]
 datos.js    red + localStorage + overrides   ← única puerta a los datos     [existe]
 logica.js   100% puro, cero imports          ← AQUÍ VIVEN LAS PRUEBAS       [existe]
+cielo.js    geometría pura del cielo         ← puro también, y NO es logica [existe]
 vista.js    DOM de la cartelera                                            [existe]
 mapa.js     Leaflet por CDN                  ← único trato con red externa  [existe]
 escala.js   DOM de la escala astronómica     ← estático, no pide datos      [existe]
@@ -127,6 +128,16 @@ quedado decidida en dos archivos — que es exactamente como esas reglas se sepa
 flores del ramo ES una fecha**, no una decisión de dibujo. Decidirlo dentro de un template lo
 dejaría sin prueba y sin un solo sitio donde mirarlo. Vive en `logica.js` con `RAMO_DESDE` y
 `RAMO_MAX`, y tiene siete pruebas.
+
+**`cielo.js` es puro igual que `logica.js` y aun así NO es `logica.js`, y esa distinción
+costó una discusión.** `logica.js` guarda la lógica de **negocio**: fechas, confianza,
+distancias, IDs — cosas con una verdad fuera del programa. La trigonometría de la galaxia no
+la tiene: su criterio de corrección es geométrico. Meterla en `logica.js` lo habría
+convertido en el cajón de todo lo puro. Un módulo propio da lo mismo —pureza, pruebas, un
+solo sitio donde mirar— sin redefinir qué es `logica.js`. **Lo que sí se rechazó fue dejarla
+sin probar:** la galaxia estuvo rota en la única capa que nadie lee, y tres rondas de
+revisión sobre prosa no la vieron. Hoy son 21 pruebas en `cielo.test.js`, y la primera
+—"los dos brazos nunca coinciden"— es la que habría matado el defecto en dos segundos.
 
 `mapa.js` está solo por una razón: es el **único** módulo que depende de recursos externos, y
 son **dos** — la librería (unpkg) y el mapa base (OpenStreetMap). **Ninguna función suya
@@ -318,6 +329,42 @@ obras equivocadas y el `git diff` sería ilegible.
 - **El comentario de la cabecera en `styles.css` dice "no vive en `vista.js`" y quedó viejo.**
   El de `index.html` se actualizó a "los módulos de vista" cuando entró el router; el del CSS
   no. Es solo un comentario, pero es el último sitio del repo que afirma que hay una sola vista.
+- **Las siete reglas geométricas de `cielo.js`, que no se ven leyendo el código.** Cada una
+  produjo un defecto real y ninguna es evidente:
+  1. **`ANCLA` ya lleva TODA la separación entre brazos** (0,55π − (−0,45π) = π). Sumarle
+     además `brazo·(2π/BRAZOS)` agrega un segundo π y deja los dos brazos exactamente
+     encima: un disco uniforme que se lee como un átomo. Sobrevivió a dos rondas de
+     revisión adversarial.
+  2. **El margen de `DISP` es `(π − VUELTA)/2`, no `π/2`.** Los brazos barren `VUELTA`
+     radianes, así que el hueco real entre la punta de uno y el arranque del otro es 0,54
+     rad y el margen por lado es 0,271. El punto donde aprieta es la punta, no el ancla.
+  3. **`capa` no puede derivar de `brazo`.** Con `BRAZOS = 2`, escribir `capa: i % 2`
+     pondría cada brazo entero en un solo plano de profundidad. De ahí el
+     `Math.floor(i / BRAZOS) % 2`.
+  4. **Los exponentes `0.55` (al sembrar) y `0.9` (en `puntoEspiral`) están acoplados:**
+     componen a ≈`sqrt(azar())`, el muestreo de área uniforme sobre un disco. Mover uno
+     solo desbalancea la densidad sin que nada avise.
+  5. **El giro es rígido y no diferencial, a propósito.** La rotación diferencial es
+     correcta en física y destructiva en pantalla: enrolla los brazos hasta borrarlos.
+  6. **Las extensiones del corazón se muestrean, no se escriben.** A mano se asumía que los
+     extremos en `y` caen en θ=0 y θ=π; es falso, el mínimo está en θ≈0,289π. El error en
+     el centro eran ~21px de corazón corrido. Lo encontró la primera corrida de las pruebas.
+  7. **`FLOR_EXT` no es un círculo de radio `tam`.** `girasol()` dibuja el tallo hasta
+     `tam*2.1` hacia abajo y el halo a `tam*1.45`. Tratar la flor como un círculo
+     subestimaba su alto por más del doble y dejaba la flor exterior cortada. Si cambia
+     `girasol()`, cambia `FLOR_EXT`.
+- **El aplanado del disco NO es constante, y por eso `radiosDelCielo()` lo devuelve.** En una
+  caja ancha vale 0,58 (galaxia de canto); en uno angosto y alto sube hasta 0,95 (casi de
+  frente). Con 0,58 fijo el disco medía 316×174 dentro de una caja de 556 de alto: el
+  universo ocupaba un tercio y el resto era negro. Los tres aplanados —el del halo, el de
+  cada capa de polvo y el máximo con el que se mide la caja— viajan juntos dentro de
+  `radios.aplanado` justamente para que no se pueda medir con uno y dibujar con otro.
+- **El blanco táctil del corazón es transparente en reposo, y eso NO es un descuido de
+  afordance.** El anillo le cortaba la silueta, y el corazón no es decoración con un botón
+  encima: es el botón. Lo que lo reemplaza como afordance es el latido, con amplitud
+  deliberadamente alta, más la pista que lo nombra ("toca el corazón para abrir la carta").
+  En un teléfono no hay hover que lo revele, así que si alguna vez se baja esa amplitud hay
+  que poner otra cosa en su lugar.
 - **El ramo NO usa `Math.random()` y la celebración SÍ, y no se contradicen.** El ramo tiene
   que ser idéntico en cada visita porque su forma y su número son un dato: sale de `ruido()`,
   un seno determinista sembrado con el índice, por la misma razón por la que los IDs salen del
@@ -401,6 +448,16 @@ el corazón abre la carta final. Los siete contenidos reutilizan un solo `<dialo
 contexto 2D falla aparecen como lista en vez de desaparecer con el dibujo. Las semillas se
 precalculan, las chispas tienen tope y el cambio de `prefers-reduced-motion` detiene o reanuda
 el bucle durante la sesión.
+
+Y encima de eso, **el universo se rehízo entero**. La galaxia vieja no tenía brazos: cuatro
+que se solapaban hasta formar un disco uniforme, más diez elipses concéntricas que se leían
+como un símbolo de átomo. Ahora **el corazón ES el núcleo** y los brazos salen de sus dos
+lóbulos; el polvo arranca fuera de su silueta, va de oro cerca a rosa lejos, y el latido viaja
+hacia afuera como un pulso. Las seis flores rodean el centro en vez de flotar sueltas, y su
+tamaño se mide contra el disco. **La geometría salió a `js/cielo.js` con 21 pruebas**: era la
+única capa del proyecto sin prosa que la explicara, y ahí es donde estuvieron los errores. Tres
+rondas de revisión adversarial sobre el texto dejaron pasar dos defectos que una aserción mató
+en dos segundos. Las reglas que no se ven leyendo están en "cosas que parecen bugs y no lo son".
 
 En los datos hay 18 teatros, 20 obras, 122 funciones repartidas en agosto y septiembre, y 53
 lugares para cenar. **94 de las 122 funciones tienen `url_entradas`**, así que el botón "Comprar
