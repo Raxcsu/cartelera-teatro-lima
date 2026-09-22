@@ -530,9 +530,18 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 .corazon-mensaje:hover,.corazon-mensaje:focus-visible{
   border-color:var(--cielo-oro);background:rgba(255,215,93,.12);
   box-shadow:0 0 0 6px rgba(255,215,93,.09),0 0 28px rgba(255,215,93,.3)}
-.corazon-mensaje{left:50%;top:53%;width:82px;height:82px;
-  border-color:rgba(217,143,160,.34);background:rgba(3,2,8,.08);
-  box-shadow:0 0 24px rgba(217,143,160,.12)}
+/* El blanco del corazón es TRANSPARENTE en reposo: el anillo dibujado encima
+   le cortaba la silueta, y el corazón no es decoración con un botón encima,
+   es el botón. El anillo aparece solo al pasar por encima o al enfocar.
+   El tamaño lo escribe flores.js en --tap-corazon (ver medir()): depende de
+   la escala y no puede vivir duplicado acá. El 82px es el respaldo del
+   instante previo a la primera medida. */
+.corazon-mensaje{left:50%;top:53%;
+  width:var(--tap-corazon,82px);height:var(--tap-corazon,82px);
+  border-color:transparent;background:transparent;box-shadow:none}
+.corazon-mensaje:hover,.corazon-mensaje:focus-visible{
+  border-color:rgba(217,143,160,.5);background:rgba(217,143,160,.06);
+  box-shadow:0 0 28px rgba(217,143,160,.18)}
 .flor-etiqueta,.corazon-etiqueta{display:none}
 .flores-leyenda{position:absolute;z-index:4;right:18px;bottom:46px;left:18px;
   min-height:20px;margin:0;text-align:center;pointer-events:none;
@@ -600,7 +609,11 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .flor-mensaje[data-etiqueta="izquierda"] .flor-etiqueta{right:52px;top:50%;transform:translateY(-50%)}
   .flor-mensaje[data-etiqueta="arriba"] .flor-etiqueta{bottom:50px;left:50%;transform:translateX(-50%)}
   .flor-mensaje[data-etiqueta="abajo"] .flor-etiqueta{top:50px;left:50%;transform:translateX(-50%)}
-  .corazon-etiqueta{top:90px;left:50%;transform:translateX(-50%)}
+  /* Cuelga del alto REAL del corazon dibujado, que flores.js escribe en
+     --corazon-alto. Con un top fijo de 90px la etiqueta caia adentro de la
+     silueta y le tapaba la punta. El 50% es el centro del boton. */
+  .corazon-etiqueta{top:calc(50% + var(--corazon-alto,50px) + 16px);left:50%;
+    transform:translateX(-50%)}
 }
 
 /* El movimiento se declara opt-in, igual que el ramo. Con las animaciones

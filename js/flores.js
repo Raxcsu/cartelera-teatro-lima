@@ -1,9 +1,15 @@
 /**
  * flores.js — el cielo de flores amarillas.
  *
- * No importa datos.js ni logica.js: no pide datos y no lee el reloj, así que
- * la vista sigue en pie aunque la cartelera esté caída o vencida, igual que
- * la escala astronómica.
+ * No pide datos y no lee el reloj, así que la vista sigue en pie aunque la
+ * cartelera esté caída o vencida, igual que la escala astronómica. Lo que da
+ * esa garantía es no hacer fetch, no la ausencia de imports: pregunta.js
+ * importa logica.js Y datos.js y también es autosuficiente.
+ *
+ * Importa cielo.js, que es la geometría pura de esta pantalla: sin DOM, sin
+ * red, sin reloj y sin azar. Vive aparte porque acá adentro no se podía
+ * probar, y la galaxia estuvo rota justamente en la capa que nadie veía
+ * leyendo. No está en logica.js porque ese módulo es lógica de negocio.
  *
  * Es la única pantalla oscura del proyecto y es a propósito: son flores
  * encendidas, y sin cielo negro no se encienden.
@@ -14,6 +20,11 @@
  * evitan dentro de la cartelera, solo que a nivel de app.js.
  */
 
+import {
+  radiosDelCielo, puntoEspiral, puntoCorazon, recortarT, tamanoFlor,
+  BRAZOS, DISP, CORAZON_U, CORAZON_ALTO, RESPLANDOR,
+} from './cielo.js';
+
 /* ── los mensajes ───────────────────────────────────────────
    Cada flor ocupa un sitio estable y abre un texto propio. El contenido se
    queda junto a la composición porque no viene de red ni es dato de la
@@ -23,37 +34,37 @@ const MENSAJES = [
     id: 'lugar-favorito',
     titulo: 'Mi lugar favorito',
     texto: 'Entre todos los planes, siempre termino eligiendo el que me lleva a ti.',
-    x: -0.13, y: 0.17, z: 0.48, fase: 0.25, tipo: 2, etiqueta: 'abajo',
+    brazo: 1, t: 0.60, desvio: 0.38, z: 0.48, fase: 0.25, tipo: 2, etiqueta: 'derecha',
   },
   {
     id: 'tu-luz',
     titulo: 'Tu luz',
     texto: 'No necesito inventar otra estrella: tú ya cambias la forma en que miro el cielo.',
-    x: 0.47, y: 0.28, z: 0.67, fase: 0.87, tipo: 0, etiqueta: 'izquierda',
+    brazo: 0, t: 0.42, desvio: -0.20, z: 0.67, fase: 0.87, tipo: 0, etiqueta: 'arriba',
   },
   {
     id: 'cada-dia',
     titulo: 'Cada día',
     texto: 'Hay una flor por cada día desde que empezamos. Ninguna alcanza a decir todo lo que has ido haciendo en mí.',
-    x: 0.38, y: 0.65, z: 0.88, fase: 0.52, tipo: 1, etiqueta: 'izquierda',
+    brazo: 0, t: 0.66, desvio: 0.22, z: 0.88, fase: 0.52, tipo: 1, etiqueta: 'izquierda',
   },
   {
     id: 'volveria-a-elegirte',
     titulo: 'Volvería a elegirte',
     texto: 'Puede cambiar el camino, la fecha o la historia. Yo volvería a encontrarte y a elegirte.',
-    x: 0.27, y: 0.80, z: 0.52, fase: 0.42, tipo: 2, etiqueta: 'derecha',
+    brazo: 0, t: 0.90, desvio: 0.65, z: 0.52, fase: 0.42, tipo: 2, etiqueta: 'izquierda',
   },
   {
     id: 'que-sea-especial',
     titulo: 'Que sea especial',
     texto: 'No siempre puedo consentirte, pero contigo siempre quiero que cada detalle valga la pena.',
-    x: -0.36, y: 0.63, z: 1.04, fase: 0.18, tipo: 0, etiqueta: 'derecha',
+    brazo: 1, t: 0.86, desvio: 0.75, z: 1.04, fase: 0.18, tipo: 0, etiqueta: 'derecha',
   },
   {
     id: 'mi-princesa',
     titulo: 'Mi Princesa',
     texto: 'No hay escala suficiente para medirte. Solo sé que mi vida es más bonita cuando estás en ella.',
-    x: -0.46, y: 0.31, z: 0.72, fase: 0.72, tipo: 1, etiqueta: 'derecha',
+    brazo: 1, t: 0.36, desvio: -0.05, z: 0.72, fase: 0.72, tipo: 1, etiqueta: 'abajo',
   },
 ];
 
@@ -103,7 +114,17 @@ let raiz = null, caja = null, lienzo = null, ctx = null, controles = null;
 let leyenda = null, dialogo = null, dialogoTitulo = null, dialogoCuerpo = null;
 let dialogoFirma = null, activadorCarta = null, fallback = null;
 let ancho = 0, alto = 0, cx = 0, cy = 0, escala = 1;
+// Los radios los deriva sembrar() con radiosDelCielo(), NO medir(): así el
+// sembrado no puede correr sobre radios viejos y el orden deja de ser un
+// contrato que hay que recordar. Con r0 = 0 todo el polvo colapsa en un
+// punto, sin lanzar nada.
+let radios = { radioUtil: 0, r0: 0, rMax: 0, escalaCorazon: 1 };
 let estrellas = [], polvo = [], corazon = [], flores = [], chispas = [];
+// Los botones DOM de las flores, en el MISMO orden que MENSAJES y que
+// flores[]. Existen porque las posiciones pasaron de porcentajes a
+// pixeles: los porcentajes eran independientes de la resolucion y estos
+// no, asi que hay que reescribirlos en cada medida.
+let botones = [];
 let cuadro = null, cuadroMedida = null, inicioEntrada = 0;
 let alRedimensionar = null, alCambiarVisibilidad = null, alCambiarMovimiento = null;
 let alCerrarDialogo = null, consultaMovimiento = null;
@@ -148,6 +169,22 @@ function medir() {
   cy = alto * 0.53;
   escala = Math.min(ancho, alto) / 720;
   sembrar();
+
+  // El tamaño del blanco táctil del corazón NO se escribe en el CSS: depende
+  // de la escala, y duplicarlo sería estrenar una segunda versión del
+  // problema de PIN contra .pin-teatro i. Se mide por el ANCHO de la curva
+  // (16 unidades) y no por su alto: es el eje mayor, y un círculo ajustado
+  // al alto dejaría los dos lóbulos fuera del blanco. El piso de 44px es la
+  // regla de área táctil de DESIGN.md.
+  caja.style.setProperty('--tap-corazon',
+    Math.max(44, Math.round(radios.r0 * 2 / RESPLANDOR)) + 'px');
+  // La media altura real del corazón dibujado. La etiqueta de escritorio
+  // cuelga de acá en vez de un top fijo: con 90px se le metía adentro.
+  caja.style.setProperty('--corazon-alto',
+    Math.round(CORAZON_ALTO * CORAZON_U * radios.escalaCorazon) + 'px');
+
+  // Ultimo: necesita flores[], que acaba de producir sembrar().
+  reposicionarControles();
 }
 
 /** Agrupa todos los resize de un cuadro en una sola resiembra. */
@@ -161,6 +198,9 @@ function programarMedida() {
 }
 
 function sembrar() {
+  // PRIMER acto, siempre. Ver el comentario de `radios` arriba.
+  radios = radiosDelCielo(ancho, alto, escala);
+
   const densidad = Math.min(1, (ancho * alto) / (1280 * 720));
 
   estrellas = Array.from({ length: Math.floor(150 + 260 * densidad) }, () => ({
@@ -168,28 +208,58 @@ function sembrar() {
     a: azar(0.9, 0.15), tw: azar(5, 0.7), p: azar(Math.PI * 2),
   }));
 
+  // Cada grano precalcula su radio y su ángulo base UNA vez. El bucle de
+  // dibujo solo le suma el giro global y hace cos/sin: cero asignaciones y
+  // cero Math.pow por cuadro. Llamar a puntoEspiral() por grano por cuadro
+  // serían ~65.000 objetos por segundo con 1080 granos a 60fps — basura
+  // efímera dentro del rAF, que en un celular de gama baja se ve como
+  // tirones y cuya causa no se parece al síntoma.
   polvo = [];
-  const granos = Math.floor(560 + 520 * densidad);
+  const granos = Math.floor(700 + 680 * densidad);
   for (let i = 0; i < granos; i++) {
-    const brazo = i % 4;
-    const t = azar();
+    const brazo = i % BRAZOS;
+    // capa tiene que ser INDEPENDIENTE de brazo. Con BRAZOS = 2, escribir
+    // i % 2 pondría cada brazo entero en un solo plano de profundidad:
+    // una regresión visual que no se ve leyendo el código.
+    const capa = Math.floor(i / BRAZOS) % 2;
+    // Acoplado al exponente 0.9 de puntoEspiral(): componen a ≈sqrt(azar()),
+    // el muestreo de área uniforme sobre un disco. Mover uno solo desbalancea
+    // la densidad sin que nada avise.
+    const t = Math.pow(azar(), 0.55);
+    const disp = azar(DISP, -DISP) * (1 - t * 0.55);
+    const { a, r } = puntoEspiral(brazo, t, radios, { disp });
     polvo.push({
-      a: brazo * Math.PI / 2 + t * 7.5 + azar(0.92, -0.92),
-      r: (15 + Math.pow(t, 0.52) * Math.min(ancho, alto) * 0.49) * escala,
-      s: azar(2.3, 0.35), o: azar(0.88, 0.12), v: azar(0.1, 0.018),
-      z: azar(1.3, 0.35), tibio: Math.random() > 0.28, capa: i % 2,
+      a0: a, r, t, apl: radios.aplanado.capa[capa], capa,
+      s: azar(2.3, 0.35), o: azar(0.88, 0.12),
+      z: azar(1.3, 0.35),
+      // El color se liga al radio: casi todo oro junto al corazón, rosa
+      // ganando hacia la punta de los brazos. Antes era azar puro, sin
+      // relación con dónde estaba el grano.
+      //
+      // Los coeficientes están calibrados contra el sesgo de t, no elegidos
+      // a ojo: con t = pow(azar(), 0.55) la media de t es 1/1.55 ≈ 0.645, así
+      // que un umbral (0.15 + t·0.85) dejaba solo ~30% de oro y la pantalla
+      // salía violeta. En una vista que se llama flores amarillas, el oro
+      // tiene que ganar.
+      calido: Math.random() > (0.06 + t * 0.62),
+      fase: azar(Math.PI * 2),
     });
   }
 
   // La curva del corazón, con las partículas repartidas al azar sobre ella.
+  //
+  // La paramétrica sale de cielo.js y viene YA recentrada: antes el corazón
+  // colgaba ~102px bajo el centro y solo ~30px encima. Y todo va contra
+  // escalaCorazon, incluido el jitter: dejarlo en `escala` desacopla la
+  // difuminación del borde del tamaño dibujado, y las dos escalas llegan a
+  // diferir un 16% en la caja angosta.
+  const ec = radios.escalaCorazon;
   corazon = [];
   for (let i = 0; i < 260; i++) {
-    const t = azar(Math.PI * 2);
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    const { x, y } = puntoCorazon(azar(Math.PI * 2));
     corazon.push({
-      x: x * escala * 6 + azar(2.2, -2.2) * escala,
-      y: y * escala * 6 + azar(2.2, -2.2) * escala,
+      x: x * ec * CORAZON_U + azar(2.2, -2.2) * ec,
+      y: y * ec * CORAZON_U + azar(2.2, -2.2) * ec,
       a: azar(0.98, 0.28), r: azar(2.3, 0.55), p: azar(Math.PI * 2),
     });
   }
@@ -197,15 +267,34 @@ function sembrar() {
   // Las posiciones y las semillas son estables. Antes el centro de cada flor
   // generaba 21 puntos al azar EN CADA CUADRO: 126 llamadas a Math.random()
   // por frame y una vibración visual que no pertenecía al movimiento.
-  flores = MENSAJES.map((mensaje, i) => ({
+  // Cada flor vive sobre un brazo, no en un x/y suelto. `t` se recorta
+  // hacia adentro hasta que la flor ENTERA entre en la caja: antes dos de
+  // las seis salian cortadas por el borde. Y el tamano se mide contra el
+  // disco, no contra `escala`: las dos medidas divergen 1,7x entre
+  // escritorio y movil, y con `escala` las flores pesaban 1,7x mas dentro
+  // del cuadro en movil. Eso era el defecto #8 por la puerta de atras.
+  // La banda de .flores-copia ocupa el fondo de la caja con la pista y su
+  // degradado. Para el recorte la caja TERMINA ahi: una flor "dentro de la
+  // caja" pero debajo de la pista se lee como cortada igual, y su etiqueta
+  // choca con el texto. Se vio en pantalla con la flor de mas abajo.
+  const RESERVA_PISTA = 40;
+  const cajaFlor = { ancho, alto: alto - RESERVA_PISTA, cx, cy };
+  flores = MENSAJES.map((mensaje, i) => {
+    const desvio = mensaje.desvio ?? 0;
+    const t = recortarT(mensaje.brazo, mensaje.t, radios, cajaFlor, desvio);
+    const p = puntoEspiral(mensaje.brazo, t, radios,
+      { cx, cy, disp: desvio });
+    return {
     ...mensaje,
+    px: p.x, py: p.y, tam: tamanoFlor(t, radios),
     giro: azar(0.3, -0.3),
     semillas: Array.from({ length: 21 }, (_, k) => {
       const radio = Math.sqrt((k + 0.5) / 21) * 0.29;
       const angulo = k * 2.3999632297 + i * 0.31;
       return { x: Math.cos(angulo) * radio, y: Math.sin(angulo) * radio };
     }),
-  }));
+    };
+  });
 }
 
 // ── dibujo ────────────────────────────────────────────────
@@ -230,38 +319,88 @@ function progresoEntrada(transcurrido, demora = 0, duracion = 600) {
 }
 
 function galaxia(t, entrada) {
+  // El halo del disco. Reemplaza a DOS cosas que se fueron: el gradiente
+  // circular del núcleo, cuyo trabajo hace ahora el resplandor con forma de
+  // corazón, y los diez ctx.ellipse() concéntricos que se leían como un logo
+  // de átomo — eran trazos geométricos duros y eran lo primero que veía el
+  // ojo. Acá no hay trazo: es un gradiente aplastado, sin coste por vuelta.
+  //
+  // Va FUERA del bloque 'lighter' y con su propio save/restore. Dos cosas
+  // que hay que mantener: el alfa se declara acá porque punto() lo deja
+  // sucio (ver el comentario de punto()), y el save/restore tiene que
+  // cerrar, o cada cuadro empuja un estado más a la pila del contexto.
+  ctx.save();
+  ctx.globalAlpha = entrada;
+  ctx.translate(cx, cy);
+  ctx.scale(1, radios.aplanado.base);
+  const halo = ctx.createRadialGradient(0, 0, 0, 0, 0, radios.radioUtil);
+  halo.addColorStop(0, 'rgba(255,214,120,.16)');
+  halo.addColorStop(0.42, 'rgba(199,126,144,.09)');
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(0, 0, radios.radioUtil, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // Giro RÍGIDO: las dos capas van en el mismo sentido y a velocidad casi
+  // igual. Antes la capa de atrás giraba al revés (-0.58) y las dos se
+  // cancelaban, y encima cada grano tenía su propia velocidad con 5,5× de
+  // dispersión: la rotación diferencial es correcta en física y destructiva
+  // en pantalla, porque enrolla los brazos hasta borrarlos. La profundidad
+  // sale de z, del alfa, del radio y del aplanado por capa, no de la velocidad.
+  const giro = t * 0.055;
+  const giroFondo = t * 0.050;
+  for (const p of polvo) {
+    const a = p.a0 + (p.capa ? giroFondo : giro);
+    // El latido del corazón viajando hacia afuera.
+    const pulso = 0.85 + 0.35 * Math.sin(t * 2.2 - p.t * 2.4 + p.fase * 0.35);
+    punto(cx + Math.cos(a) * p.r, cy + Math.sin(a) * p.r * p.apl,
+      p.s * p.z, p.calido ? CIELO.oro : CIELO.rosa, p.o * pulso * entrada);
+  }
+  ctx.restore();
+}
+
+/**
+ * El núcleo de la galaxia, recortado a la forma del corazón.
+ *
+ * Es lo que reemplaza al gradiente circular que vivía en galaxia(): ahora la
+ * galaxia no tiene un núcleo propio compitiendo con el corazón, tiene ESTE.
+ * De ahí salen los brazos, y por eso el polvo arranca justo en su borde.
+ *
+ * Se dibuja antes que el polvo y después que las estrellas, y por eso el
+ * `globalAlpha` se declara: punto() lo deja sucio y las estrellas son lo
+ * último que lo tocó. Sin este reset el núcleo hereda el alfa de la última
+ * estrella —distinto cada cuadro— y parpadea sin motivo. Es el mismo defecto
+ * que una vez dejó a las flores amarillas sin amarillo.
+ */
+function nucleoCorazon(t, entrada) {
+  const u = radios.escalaCorazon * CORAZON_U * RESPLANDOR;
+  const respira = 1 + Math.sin(t * 2.2) * 0.035;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.globalAlpha = entrada;
-
-  const nucleo = ctx.createRadialGradient(cx, cy, 0, cx, cy, 130 * escala);
-  nucleo.addColorStop(0, 'rgba(255,252,218,.46)');
-  nucleo.addColorStop(0.08, 'rgba(255,199,63,.34)');
-  nucleo.addColorStop(0.35, 'rgba(199,126,144,.16)');
-  nucleo.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = nucleo;
+  // El gradiente se apaga MUY rápido: llenando la silueta entera a alfa alto,
+  // el resplandor deja de leerse como luz y pasa a ser un borrón beige que
+  // le come el contorno a las partículas. Lo que tiene que brillar es el
+  // centro, no la forma.
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(1, radios.r0));
+  g.addColorStop(0, 'rgba(255,228,150,.34)');
+  g.addColorStop(0.18, 'rgba(255,186,54,.17)');
+  g.addColorStop(0.45, 'rgba(217,143,160,.06)');
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.arc(cx, cy, 132 * escala, 0, Math.PI * 2);
+  for (let i = 0; i <= 120; i++) {
+    const { x, y } = puntoCorazon((i / 120) * Math.PI * 2);
+    const px = cx + x * u * respira;
+    const py = cy + y * u * respira;
+    if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+  }
+  ctx.closePath();
   ctx.fill();
-
-  for (const p of polvo) {
-    const sentido = p.capa ? -0.58 : 1;
-    const a = p.a + t * p.v * sentido;
-    const parpadeo = 0.72 + Math.sin(t * 1.7 + p.r) * 0.28;
-    punto(cx + Math.cos(a) * p.r, cy + Math.sin(a) * p.r * (p.capa ? 0.42 : 0.53),
-      p.s * p.z, p.tibio ? CIELO.oro : CIELO.rosa, p.o * parpadeo * entrada);
-  }
-
-  ctx.globalAlpha = entrada;
-  for (let i = 0; i < 10; i++) {
-    const a = t * 0.09 + i * Math.PI / 5;
-    const r = (60 + i * 15) * escala;
-    ctx.strokeStyle = 'rgba(255,194,51,' + (0.02 - i * 0.0015) + ')';
-    ctx.lineWidth = (18 - i) * escala;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, r * 2.2, r * 0.72, a, 0, Math.PI * 2);
-    ctx.stroke();
-  }
   ctx.restore();
 }
 
@@ -269,7 +408,7 @@ function latido(t, entrada) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.globalAlpha = entrada;
-  const respira = 1 + Math.sin(t * 2.2) * 0.035;
+  const respira = 1 + Math.sin(t * 2.2) * 0.075;
   for (const p of corazon) {
     const a = p.a * (0.62 + Math.sin(t * 2 + p.p) * 0.38);
     const x = cx + p.x * respira;
@@ -349,8 +488,8 @@ function ramillete(t, transcurrido) {
     const entrada = progresoEntrada(transcurrido, 480 + i * 85, 420);
     const flotaY = Math.sin(t * 0.65 + f.fase * 9) * 10 * escala;
     const flotaX = Math.cos(t * 0.44 + f.fase * 7) * 5 * escala;
-    girasol(cx + f.x * ancho + flotaX, f.y * alto + flotaY,
-      (28 + f.z * 32) * escala, f.giro, t, f.tipo, f.semillas, entrada);
+    girasol(f.px + flotaX, f.py + flotaY,
+      f.tam, f.giro, t, f.tipo, f.semillas, entrada);
   });
 }
 
@@ -387,6 +526,9 @@ function dibujar(ahora) {
     if (s.r > 1.1) punto(s.x, s.y, s.r * 3, CIELO.rosa, a * 0.1);
   }
 
+  // El orden manda: el núcleo va DEBAJO de los brazos y el corazón ENCIMA.
+  // Así los brazos nacen de él y el polvo no le rompe la silueta.
+  nucleoCorazon(t, progresoEntrada(transcurrido, 200, 700));
   galaxia(t, progresoEntrada(transcurrido, 0, 800));
   latido(t, progresoEntrada(transcurrido, 300, 650));
   ramillete(t, transcurrido);
@@ -448,23 +590,40 @@ function fijarLeyenda(texto = 'Elige una flor') {
   if (leyenda) leyenda.textContent = texto;
 }
 
-function posicionarControl(boton, mensaje) {
-  // Las flores pueden asomarse por el borde, pero su blanco táctil no: en
-  // 320px, los centros extremos dejarían 11–13px del botón recortados.
-  boton.style.left = 'clamp(22px,' + (50 + mensaje.x * 100) + '%,calc(100% - 22px))';
-  boton.style.top = mensaje.y * 100 + '%';
+/**
+ * Reescribe la posicion de los botones desde flores[].
+ *
+ * Antes esto era un clamp en porcentajes escrito UNA vez en crearControles(),
+ * y era seguro porque los porcentajes no dependen de la resolucion. Ahora las
+ * posiciones son pixeles calculados sobre la espiral, asi que medir() tiene
+ * que volver a escribirlos: sin esto, girar el telefono despega los botones
+ * de sus flores y el dibujo se ve perfecto mientras el blanco tactil apunta
+ * a otro lado. Modo de falla silencioso, de los peores.
+ *
+ * El clamp se conserva: las flores pueden asomarse por el borde, su blanco no.
+ */
+function reposicionarControles() {
+  botones.forEach((boton, i) => {
+    const f = flores[i];
+    if (!f) return;
+    boton.style.left = Math.round(Math.min(Math.max(f.px, 22), ancho - 22)) + 'px';
+    boton.style.top = Math.round(Math.min(Math.max(f.py, 22), alto - 22)) + 'px';
+  });
 }
 
 function crearControles() {
   const fragmento = document.createDocumentFragment();
 
-  for (const mensaje of MENSAJES) {
+  // Sin posicionar: lo hace reposicionarControles() desde medir(). Por eso
+  // crearControles() corre ANTES de la primera medida, para que los botones
+  // existan cuando esa medida los coloque.
+  botones = [];
+  MENSAJES.forEach((mensaje, indice) => {
     const boton = document.createElement('button');
     boton.type = 'button';
     boton.className = 'flor-mensaje';
     boton.dataset.etiqueta = mensaje.etiqueta;
     boton.setAttribute('aria-label', 'Abrir mensaje: ' + mensaje.titulo);
-    posicionarControl(boton, mensaje);
 
     const titulo = document.createElement('span');
     titulo.className = 'flor-etiqueta';
@@ -479,11 +638,16 @@ function crearControles() {
     boton.addEventListener('pointerleave', ocultarTitulo);
     boton.addEventListener('click', (evento) => {
       evento.stopPropagation();
-      estallar(cx + mensaje.x * ancho, mensaje.y * alto);
+      // La posicion sale de flores[], NO de mensaje.x/mensaje.y: esos campos
+      // ya no existen, y leerlos daria `undefined * ancho = NaN`, con las
+      // chispas cayendo en ninguna parte y sin un solo error en consola.
+      const f = flores[indice];
+      if (f) estallar(f.px, f.py);
       abrirCarta(mensaje, boton);
     });
+    botones.push(boton);
     fragmento.append(boton);
-  }
+  });
 
   const corazonBoton = document.createElement('button');
   corazonBoton.type = 'button';
@@ -539,7 +703,7 @@ export function pintarFlores(app) {
         <div class="flores-controles" aria-label="Mensajes entre las flores"></div>
         <p class="flores-leyenda" aria-hidden="true">Elige una flor</p>
         <div class="flores-copia">
-          <p class="flores-pista"><span class="flores-pista-elige">Elige una flor · </span>toca el cielo para encender estrellas</p>
+          <p class="flores-pista"><span class="flores-pista-elige">Elige una flor · </span>toca el corazón para abrir la carta</p>
         </div>
         <section class="flores-fallback" aria-labelledby="flores-fallback-titulo" hidden>
           <h3 id="flores-fallback-titulo">Un pequeño universo para ti</h3>
@@ -590,8 +754,10 @@ export function pintarFlores(app) {
   if (!ctx) {
     activarFallback();
   } else {
-    medir();
+    // crearControles() ANTES de medir(): los botones ya no traen su
+    // posicion puesta, se la escribe la medida.
     crearControles();
+    medir();
     inicioEntrada = performance.now();
     if (quieto()) dibujar(inicioEntrada);
     else arrancarBucle();
@@ -645,6 +811,8 @@ export function desmontar() {
   // Sin esto los ~1500 objetos del cielo siguen vivos colgados del módulo
   // aunque el DOM que los mostraba ya no exista.
   estrellas = polvo = corazon = flores = chispas = [];
+  radios = { radioUtil: 0, r0: 0, rMax: 0, escalaCorazon: 1 };
+  botones = [];
   raiz = caja = lienzo = ctx = controles = leyenda = fallback = null;
   dialogo = dialogoTitulo = dialogoCuerpo = dialogoFirma = activadorCarta = null;
   consultaMovimiento = null;
