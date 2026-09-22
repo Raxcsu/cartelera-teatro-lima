@@ -11,6 +11,11 @@ TODOS.md
 # Maquetas y bocetos: el repo publico es solo codigo y datos.
 layout.png
 
+# La cancion de la carta: tiene derechos y este repo es publico. El archivo
+# vive en local; en la pagina suena por un embed de YouTube, que es la via
+# con licencia. Subirlo seria distribuir un tema comercial desde el dominio.
+data/music.mp3
+
 # Las entradas reales: llevan DNI, numero de compra y los QR de acceso.
 # Este repo es publico y cada push despliega, asi que no entran nunca.
 docs/bodas_figaro_entradas.pdf

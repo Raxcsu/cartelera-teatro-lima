@@ -139,8 +139,10 @@ sin probar:** la galaxia estuvo rota en la única capa que nadie lee, y tres ron
 revisión sobre prosa no la vieron. Hoy son 21 pruebas en `cielo.test.js`, y la primera
 —"los dos brazos nunca coinciden"— es la que habría matado el defecto en dos segundos.
 
-`mapa.js` está solo por una razón: es el **único** módulo que depende de recursos externos, y
-son **dos** — la librería (unpkg) y el mapa base (OpenStreetMap). **Ninguna función suya
+`mapa.js` ya no es el único módulo con dependencias externas —la carta final embebe un
+reproductor de YouTube, ver abajo— pero sigue siendo el único cuyo **fallo rompe una
+función**: si el reproductor no carga, la carta se lee igual. Y las suyas son **dos**:
+la librería (unpkg) y el mapa base (OpenStreetMap). **Ninguna función suya
 lanza.** Si cae el CDN de Leaflet, `crearMapa()` devuelve `null`, `vista.js` esconde la banda y
 la lista queda entera. Si caen solo las teselas, `mapa.js` avisa por `alFallarTeselas` y
 `vista.js` retira el mapa entero. Un fallo de red no puede leerse como "no hay teatro", y
@@ -365,6 +367,21 @@ obras equivocadas y el `git diff` sería ilegible.
   deliberadamente alta, más la pista que lo nombra ("toca el corazón para abrir la carta").
   En un teléfono no hay hover que lo revele, así que si alguna vez se baja esa amplitud hay
   que poner otra cosa en su lugar.
+- **La canción de la carta NO se sirve desde el repo, y no es un olvido.** Existe
+  `data/music.mp3` en local y está en `.gitignore` a propósito: "Te mando flores" es un tema
+  comercial y esto se publica en GitHub Pages, así que subirlo sería distribuir música con
+  derechos desde el dominio. El embed de YouTube la reproduce entera, con licencia y sin
+  hospedar nada. **Si alguien "arregla" esto subiendo el mp3, lo está rompiendo.**
+- **El `autoplay=1` del embed no es ingenuo, y que a veces no funcione es lo esperado.**
+  Ningún navegador deja que una página arranque audio al cargar. Pero abrir la carta exige
+  tocar el corazón, y esa activación habilita el autoplay de la página: en Chrome la canción
+  arranca sola en el momento en que se abre. Safari de iPhone exige que el gesto sea sobre el
+  reproductor mismo, así que ahí degrada a tocar play. Es gratis: donde funciona, mejora.
+- **El scroll de la carta vive en `.carta-papel` y no en `.carta-dialogo`.** El diálogo es
+  transparente; el papel visible con sus esquinas redondeadas es el papel, así que una barra
+  en el diálogo flotaría fuera de la hoja. Y sin ese `overflow-y` la carta larga se corta con
+  el botón Cerrar fuera de alcance: se sale con Escape, pero el control visible desaparece.
+  Con tres párrafos no se veía; con cinco, en una pantalla de 667px, sí.
 - **El ramo NO usa `Math.random()` y la celebración SÍ, y no se contradicen.** El ramo tiene
   que ser idéntico en cada visita porque su forma y su número son un dato: sale de `ruido()`,
   un seno determinista sembrado con el índice, por la misma razón por la que los IDs salen del

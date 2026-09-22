@@ -71,11 +71,25 @@ const MENSAJES = [
 const CARTA_FINAL = {
   titulo: 'Para Valeria',
   parrafos: [
-    'Valeria: hice este pequeño universo para decirte algo sin esconderlo detrás de una cifra: te amo.',
-    'Si el experimento pudiera repetirse infinitas veces, volvería a encontrarte, elegirte, conquistarte y enamorarme de ti.',
-    'Puede cambiar el camino; el resultado seguirías siendo tú.',
+    'Hoy, 21 de setiembre, las flores amarillas me hicieron pensar en ti.',
+    'En tu forma de iluminar mis días, en la alegría que siento cuando estamos juntos y en cómo, poco a poco, te has convertido en alguien imprescindible para mí.',
+    'Quiero decírtelo sin rodeos y con el corazón abierto: te amo.',
+    'No sé cuántas cosas cambiarán con el tiempo, pero sí sé lo que quiero: seguir caminando contigo, cuidarte, hacerte feliz y construir a tu lado muchos recuerdos más.',
+    'Estas flores amarillas son para ti, Valeria, Mi princesa, porque desde que llegaste a mi vida, todo se siente más bonito.',
   ],
   firma: '— Oscar',
+  /* La cancion NO se sirve desde el repo. "Te mando flores" es un tema
+     comercial y esto se publica en GitHub Pages: el mp3 aca seria distribuir
+     musica con derechos desde el dominio. El embed de YouTube la reproduce
+     entera, con licencia y sin hospedar nada. Se usa el dominio sin cookies,
+     y el `list=RD...` del enlace original se descarta a proposito: eso
+     encadena una radio automatica despues de la cancion.
+
+     El `autoplay=1` no es un pedido vano. Abrir esta carta exige tocar el
+     corazon, y esa activacion habilita el autoplay de la pagina: en Chrome la
+     cancion arranca sola al abrirse. En Safari de iPhone no alcanza, porque
+     exige el gesto sobre el reproductor mismo, y degrada a tocar play. */
+  cancion: 'https://www.youtube-nocookie.com/embed/uAjwRJBzvMg?autoplay=1',
 };
 
 /* ── la paleta del cielo ────────────────────────────────────
@@ -112,7 +126,7 @@ const DURACION_ENTRADA = 1400;
 // Estado de módulo. Todo lo que se enciende acá se apaga en desmontar().
 let raiz = null, caja = null, lienzo = null, ctx = null, controles = null;
 let leyenda = null, dialogo = null, dialogoTitulo = null, dialogoCuerpo = null;
-let dialogoFirma = null, activadorCarta = null, fallback = null;
+let dialogoFirma = null, dialogoCancion = null, activadorCarta = null, fallback = null;
 let ancho = 0, alto = 0, cx = 0, cy = 0, escala = 1;
 // Los radios los deriva sembrar() con radiosDelCielo(), NO medir(): así el
 // sembrado no puede correr sobre radios viejos y el orden deja de ser un
@@ -583,6 +597,18 @@ function abrirCarta(contenido, activador) {
 
   dialogoFirma.textContent = contenido.firma ?? '';
   dialogoFirma.hidden = !contenido.firma;
+
+  // Igual que `firma`: campo opcional del contenido. Solo la carta final lo
+  // trae; los seis mensajes de las flores comparten este mismo dialogo y no
+  // llevan musica. El src se pone aca y no en la plantilla para no pedirle
+  // nada a YouTube mientras ella lee los otros seis.
+  const iframe = dialogoCancion.querySelector('iframe');
+  dialogoCancion.hidden = !contenido.cancion;
+  if (contenido.cancion) {
+    if (iframe.src !== contenido.cancion) iframe.src = contenido.cancion;
+  } else if (iframe.src) {
+    iframe.removeAttribute('src');
+  }
   if (!dialogo.open) dialogo.showModal();
 }
 
@@ -719,6 +745,11 @@ export function pintarFlores(app) {
         <h3 id="carta-titulo"></h3>
         <div class="carta-cuerpo"></div>
         <p class="carta-firma" hidden></p>
+        <div class="carta-cancion" hidden>
+          <iframe title="Te mando flores — Fonseca" loading="lazy"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
         <form method="dialog">
           <button type="submit" class="btn carta-cerrar">Cerrar</button>
         </form>
@@ -734,6 +765,7 @@ export function pintarFlores(app) {
   dialogoTitulo = app.querySelector('#carta-titulo');
   dialogoCuerpo = app.querySelector('.carta-cuerpo');
   dialogoFirma = app.querySelector('.carta-firma');
+  dialogoCancion = app.querySelector('.carta-cancion');
   consultaMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
   try {
     ctx = lienzo.getContext('2d');
@@ -815,5 +847,6 @@ export function desmontar() {
   botones = [];
   raiz = caja = lienzo = ctx = controles = leyenda = fallback = null;
   dialogo = dialogoTitulo = dialogoCuerpo = dialogoFirma = activadorCarta = null;
+  dialogoCancion = null;
   consultaMovimiento = null;
 }
