@@ -32,7 +32,7 @@ Para desarrollo:
 
 ```bash
 npm install                    # solo Vitest, nunca se publica
-npm test                       # 87 pruebas sobre la lógica pura
+npm test                       # 108 pruebas: 87 de logica.js + 21 de cielo.js
 npm run validar                # valida los JSON y reporta cobertura de confianza y de obra
 ```
 
@@ -42,7 +42,8 @@ npm run validar                # valida los JSON y reporta cobertura de confianz
 index.html   styles.css
 js/  app.js      router por hash — decide cuál de las cuatro vistas se pinta
      datos.js    red, localStorage, overrides
-     logica.js   100% funciones puras — todas las pruebas viven acá
+     logica.js   100% funciones puras — lógica de negocio, todas sus pruebas viven acá
+     cielo.js    geometría pura de la galaxia — puro también, probado aparte
      vista.js    la capa DOM de la cartelera
      mapa.js     Leaflet por CDN — el único trato con red externa
      escala.js   la lectura estática
@@ -130,7 +131,7 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en cuatro vistas.
 
-- Lógica pura con 87 pruebas, validador y esquemas de datos.
+- Lógica pura con 108 pruebas, validador y esquemas de datos.
 - Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,
   hora, teatro y link de compra.
 - Cartelera real de Lima: 18 teatros, 20 obras y 122 funciones en agosto y septiembre, todas
