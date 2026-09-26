@@ -1,7 +1,7 @@
 /**
  * app.js — navegación de primer nivel.
  *
- * Las cuatro vistas no comparten datos ni estados de error. El hash permite
+ * Las cinco vistas no comparten datos ni estados de error. El hash permite
  * entrar directamente a cada una y hace que atrás y adelante del navegador
  * sean navegación real, no una imitación con botones.
  */
@@ -10,6 +10,7 @@ import { arrancar as montarCartelera, desmontar as desmontarCartelera } from './
 import { pintarEscala } from './escala.js';
 import { pintarPregunta } from './pregunta.js';
 import { pintarFlores, desmontar as desmontarFlores } from './flores.js';
+import { pintarPrimerMes, desmontar as desmontarPrimerMes } from './primer-mes.js';
 
 // Marca de que la invitación ya se abrió sola alguna vez.
 const CLAVE_VISTA = 'teatro.pregunta.vista';
@@ -61,6 +62,15 @@ const RUTAS = {
     pintar: pintarFlores,
     desmontar: desmontarFlores,
   },
+  // Tiene qué apagar: un listener de scroll, dos observadores y el reloj
+  // que enciende cada "Descubrir" al llegar su hora.
+  'primer-mes': {
+    titulo: 'Nuestro primer mes — Theater with her',
+    hash: '#primer-mes',
+    foco: '#primer-mes-titulo',
+    pintar: pintarPrimerMes,
+    desmontar: desmontarPrimerMes,
+  },
 };
 
 let app = null;
@@ -86,7 +96,7 @@ function actualizarPestanas(ruta) {
 }
 
 /**
- * Con cuatro destinos las etiquetas completas ya no entran en un teléfono
+ * Con cuatro o más destinos las etiquetas completas ya no entran en un teléfono
  * angosto y la barra scrollea. La pestaña activa tiene que estar a la vista,
  * y eso se hace con scrollLeft y NUNCA con scrollIntoView: sobre un hijo de
  * un contenedor con scroll horizontal, scrollIntoView desplaza además el
@@ -139,7 +149,7 @@ function pintarRuta() {
 
   // Solo la cartelera devuelve una promesa: sus JSON tardan y el encabezado
   // al que debe llegar el foco no existe hasta que esa promesa resuelva.
-  // Las otras tres pintan sincrónicamente y no devuelven nada.
+  // Las otras cuatro pintan sincrónicamente y no devuelven nada.
   const pintado = destino.pintar(app);
   if (debeMoverFoco) {
     if (pintado) pintado.then(() => { if (rutaDesdeHash() === ruta) moverFoco(ruta); });

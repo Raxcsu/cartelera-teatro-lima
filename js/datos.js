@@ -73,6 +73,12 @@ export function hoyLima() {
   return lima.toISOString().slice(0, 10);
 }
 
+/** Ahora en Lima como 'YYYY-MM-DDTHH:MM', mismo cálculo que hoyLima(). */
+export function ahoraLima() {
+  const lima = new Date(Date.now() - 5 * 3600000);
+  return lima.toISOString().slice(0, 16);
+}
+
 // ── guardados (localStorage) ─────────────────────────────────
 // V1: viven en el navegador. V2: se mudan al Worker sin tocar vista.js.
 const CLAVE = 'teatro.guardados';

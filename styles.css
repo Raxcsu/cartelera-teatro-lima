@@ -378,6 +378,7 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
    para decorar, que es la misma razón por la que el acento es rosa vino y
    no dorado. Todo va scoped acá; :root no se toca. */
 .app.pregunta,
+.app.primer-mes,
 .petalos{
   --flor-1:#e3b9c1; --flor-2:#c77e90; --flor-3:#a35267; --flor-4:#854052;
 }
@@ -477,6 +478,208 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .pregunta .rebrote .tallo{animation:rebrotar .55s cubic-bezier(.22,.9,.3,1) backwards;
     animation-delay:calc(var(--i) * 30ms)}
   .pregunta-dicho{animation:aparecer .45s ease-out}
+}
+
+/* ── nuestro primer mes ────────────────────────────────────
+   El recuerdo del 26.09.2026. Reusa la tipografía y los rosas de la
+   invitación, y suma solo lo que el mapa de aquel día necesitaba: el papel
+   crema y tres flores más. Todo scoped acá, como la invitación; :root no se
+   toca.
+
+   El verde NO es --ok y el amarillo NO es --mid: son los del semáforo de
+   confianza y DESIGN.md prohíbe reusarlos para decorar. Estos son tonos
+   florales propios y solo viven dentro de los dibujos, nunca como estado.
+
+   Toda la animación vive dentro de prefers-reduced-motion:no-preference.
+   Apagada, la ruta aparece entera y todo se ve quieto: el contenido nunca
+   depende del movimiento. */
+.app.primer-mes{
+  --papel:#fffdf8; --flor-blanca:#fffaf4; --flor-amarilla:#e9b95b;
+  --flor-amarilla-2:#f4d993; --flor-violeta:#9a86b8; --flor-violeta-2:#c7badc;
+  --hoja-mes:#72866a;
+  max-width:720px;padding:18px 20px 0;overflow-x:clip}
+.mes-articulo{display:flex;flex-direction:column;gap:clamp(56px,12vw,88px)}
+.mes-articulo .corazon{display:inline-block;vertical-align:middle}
+
+/* el hero */
+.mes-hero{position:relative;text-align:center;padding:26px 0 0}
+.mes-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.24em;color:var(--ink3)}
+.primer-mes h2{margin-top:12px;font-family:var(--serif);font-weight:400;
+  font-size:clamp(34px,9vw,52px);line-height:1.04;letter-spacing:-.035em;color:var(--ink)}
+.primer-mes h2 .corazon{transform:rotate(-45deg) scale(1.35);margin:0 0 6px 12px}
+.mes-sub{margin-top:14px;font-size:14.5px;line-height:1.62;color:var(--ink2)}
+.mes-trazo{display:block;width:180px;height:22px;margin:18px auto 0;overflow:visible}
+.mes-trazo path{fill:none;stroke:var(--flor-2);stroke-width:1.4;stroke-linecap:round}
+/* Cuatro pétalos sueltos alrededor del título: la misma forma de los de la
+   lluvia del "sí", quietos y en los rosas claros. */
+.mes-petalo{position:absolute;width:10px;height:13px;opacity:.7;
+  border-radius:60% 60% 60% 60% / 70% 70% 40% 40%;background:var(--flor-1)}
+.mes-petalo.p1{left:8%;top:18px;transform:rotate(-24deg)}
+.mes-petalo.p2{right:10%;top:44px;transform:rotate(38deg);background:var(--flor-2);opacity:.45}
+.mes-petalo.p3{left:16%;bottom:6px;transform:rotate(62deg) scale(.8)}
+.mes-petalo.p4{right:18%;bottom:-8px;transform:rotate(-70deg) scale(.7);opacity:.5}
+
+/* las secciones */
+.mes-titulo-seccion{text-align:center;font:400 clamp(25px,6.4vw,32px)/1.12 var(--serif);
+  letter-spacing:-.025em;color:var(--ink)}
+.mes-bajada{margin-top:9px;text-align:center;font-size:13px;line-height:1.55;color:var(--ink2)}
+
+/* el mapa: papel crema, flores como marcadores y una ruta punteada que la
+   mide y la traza js/primer-mes.js sobre las flores como quedaron. */
+.mapa-papel{position:relative;margin-top:22px;padding:30px 16px 34px;
+  background:var(--papel);border:1px solid var(--hair);border-radius:14px;
+  box-shadow:0 1px 0 #fff inset,0 10px 28px -18px rgba(58,42,46,.28)}
+.ruta{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ruta-linea{fill:none;stroke:var(--flor-2);stroke-width:1.8;stroke-linecap:round;
+  stroke-dasharray:1 7}
+.ruta-mascara{fill:none;stroke:#fff;stroke-width:16;stroke-linecap:round}
+.paradas{position:relative;list-style:none;display:flex;flex-direction:column;gap:64px}
+.parada{display:grid;grid-template-columns:84px minmax(0,1fr);gap:4px 14px;align-items:start}
+.parada.lado-der{grid-template-columns:minmax(0,1fr) 84px}
+.parada.lado-der .parada-marca{order:2}
+.parada.lado-der .parada-texto{text-align:right}
+.parada-marca{width:84px;height:84px;position:relative;z-index:1}
+.flor-marca{display:block;width:100%;height:100%;overflow:visible}
+.flor-hoja{fill:var(--hoja-mes);opacity:.72}
+.flor-petalo{opacity:.9}
+.flor-rosa .flor-petalo{fill:var(--flor-1)}
+.flor-rosa .flor-petalo-dentro{fill:var(--flor-2);opacity:.55}
+.flor-blanca .flor-petalo{fill:var(--flor-blanca);stroke:var(--hair);stroke-width:.8}
+.flor-blanca .flor-petalo-dentro{fill:#f3ebe0;opacity:.8}
+.flor-amarilla .flor-petalo{fill:var(--flor-amarilla-2)}
+.flor-amarilla .flor-petalo-dentro{fill:var(--flor-amarilla);opacity:.8}
+.flor-violeta .flor-petalo{fill:var(--flor-violeta-2)}
+.flor-violeta .flor-petalo-dentro{fill:var(--flor-violeta);opacity:.8}
+.flor-centro{fill:var(--flor-amarilla)}
+.flor-amarilla .flor-centro{fill:#a0763a}
+
+.parada-texto{padding-top:6px}
+.escena{display:block;width:76px;height:46px;overflow:visible;fill:none;
+  stroke:var(--ink3);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.lado-der .escena{margin-left:auto}
+.relleno-papel{fill:var(--papel)}
+.relleno-hoja{fill:var(--hoja-mes);fill-opacity:.35}
+.relleno-amarillo{fill:var(--flor-amarilla);fill-opacity:.6}
+.relleno-violeta{fill:var(--flor-violeta);fill-opacity:.55}
+.relleno-rosa{fill:var(--flor-1);fill-opacity:.8}
+.trazo-acento{stroke:var(--accent);fill:var(--flor-1)}
+.luz{fill:var(--flor-amarilla);stroke:none}
+.parada-hora{margin-top:8px;font:400 26px/1.05 var(--serif);letter-spacing:-.02em;color:var(--ink)}
+.parada-frase{margin-top:5px;font-size:14px;line-height:1.5;color:var(--ink2)}
+.parada-frase .corazon{transform:rotate(-45deg) scale(.8);margin:0 0 2px 7px}
+.parada-accion{margin-top:12px}
+.parada-accion:empty{display:none}
+.parada-espera{font:600 10px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink3)}
+.parada-descubrir{background:var(--surface)}
+
+/* La polaroid: el mismo marco sirve a la revelación y a la galería. */
+.polaroid{margin:0;padding:10px 10px 12px;background:#fff;border-radius:3px;
+  box-shadow:0 1px 2px rgba(58,42,46,.12),0 10px 24px -14px rgba(58,42,46,.35)}
+.revelado{max-width:230px;margin-top:14px;transform:rotate(-1.6deg)}
+.lado-der .revelado{margin-left:auto;transform:rotate(1.6deg)}
+.revelado[hidden]{display:none}
+.revelado-imagen{display:grid;place-items:center;aspect-ratio:4/3;overflow:hidden;border-radius:2px}
+.revelado-imagen .flor-marca{width:44%;height:auto}
+.revelado-imagen img{width:100%;height:100%;object-fit:cover}
+.flor-fondo-rosa{background:#f7e9ea}
+.flor-fondo-blanca{background:#f6f0e8}
+.flor-fondo-amarilla{background:#f8eed6}
+.flor-fondo-violeta{background:#ece6f3}
+.revelado figcaption{display:flex;flex-direction:column;gap:3px;padding-top:10px;text-align:center}
+.revelado-nombre{font:400 19px/1.15 var(--serif);color:var(--ink)}
+.revelado-nota{font:italic 14px/1.3 var(--serif);color:var(--ink2)}
+
+/* la galería */
+.galeria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 16px;margin-top:26px}
+.foto{transform:rotate(var(--giro))}
+.foto:last-child:nth-child(odd){grid-column:1 / -1;justify-self:center;width:calc(50% - 8px)}
+.foto-marco{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:2px;
+  background:repeating-linear-gradient(135deg,#faf4f2 0 10px,#f5ecea 10px 20px)}
+.foto-marco img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto-vacia{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  font:600 9.5px/1.6 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.foto-nota{padding-top:9px;text-align:center;font:italic 14px/1.35 var(--serif);color:var(--ink2)}
+
+/* el scrapbook: tarjetas con una cinta de papel encima */
+.recuerdos{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px 14px;margin-top:26px}
+.recuerdo-tarjeta{position:relative;padding:22px 14px 16px;background:var(--papel);
+  border:1px solid var(--line);border-radius:6px;transform:rotate(var(--giro));
+  box-shadow:0 8px 18px -14px rgba(58,42,46,.35)}
+.recuerdo-tarjeta::before{content:'';position:absolute;top:-8px;left:50%;width:54px;height:16px;
+  margin-left:-27px;background:rgba(227,185,193,.55);transform:rotate(-3deg)}
+.recuerdo-icono{display:block;width:28px;height:28px;fill:none;stroke:var(--ink3);
+  stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.recuerdo-tarjeta h4{margin-top:10px;font:600 10px/1.4 var(--sans);letter-spacing:.12em;
+  text-transform:uppercase;color:var(--accent)}
+.recuerdo-texto{margin-top:6px;font:italic 15px/1.45 var(--serif);color:var(--ink)}
+.recuerdo-texto.pendiente{color:var(--ink3)}
+
+/* el cierre, con aire */
+.mes-cierre{position:relative;text-align:center;padding:40px 0 clamp(96px,22vw,150px)}
+.mes-cierre h3{font:400 clamp(30px,8vw,44px)/1.08 var(--serif);letter-spacing:-.03em;color:var(--ink)}
+.mes-cierre h3 .corazon{transform:rotate(-45deg) scale(1.2);margin:0 0 6px 10px}
+.mes-cierre p{margin-top:18px;font-size:14.5px;line-height:1.7;color:var(--ink2)}
+.mariposa{position:absolute;right:14%;top:0;width:34px;height:28px;overflow:visible}
+.ala path{fill:var(--flor-violeta-2);stroke:var(--flor-violeta);stroke-width:.8;opacity:.9}
+.mariposa-cuerpo{stroke:var(--ink2);stroke-width:1.6;stroke-linecap:round}
+
+@media (prefers-reduced-motion:no-preference){
+  .primer-mes .aparece{transition:opacity .7s ease,transform .7s cubic-bezier(.22,.9,.3,1)}
+  .primer-mes .aparece:not(.visible){opacity:0;transform:translateY(16px)}
+  .primer-mes .foto.aparece:not(.visible),
+  .primer-mes .recuerdo-tarjeta.aparece:not(.visible){transform:translateY(16px) rotate(var(--giro))}
+  .mes-cierre h3,.mes-cierre p{transition:opacity 1.2s ease .2s}
+  .mes-cierre p{transition-delay:.7s}
+  .mes-cierre:not(.visible) h3,.mes-cierre:not(.visible) p{opacity:0}
+
+  .mes-hero>*{animation:aparecer .7s ease-out backwards}
+  .mes-hero h2{animation-delay:.12s}
+  .mes-hero .mes-sub{animation-delay:.3s}
+  .mes-trazo path{stroke-dasharray:1;animation:mes-trazar 1.6s ease-in-out .5s backwards}
+  .mes-hero .mes-petalo{animation:mes-posarse 1.4s ease-out backwards}
+  .mes-petalo.p2{animation-delay:.35s}
+  .mes-petalo.p3{animation-delay:.6s}
+  .mes-petalo.p4{animation-delay:.85s}
+
+  .revelado:not([hidden]){animation:mes-revelar .45s cubic-bezier(.22,.9,.3,1)}
+  .foto{transition:transform .25s ease}
+  .foto:hover{transform:rotate(0) translateY(-4px)}
+
+  /* Una sola mariposa, un solo vuelo, y se posa. Las alas baten lento:
+     más rápido se lee como insecto y no como adorno. */
+  .mes-cierre.visible .mariposa{animation:mes-volar 9s ease-in-out both}
+  .ala{transform-box:fill-box}
+  .ala-izq{transform-origin:right center}
+  .ala-der{transform-origin:left center}
+  .mes-cierre.visible .ala{animation:mes-batir 1.6s ease-in-out infinite alternate}
+}
+@keyframes mes-trazar{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes mes-posarse{from{opacity:0;translate:0 -18px;scale:.4}}
+@keyframes mes-revelar{from{opacity:0;scale:.92;translate:0 -8px}}
+/* Vuela SIEMPRE por encima del título: con la entrada desde abajo, en un
+   teléfono pasaba por delante de "Feliz" a mitad de vuelo. */
+@keyframes mes-volar{
+  0%{opacity:0;translate:-60vw -8px;rotate:-8deg}
+  15%{opacity:1}
+  55%{translate:-18vw -30px;rotate:6deg}
+  100%{opacity:1;translate:0 0;rotate:0deg}
+}
+@keyframes mes-batir{from{scale:1 1}to{scale:.55 1}}
+
+@media (min-width:700px){
+  .mapa-papel{padding:40px 44px 46px}
+  .paradas{gap:60px}
+  /* En pantalla ancha la ruta zigzaguea: cada parada se corre hacia su
+     lado y la línea cruza el papel entero de una flor a la otra. */
+  .parada{grid-template-columns:104px minmax(0,340px);width:fit-content;max-width:78%}
+  .parada.lado-der{grid-template-columns:minmax(0,340px) 104px;margin-left:auto}
+  .parada-marca{width:104px;height:104px}
+  .galeria{display:flex;flex-wrap:wrap;justify-content:center;gap:0;
+    max-width:640px;margin-inline:auto}
+  .foto,.foto:last-child:nth-child(odd){width:31%;margin:10px -6px}
+  .recuerdos{grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 18px}
 }
 
 /* ── flores amarillas ──────────────────────────────────────
@@ -737,6 +940,11 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .pregunta-articulo{gap:22px}
   .pregunta h2{font-size:clamp(32px,5.2dvh,44px)}
   .ramo{max-width:430px}
+
+  /* Como la invitación, el recuerdo es una lectura larga: scrollea .app,
+     porque en este layout el body mide 100dvh. js/primer-mes.js escucha el
+     scroll en captura sobre document para servir a los dos casos. */
+  .app.primer-mes{max-width:900px;overflow-y:auto;padding:6px 36px 0}
 
   /* El cielo ya ocupa lo que queda bajo la cabecera, porque flores.js lo
      mide en los dos layouts. Acá solo se suelta el ancho —un cosmos

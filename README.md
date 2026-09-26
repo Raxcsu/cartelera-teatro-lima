@@ -32,7 +32,7 @@ Para desarrollo:
 
 ```bash
 npm install                    # solo Vitest, nunca se publica
-npm test                       # 108 pruebas: 87 de logica.js + 21 de cielo.js
+npm test                       # 113 pruebas: 92 de logica.js + 21 de cielo.js
 npm run validar                # valida los JSON y reporta cobertura de confianza y de obra
 ```
 
@@ -40,7 +40,7 @@ npm run validar                # valida los JSON y reporta cobertura de confianz
 
 ```
 index.html   styles.css
-js/  app.js      router por hash — decide cuál de las cuatro vistas se pinta
+js/  app.js      router por hash — decide cuál de las cinco vistas se pinta
      datos.js    red, localStorage, overrides
      logica.js   100% funciones puras — lógica de negocio, todas sus pruebas viven acá
      cielo.js    geometría pura de la galaxia — puro también, probado aparte
@@ -48,6 +48,7 @@ js/  app.js      router por hash — decide cuál de las cuatro vistas se pinta
      mapa.js     Leaflet por CDN — el único trato con red externa
      escala.js   la lectura estática
      pregunta.js la invitación
+     primer-mes.js el recuerdo del primer mes
      flores.js   el cielo de flores amarillas — el único canvas del proyecto
 data/*.json  fuente de verdad, editable a mano
 data/paper_cientifico/   el paper de la vista de lectura: .tex fuente, .pdf compilado
@@ -55,8 +56,8 @@ docs/        encargo-cartelera.md — el pedido de investigación de datos
 scripts/     validar_datos.py — la única puerta de calidad de los datos
 ```
 
-Las cuatro vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`
-y `#flores-amarillas`), y no por rutas reales, porque GitHub Pages sirve archivos estáticos:
+Las cinco vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`,
+`#flores-amarillas` y `#primer-mes`), y no por rutas reales, porque GitHub Pages sirve archivos estáticos:
 `/una-pregunta` daría 404 al recargar. Con hash, entrar directo a cada vista funciona y los
 botones de atrás y adelante del navegador son navegación de verdad.
 
@@ -129,9 +130,9 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 ## Estado
 
-Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en cuatro vistas.
+Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en cinco vistas.
 
-- Lógica pura con 108 pruebas, validador y esquemas de datos.
+- Lógica pura con 113 pruebas, validador y esquemas de datos.
 - Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,
   hora, teatro y link de compra.
 - Cartelera real de Lima: 18 teatros, 20 obras y 122 funciones en agosto y septiembre, todas

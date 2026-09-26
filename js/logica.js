@@ -86,6 +86,23 @@ export function tallosDelRamo(desde, hoy, max = RAMO_MAX) {
 }
 
 /**
+ * ¿Ya llegó la hora de un momento? Es lo que enciende cada "Descubrir" del
+ * mapa del primer mes: los lugares se revelan conforme llega su hora.
+ *
+ * Mismo motivo que `tallosDelRamo()`: la hora de desbloqueo es un dato, no
+ * una decisión de dibujo. Compara cadenas 'YYYY-MM-DDTHH:MM', que ordenan
+ * igual que el tiempo. Ante una entrada inválida responde `false`: revelar
+ * antes de tiempo arruina la sorpresa, esperar de más no rompe nada.
+ */
+const INSTANTE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+export function momentoAbierto(fecha, hora, ahora) {
+  const momento = `${fecha ?? ''}T${hora ?? ''}`;
+  if (!INSTANTE.test(momento) || !INSTANTE.test(String(ahora ?? ''))) return false;
+  return ahora >= momento;
+}
+
+/**
  * La confianza mostrada se CALCULA, no se lee del JSON.
  *
  * Guardar `verificado_el` y después nunca mirarlo produce confianza

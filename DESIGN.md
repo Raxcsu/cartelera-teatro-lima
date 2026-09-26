@@ -207,7 +207,7 @@ puede — *"¿está cerca?"* — sin que haya que abrir nada.
 Se conserva lo bueno de la decisión anterior: Leaflet sigue entrando por `import()` dinámico y
 su fallo no toca el resto de la pantalla.
 
-## Las otras tres vistas
+## Las otras vistas
 
 La app dejó de ser una sola pantalla: la cabecera lleva cuatro pestañas y `app.js` despacha por
 hash. Las tres vistas nuevas son personales y no producto, pero se rigen por la misma paleta y
@@ -364,6 +364,26 @@ eso, girar el teléfono dejaba el cielo en blanco. El `MediaQueryList` se escuch
 sesión: al activar movimiento reducido se detiene el bucle, se borran las chispas y se dibuja
 el estado final; al desactivarlo se reanuda sin repetir la entrada.
 
+**Nuestro primer mes vuelve al papel claro y reusa la invitación.** Mismos kicker, serif y
+rosas (`--flor-1…4`, cuyo selector se extendió a `.app.primer-mes`). Suma solo lo que pedía el
+mapa de aquel día, scoped en `.app.primer-mes` y nunca en `:root`:
+
+```css
+--papel:#fffdf8;                                   /* el mapa y las tarjetas */
+--flor-amarilla:#e9b95b; --flor-amarilla-2:#f4d993; /* flor de las 6:00 */
+--flor-violeta:#9a86b8;  --flor-violeta-2:#c7badc;  /* flor de las 9:30 y la mariposa */
+--hoja-mes:#72866a;                                /* verde PROPIO, no --ok */
+```
+
+El amarillo **no es `--mid`** ni el verde `--ok`: viven solo dentro de los dibujos y nunca como
+estado. Los corazones del texto son el `.corazon` de la cabecera, no emoji; las flores, las
+escenas y los íconos del scrapbook son SVG propios. Las polaroids y las tarjetas llevan giros
+**fijos por índice**, por la regla del ramo: cada visita ve el mismo álbum. Toda la animación
+(la línea que se dibuja con el scroll, las apariciones, la polaroid que se abre y una sola
+mariposa que se posa) vive en `prefers-reduced-motion: no-preference`. Apagada, la ruta está
+entera desde el principio y todo se ve quieto. Los "Descubrir" son `.btn` de 44px con
+`aria-expanded`.
+
 ## Accesibilidad, verificada no supuesta
 
 - Todo texto sobre `--bg` mide **4.5:1 o más**. Comprobado por cálculo, no a ojo.
@@ -422,7 +442,7 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Calendario del mes | **Hecho.** Tira horizontal de los días que quedan del mes; las 42 celdas fijas siguen existiendo, plegadas en "Ver el mes completo". Lunes primero, punto en los días con función. |
 | Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 13/20 con sinopsis, 12/20 con género, 9/20 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
-| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus cuatro pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
+| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus cinco pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
 | Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 20 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
 | Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (12 obras con dato) y distrito. |

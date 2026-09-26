@@ -9,7 +9,7 @@ import {
   filtrarFunciones,
   agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones, desplazarMes,
   mesInicial, rangoNavegable,
-  tallosDelRamo, RAMO_DESDE, RAMO_MAX,
+  tallosDelRamo, RAMO_DESDE, RAMO_MAX, momentoAbierto,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -605,5 +605,29 @@ describe('ramo', () => {
     expect(tallosDelRamo(null, '2026-09-24')).toBe(1);
     expect(tallosDelRamo(RAMO_DESDE, null)).toBe(1);
     expect(tallosDelRamo(RAMO_DESDE, 'no-es-fecha')).toBe(1);
+  });
+});
+
+describe('momentoAbierto — los lugares se revelan conforme llega su hora', () => {
+  it('antes de la hora sigue cerrado', () => {
+    expect(momentoAbierto('2026-09-26', '18:00', '2026-09-26T17:59')).toBe(false);
+  });
+  it('se abre en el minuto exacto', () => {
+    expect(momentoAbierto('2026-09-26', '18:00', '2026-09-26T18:00')).toBe(true);
+  });
+  it('después de la hora queda abierto', () => {
+    expect(momentoAbierto('2026-09-26', '21:30', '2026-09-26T23:10')).toBe(true);
+  });
+  it('compara el día además de la hora', () => {
+    // Las 22:00 del día anterior son más tarde que las 18:00 como hora,
+    // pero anteriores como instante.
+    expect(momentoAbierto('2026-09-26', '18:00', '2026-09-25T22:00')).toBe(false);
+    expect(momentoAbierto('2026-09-26', '21:30', '2026-09-27T08:00')).toBe(true);
+  });
+  it('ante un dato inválido no revela nada', () => {
+    expect(momentoAbierto('2026-09-26', '18:00', null)).toBe(false);
+    expect(momentoAbierto('2026-09-26', '18:00', '2026-09-26')).toBe(false);
+    expect(momentoAbierto(null, '18:00', '2026-09-26T19:00')).toBe(false);
+    expect(momentoAbierto('2026-09-26', '6 pm', '2026-09-26T19:00')).toBe(false);
   });
 });

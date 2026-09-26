@@ -7,7 +7,7 @@ Proyecto en español: código, comentarios y datos van en español.
 ## Comandos
 
 ```bash
-npm test                          # Vitest, 108 pruebas: 87 de logica.js + 21 de cielo.js
+npm test                          # Vitest, 113 pruebas: 92 de logica.js + 21 de cielo.js
 npx vitest run -t "confianza"     # un solo grupo de pruebas por nombre
 npm run test:watch                # reejecuta al guardar
 
@@ -46,6 +46,7 @@ mapa.js     Leaflet por CDN                  ← único trato con red externa  [
 escala.js   DOM de la escala astronómica     ← estático, no pide datos      [existe]
 pregunta.js DOM de la invitación             ← SVG del ramo + celebración   [existe]
 flores.js   canvas del cielo de flores       ← único bucle de rAF del repo  [existe]
+primer-mes.js DOM del recuerdo del 26.09    ← ruta medida + reloj          [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
@@ -56,11 +57,11 @@ el nombre de la app y su `<nav>`**, y está ahí a propósito: es constante y no
 durante "Cargando cartelera…" y sobrevive a los estados de error y de cartelera vencida, que
 reemplazan todo `#app`. De paso es el único `<h1>` de la página, así que ninguna pantalla queda
 sin encabezado de primer nivel. Que la navegación viva ahí tiene su propio motivo: **ninguna
-de las otras tres vistas puede depender de que la cartelera logre cargar.**
+de las otras vistas puede depender de que la cartelera logre cargar.**
 
-## Las cuatro vistas
+## Las cinco vistas
 
-La app dejó de ser una sola pantalla. `app.js` despacha por hash a cuatro vistas que **no
+La app dejó de ser una sola pantalla. `app.js` despacha por hash a cinco vistas que **no
 comparten datos ni estados de error**:
 
 | Ruta | Módulo | Qué es |
@@ -69,6 +70,7 @@ comparten datos ni estados de error**:
 | `#escala-astronomica` | `escala.js` | Lectura estática: el resumen del paper y el PDF embebido. |
 | `#una-pregunta` | `pregunta.js` | La invitación: el ramo en SVG y la celebración. |
 | `#flores-amarillas` | `flores.js` | El cielo: galaxia, girasoles y corazón en `<canvas>`. |
+| `#primer-mes` | `primer-mes.js` | El recuerdo del primer mes: el mapa sorpresa, fotos y scrapbook. |
 
 **`RUTAS` ganó una columna, `desmontar`, y ese es el cambio de fondo que trajo la cuarta
 vista.** Antes era una llamada suelta a `desmontarCartelera()` en `pintarRuta()`, porque la
@@ -83,6 +85,29 @@ De `datos.js`, `pregunta.js` solo toma `hoyLima()`, que lee el reloj y nada más
 **parámetro con valor por defecto** —`pintarPregunta(app, hoy = hoyLima())`— porque es la
 primera vez que la regla "el tiempo se inyecta, no se lee" llega a una vista: ese segundo
 argumento es lo único que hace probable el ramo sin tocar el reloj del sistema.
+
+### El primer mes: el contenido vive en `RECUERDO`
+
+`#primer-mes` guarda el 26.09.2026. Todo lo editable (horas, frases, lugares, fotos y
+tarjetas) está en el objeto `RECUERDO` al comienzo de `js/primer-mes.js`, y no en un JSON: así
+guarda `flores.js` sus mensajes, y la vista queda sincrónica y sin red. **`null` es "todavía no
+escrito"** y la pantalla lo dice ("Por escribir", "por agregar"). Es la regla 1 aplicada a un
+recuerdo: no se rellena con algo plausible.
+
+- **Los lugares se revelan conforme llega su hora.** `momentoAbierto()` (en `logica.js`, con
+  pruebas) compara la hora del momento contra `ahoraLima()`, y un reloj de 30 s enciende el
+  "Descubrir" sin recargar. Un momento con `lugar: null` no tiene botón aunque su hora haya
+  pasado. `pintarPrimerMes(app, '2026-09-26T18:05')` congela el reloj para probar.
+- **La ruta se mide, no se declara.** `trazarRuta()` lee dónde quedó cada flor y dibuja el
+  camino, así que sirve en el teléfono y en el escritorio, y también cuando se abre una polaroid.
+  Un `ResizeObserver` sobre el papel la vuelve a trazar. **Cruza de lado solo en el hueco entre
+  paradas**: una S libre de flor a flor pasaba por encima del texto y lo tachaba.
+- **El scroll se escucha en captura sobre `document`**, porque en móvil scrollea la ventana y
+  en escritorio `.app`. `desmontar()` lo retira junto con los dos observadores y el reloj.
+- **Las fotos van en `assets/primer-mes/01.jpg … 05.jpg`, y esa carpeta SE PUBLICA.** Si un
+  archivo falta, su `<img>` se retira y queda el marco "por agregar". Los 404 en consola son
+  esperables hasta que estén las fotos.
+- El mapa ilustrado original (`data/mes01/`) **no se usa** a propósito: la ruta es código.
 
 ### El paper vive en `data/paper_cientifico/`
 
@@ -107,7 +132,7 @@ alcanzaba un ternario; con tres, esas cadenas crecen en cada pantalla nueva y el
 de estar en un solo sitio.
 
 **Solo la cartelera devuelve una promesa.** Sus JSON tardan y el encabezado al que va el foco no
-existe hasta que resuelva; las otras tres pintan sincrónicamente. Por eso `pintarRuta()` mira si
+existe hasta que resuelva; las otras cuatro pintan sincrónicamente. Por eso `pintarRuta()` mira si
 `pintar()` devolvió algo antes de mover el foco.
 
 **Hay dos layouts, no uno responsive a medias.** Debajo de 900×600 es la columna de 430px de
@@ -455,7 +480,7 @@ Y encima de todo eso, lo último: la app **dejó de ser una sola pantalla**. `ap
 por hash a cuatro vistas —`#cartelera`, `#escala-astronomica`, `#una-pregunta` y
 `#flores-amarillas`— y la cabecera lleva la navegación. La cartelera es la única que pide
 datos; las otras tres son autosuficientes a propósito, así que siguen en pie aunque los JSON
-estén caídos o la cartelera vencida. Ver "Las cuatro vistas".
+estén caídos o la cartelera vencida. Ver "Las cinco vistas".
 
 La última en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
 vista: un cielo en `<canvas>` con una galaxia, seis girasoles y un corazón de partículas. Es
