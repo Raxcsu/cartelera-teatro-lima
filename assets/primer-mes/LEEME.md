@@ -3,11 +3,14 @@
 Las fotos reales del 26.09.2026 van en esta carpeta, con estos nombres exactos:
 
 ```
-01.jpg  02.jpg  03.jpg  04.jpg  05.jpg
+01.jpg  02.jpg  03.jpg  04.jpg  05.jpg  06.jpg  07.jpg
 ```
 
+Hoy están las 7, en el orden del día. `02`, `04` y `07` además aparecen en las polaroids
+del mapa (el cafecito, el Parque de las Leyendas y La Mariposario).
+
 - JPG de 1600px como máximo en el lado largo. Una foto del celular sin achicar pesa 3 a 5 MB,
-  y la galería carga las cinco.
+  y la galería carga todas.
 - El marco es vertical (4:5) y la foto se recorta al centro para llenarlo.
 - Un archivo que falta deja su marco con la leyenda "Foto 0N · por agregar", y no rompe nada.
 

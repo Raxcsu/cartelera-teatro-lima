@@ -31,23 +31,26 @@ const RECUERDO = {
     { hora: '16:00', etiqueta: '4:00 p. m.', frase: 'Nos vemos aquí',
       flor: 'rosa', escena: 'auto', lugar: null },
     { hora: '17:00', etiqueta: '5:00 p. m.', frase: 'Una pausa para recargar',
-      flor: 'blanca', escena: 'pausa', lugar: null },
+      flor: 'blanca', escena: 'pausa',
+      lugar: { nombre: 'El cafecito', nota: 'Una pausa para recargar', foto: 'assets/primer-mes/02.jpg' } },
     { hora: '18:00', etiqueta: '6:00 p. m.', frase: 'A explorar juntos',
       flor: 'amarilla', escena: 'naturaleza',
-      lugar: { nombre: 'Parque de las Leyendas', nota: 'Experiencia nocturna', foto: null } },
+      lugar: { nombre: 'Parque de las Leyendas', nota: 'Experiencia nocturna', foto: 'assets/primer-mes/04.jpg' } },
     { hora: '21:30', etiqueta: '9:30 p. m.', frase: 'Drinks y buena compañía',
       flor: 'violeta', escena: 'noche',
-      lugar: { nombre: 'La Mariposario', nota: 'Drinks', foto: null } },
+      lugar: { nombre: 'La Mariposario', nota: 'Drinks', foto: 'assets/primer-mes/07.jpg' } },
   ],
   // Las fotos reales van en assets/primer-mes/. Si un archivo no existe,
   // su marco queda vacío con la leyenda "por agregar": no hay que tocar
   // código para sumarlas, solo copiarlas con estos nombres.
   fotos: [
-    { archivo: 'assets/primer-mes/01.jpg', nota: null },
-    { archivo: 'assets/primer-mes/02.jpg', nota: null },
-    { archivo: 'assets/primer-mes/03.jpg', nota: null },
-    { archivo: 'assets/primer-mes/04.jpg', nota: null },
-    { archivo: 'assets/primer-mes/05.jpg', nota: null },
+    { archivo: 'assets/primer-mes/01.jpg', alt: 'Selfie en el auto', nota: null },
+    { archivo: 'assets/primer-mes/02.jpg', alt: 'Dos frappuccinos en el auto', nota: null },
+    { archivo: 'assets/primer-mes/03.jpg', alt: 'Junto a la estatua de un capibara', nota: null },
+    { archivo: 'assets/primer-mes/04.jpg', alt: 'Selfie frente al esqueleto de un elefante', nota: null },
+    { archivo: 'assets/primer-mes/05.jpg', alt: 'Peces en un acuario', nota: null },
+    { archivo: 'assets/primer-mes/06.jpg', alt: 'Selfie de noche', nota: null },
+    { archivo: 'assets/primer-mes/07.jpg', alt: 'Luces y mariposas en La Mariposario', nota: null },
   ],
   pequenas: [
     { icono: 'flor', titulo: 'El detalle', texto: null },
@@ -61,7 +64,7 @@ const RECUERDO = {
 
 // Giros de las polaroids y las tarjetas. Fijos por índice y no al azar, por
 // la misma regla del ramo: cada visita tiene que ver el mismo álbum.
-const GIROS = [-2.4, 1.8, -1.2, 2.6, -1.9, 1.3];
+const GIROS = [-2.4, 1.8, -1.2, 2.6, -1.9, 1.3, -0.8];
 
 // Cada cuánto se vuelve a mirar el reloj con la página abierta, para que
 // un "Descubrir" se encienda solo al llegar su hora.
@@ -170,11 +173,11 @@ function accionMomento(m, i, abierta) {
 function reveladoMomento(m, i) {
   if (!m.lugar) return '';
   const imagen = m.lugar.foto
-    ? `<img src="${esc(m.lugar.foto)}" alt="" loading="lazy" decoding="async">`
+    ? `<img src="${esc(m.lugar.foto)}" alt="Foto en ${esc(m.lugar.nombre)}" loading="lazy" decoding="async">`
     : florSvg(m.flor);
   return `
     <figure class="revelado polaroid" id="revelado-${i}" hidden>
-      <div class="revelado-imagen flor-fondo-${esc(m.flor)}">${imagen}</div>
+      <div class="revelado-imagen flor-fondo-${esc(m.flor)}${m.lugar.foto ? ' con-foto' : ''}">${imagen}</div>
       <figcaption>
         <span class="revelado-nombre">${esc(m.lugar.nombre)}</span>
         ${m.lugar.nota ? `<span class="revelado-nota">${esc(m.lugar.nota)}</span>` : ''}
@@ -206,7 +209,7 @@ function galeria() {
         <div class="foto-marco">
           <span class="foto-vacia">Foto ${n}<br>por agregar</span>
           <img src="${esc(f.archivo)}" width="800" height="1000" loading="lazy" decoding="async"
-            alt="${f.nota ? esc(f.nota) : `Foto ${i + 1} del 26 de septiembre`}">
+            alt="${esc(f.alt ?? f.nota ?? `Foto ${i + 1} del 26 de septiembre`)}">
         </div>
         ${f.nota ? `<figcaption class="foto-nota">${esc(f.nota)}</figcaption>` : ''}
       </figure>`;
