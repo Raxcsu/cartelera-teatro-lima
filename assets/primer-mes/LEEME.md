@@ -12,10 +12,15 @@ del mapa (el cafecito, el Parque de las Leyendas y La Mariposario).
 - JPG de 1600px como máximo en el lado largo. Una foto del celular sin achicar pesa 3 a 5 MB,
   y la galería carga todas.
 - El marco es vertical (4:5) y la foto se recorta al centro para llenarlo.
-- Un archivo que falta deja su marco con la leyenda "Foto 0N · por agregar", y no rompe nada.
+- Un archivo que falta deja su marco de la galería con la leyenda "Foto 0N · por agregar", y
+  no rompe nada. En la polaroid del mapa queda el fondo liso, sin leyenda.
 
 Para cambiar los nombres, sumar fotos o escribir la nota manuscrita de cada una, se edita
 `RECUERDO.fotos` en `js/primer-mes.js`. Si un lugar revelado del mapa necesita foto, va en
 `RECUERDO.momentos[n].lugar.foto`.
+
+**Ojo al renombrar `02`, `04` o `07`:** están escritas dos veces, en `RECUERDO.fotos[].archivo`
+(la galería) y en `RECUERDO.momentos[].lugar.foto` (la polaroid del mapa). Hay que cambiar las
+dos, o una de las dos queda vacía.
 
 **Esta carpeta se publica.** El repo es público y cada push despliega en GitHub Pages.

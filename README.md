@@ -2,7 +2,7 @@
 
 **En vivo: https://raxcsu.github.io/cartelera-teatro-lima/**
 
-Un sitio personal de tres pestañas. La principal es la **cartelera**: el teatro de Lima del mes
+Un sitio personal de cinco pestañas. La principal es la **cartelera**: el teatro de Lima del mes
 en una pantalla, con mapa de los teatros, tira de días, y por cada función **de qué trata la
 obra, de qué género es y quién actúa**, con su hora, su teatro y el link de compra. Dónde cenar
 cerca queda a un toque de distancia, en segundo plano.
@@ -10,9 +10,9 @@ cerca queda a un toque de distancia, en segundo plano.
 El precio se guarda con su fuente pero no se muestra: la pregunta que contesta la cartelera es
 "¿qué obra es y vale la pena?", no "¿cuánto sale?".
 
-Las otras dos pestañas son piezas personales, no producto: una **lectura** con un paper y su
-resumen, y una **invitación**. Ninguna de las dos pide datos al servidor, así que siguen en pie
-aunque la cartelera no pueda cargar.
+Las otras cuatro pestañas son piezas personales, no producto: una **lectura** con un paper y su
+resumen, una **invitación**, un **cielo de flores amarillas** y el **recuerdo del primer mes**.
+Ninguna pide datos al servidor, así que siguen en pie aunque la cartelera no pueda cargar.
 
 En el celular va todo apilado; desde 900×600 la cartelera se abre en dos columnas, con el mapa
 grande a la izquierda y el calendario sobre la lista a la derecha. El breakpoint pide alto
@@ -138,8 +138,8 @@ Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en c
 - Cartelera real de Lima: 18 teatros, 20 obras y 122 funciones en agosto y septiembre, todas
   con fuente y 94 con link de compra.
 - 53 lugares para cenar con horario de cocina, dentro del desplegable de cada función.
-- Navegación por hash entre la cartelera y las dos vistas personales, que no dependen de que
-  los datos carguen.
+- Navegación por hash entre la cartelera y las cuatro vistas personales, que no dependen de
+  que los datos carguen.
 
 **El cuello de botella son los datos, no la pantalla**, y se comprobó otra vez con la sinopsis:
 la tarjeta nueva no servía de nada mientras las obras no tuvieran de qué hablar. Lo que la hizo

@@ -90,9 +90,10 @@ argumento es lo único que hace probable el ramo sin tocar el reloj del sistema.
 
 `#primer-mes` guarda el 26.09.2026. Todo lo editable (horas, frases, lugares, fotos y
 tarjetas) está en el objeto `RECUERDO` al comienzo de `js/primer-mes.js`, y no en un JSON: así
-guarda `flores.js` sus mensajes, y la vista queda sincrónica y sin red. **`null` es "todavía no
-escrito"** y la pantalla lo dice ("Por escribir", "por agregar"). Es la regla 1 aplicada a un
-recuerdo: no se rellena con algo plausible.
+guarda `flores.js` sus mensajes, y la vista pinta sincrónicamente sin pedir datos (las fotos
+sí se descargan, como cualquier `<img>`). **`null` es "todavía no escrito"**: la tarjeta sin
+`texto` dice "Por escribir", y una foto sin `nota` simplemente no lleva pie. Es la regla 1
+aplicada a un recuerdo: no se rellena con algo plausible.
 
 - **Los lugares se revelan conforme llega su hora.** `momentoAbierto()` (en `logica.js`, con
   pruebas) compara la hora del momento contra `ahoraLima()`, y un reloj de 30 s enciende el
@@ -104,9 +105,14 @@ recuerdo: no se rellena con algo plausible.
   paradas**: una S libre de flor a flor pasaba por encima del texto y lo tachaba.
 - **El scroll se escucha en captura sobre `document`**, porque en móvil scrollea la ventana y
   en escritorio `.app`. `desmontar()` lo retira junto con los dos observadores y el reloj.
-- **Las fotos van en `assets/primer-mes/01.jpg … 05.jpg`, y esa carpeta SE PUBLICA.** Si un
-  archivo falta, su `<img>` se retira y queda el marco "por agregar". Los 404 en consola son
-  esperables hasta que estén las fotos.
+- **Las fotos están en `assets/primer-mes/01.jpg … 07.jpg`, en orden del día, y esa carpeta
+  SE PUBLICA.** Las originales viven en `data/mes01/fotos/`, que no se commitea. Si un archivo
+  falta, su `<img>` se retira: en la galería queda el marco "por agregar"; en la polaroid del
+  mapa, el fondo liso sin leyenda. `02`, `04` y `07` además son
+  las polaroids del mapa (`lugar.foto`), y con foto la polaroid pasa a 4:5 (`.con-foto`)
+  para no cortar caras.
+- **Las 4:00 siguen con `lugar: null`**: nadie dio el nombre de ese lugar. Las 5:00 son "El
+  cafecito", con las palabras de Oscar y no la marca de los vasos.
 - El mapa ilustrado original (`data/mes01/`) **no se usa** a propósito: la ruta es código.
 
 ### El paper vive en `data/paper_cientifico/`
@@ -439,7 +445,7 @@ obras equivocadas y el `git diff` sería ilegible.
   lado esperando ese dato. Cada carga vuelve a preguntar.
 - **`styles.css` se pide con `?v=…` y hay que moverlo al cambiar el CSS.** GitHub Pages cachea
   agresivo y un layout nuevo servido con el CSS viejo se ve roto, no desactualizado. El valor
-  actual es `20260918-petalos`; la convención es fecha más una palabra de qué cambió.
+  actual es `20260927-fotos`; la convención es fecha más una palabra de qué cambió.
 - **Las entradas reales están en `.gitignore` y no pueden entrar nunca.**
   `docs/bodas_figaro_entradas.pdf` y `docs/entrada_valeria.png` llevan DNI, número de compra y
   los QR de acceso. Este repo es público y cada push despliega: un commit descuidado las
@@ -482,7 +488,7 @@ por hash a cuatro vistas —`#cartelera`, `#escala-astronomica`, `#una-pregunta`
 datos; las otras tres son autosuficientes a propósito, así que siguen en pie aunque los JSON
 estén caídos o la cartelera vencida. Ver "Las cinco vistas".
 
-La última en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
+La cuarta en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
 vista: un cielo en `<canvas>` con una galaxia, seis girasoles y un corazón de partículas. Es
 la única pantalla oscura del proyecto y el único módulo con un bucle de `requestAnimationFrame`
 —de ahí la columna `desmontar` en `RUTAS`—. Cada flor tiene un mensaje y un botón DOM de 44px;
@@ -500,6 +506,11 @@ tamaño se mide contra el disco. **La geometría salió a `js/cielo.js` con 21 p
 única capa del proyecto sin prosa que la explicara, y ahí es donde estuvieron los errores. Tres
 rondas de revisión adversarial sobre el texto dejaron pasar dos defectos que una aserción mató
 en dos segundos. Las reglas que no se ven leyendo están en "cosas que parecen bugs y no lo son".
+
+Después entró una quinta, **`#primer-mes`**, el recuerdo del 26.09.2026: el mapa sorpresa de
+aquel día dibujado en SVG, con lugares que se descubren conforme llega su hora, siete fotos y
+un scrapbook por completar. Es tan autosuficiente como las otras personales. Ver "El primer
+mes: el contenido vive en `RECUERDO`".
 
 En los datos hay 18 teatros, 20 obras, 122 funciones repartidas en agosto y septiembre, y 53
 lugares para cenar. **94 de las 122 funciones tienen `url_entradas`**, así que el botón "Comprar

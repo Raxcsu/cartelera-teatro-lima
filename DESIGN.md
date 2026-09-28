@@ -209,8 +209,8 @@ su fallo no toca el resto de la pantalla.
 
 ## Las otras vistas
 
-La app dejó de ser una sola pantalla: la cabecera lleva cuatro pestañas y `app.js` despacha por
-hash. Las tres vistas nuevas son personales y no producto, pero se rigen por la misma paleta y
+La app dejó de ser una sola pantalla: la cabecera lleva cinco pestañas y `app.js` despacha por
+hash. Las cuatro vistas que no son la cartelera son personales y no producto, pero se rigen por la misma paleta y
 las mismas reglas de área táctil.
 
 **Las pestañas.** Sans en mayúsculas, en la familia del nombre de la app pero un escalón por
