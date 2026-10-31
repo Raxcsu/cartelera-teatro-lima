@@ -1,7 +1,7 @@
 /**
  * app.js — navegación de primer nivel.
  *
- * Las cinco vistas no comparten datos ni estados de error. El hash permite
+ * Las seis vistas no comparten datos ni estados de error. El hash permite
  * entrar directamente a cada una y hace que atrás y adelante del navegador
  * sean navegación real, no una imitación con botones.
  */
@@ -11,6 +11,7 @@ import { pintarEscala } from './escala.js';
 import { pintarPregunta } from './pregunta.js';
 import { pintarFlores, desmontar as desmontarFlores } from './flores.js';
 import { pintarPrimerMes, desmontar as desmontarPrimerMes } from './primer-mes.js';
+import { pintarNocheCriolla, desmontar as desmontarNocheCriolla } from './noche-criolla.js';
 
 // Marca de que la invitación ya se abrió sola alguna vez.
 const CLAVE_VISTA = 'teatro.pregunta.vista';
@@ -70,6 +71,14 @@ const RUTAS = {
     foco: '#primer-mes-titulo',
     pintar: pintarPrimerMes,
     desmontar: desmontarPrimerMes,
+  },
+  // Tiene qué apagar: el reloj que mueve el estado de la noche.
+  'noche-criolla': {
+    titulo: 'Noche criolla — Theater with her',
+    hash: '#noche-criolla',
+    foco: '#noche-criolla-titulo',
+    pintar: pintarNocheCriolla,
+    desmontar: desmontarNocheCriolla,
   },
 };
 
@@ -149,7 +158,7 @@ function pintarRuta() {
 
   // Solo la cartelera devuelve una promesa: sus JSON tardan y el encabezado
   // al que debe llegar el foco no existe hasta que esa promesa resuelva.
-  // Las otras cuatro pintan sincrónicamente y no devuelven nada.
+  // Las otras cinco pintan sincrónicamente y no devuelven nada.
   const pintado = destino.pintar(app);
   if (debeMoverFoco) {
     if (pintado) pintado.then(() => { if (rutaDesdeHash() === ruta) moverFoco(ruta); });

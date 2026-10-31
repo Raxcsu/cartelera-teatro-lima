@@ -10,6 +10,7 @@ import {
   agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones, desplazarMes,
   mesInicial, rangoNavegable,
   tallosDelRamo, RAMO_DESDE, RAMO_MAX, momentoAbierto,
+  estadoNoche, NOCHE_HORARIO,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -629,5 +630,50 @@ describe('momentoAbierto — los lugares se revelan conforme llega su hora', () 
     expect(momentoAbierto('2026-09-26', '18:00', '2026-09-26')).toBe(false);
     expect(momentoAbierto(null, '18:00', '2026-09-26T19:00')).toBe(false);
     expect(momentoAbierto('2026-09-26', '6 pm', '2026-09-26T19:00')).toBe(false);
+  });
+});
+
+describe('estadoNoche — el reloj de la noche criolla', () => {
+  const en = (hora) => estadoNoche(`2026-10-31T${hora}`);
+
+  it('el horario es el de Teleticket, con el final corrido a 21:30', () => {
+    expect(NOCHE_HORARIO).toEqual({ fecha: '2026-10-31', puertas: '19:00', inicio: '19:30', fin: '21:30' });
+  });
+  it('antes del día cuenta días de calendario, no de 24 h', () => {
+    expect(estadoNoche('2026-10-30T23:59')).toEqual({ estado: 'dias', dias: 1 });
+    expect(estadoNoche('2026-10-28T00:01')).toEqual({ estado: 'dias', dias: 3 });
+  });
+  it('el día, hasta las puertas, cuenta hasta el INICIO (19:30)', () => {
+    expect(en('18:18')).toEqual({ estado: 'antes', horas: 1, minutos: 12 });
+    expect(en('00:00')).toEqual({ estado: 'antes', horas: 19, minutos: 30 });
+  });
+  it('a menos de una hora las horas valen 0 y la vista escribe solo los minutos', () => {
+    expect(en('18:41')).toEqual({ estado: 'antes', horas: 0, minutos: 49 });
+  });
+  it('18:59 es antes y 19:00 ya son las puertas', () => {
+    expect(en('18:59').estado).toBe('antes');
+    expect(en('19:00')).toEqual({ estado: 'puertas' });
+  });
+  it('19:29 son las puertas y 19:30 ya está sonando', () => {
+    expect(en('19:29').estado).toBe('puertas');
+    expect(en('19:30')).toEqual({ estado: 'durante' });
+  });
+  it('a las 21:00 —el final aproximado— todavía no es recuerdo', () => {
+    expect(en('21:00').estado).toBe('durante');
+    expect(en('21:29').estado).toBe('durante');
+    expect(en('21:30')).toEqual({ estado: 'despues' });
+  });
+  it('el día siguiente, a cualquier hora, ya es recuerdo', () => {
+    expect(estadoNoche('2026-11-01T00:05')).toEqual({ estado: 'despues' });
+    expect(estadoNoche('2027-10-31T18:00')).toEqual({ estado: 'despues' });
+  });
+  it('ante un ahora inválido devuelve null, nunca NaN', () => {
+    expect(estadoNoche(null)).toBeNull();
+    expect(estadoNoche('2026-10-31')).toBeNull();
+    expect(estadoNoche('basura')).toBeNull();
+  });
+  it('acepta otro horario inyectado', () => {
+    const h = { fecha: '2026-12-24', puertas: '20:00', inicio: '20:30', fin: '23:00' };
+    expect(estadoNoche('2026-12-24T19:45', h)).toEqual({ estado: 'antes', horas: 0, minutos: 45 });
   });
 });

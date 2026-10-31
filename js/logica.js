@@ -103,6 +103,55 @@ export function momentoAbierto(fecha, hora, ahora) {
 }
 
 /**
+ * El horario de la noche criolla del 31.10.2026, según Teleticket. `fin` NO
+ * es el final publicado (~21:00, "duración aproximada 1 h 30 min") sino el
+ * final con margen: el recuerdo no puede llegar mientras sigue la música.
+ */
+export const NOCHE_HORARIO = Object.freeze({
+  fecha: '2026-10-31', puertas: '19:00', inicio: '19:30', fin: '21:30',
+});
+
+// Minutos desde una fecha base fija, sin pasar por Date local: así la
+// cuenta no depende de la zona horaria de la máquina que corre la prueba.
+function minutosDe(instante) {
+  const [f, h] = instante.split('T');
+  const [a, m, d] = f.split('-').map(Number);
+  const [hh, mm] = h.split(':').map(Number);
+  return Date.UTC(a, m - 1, d) / 60000 + hh * 60 + mm;
+}
+
+/**
+ * ¿En qué parte de la noche estamos? Es lo que decide el reloj, la línea
+ * útil, el punto del programa y el tiempo verbal de #noche-criolla.
+ *
+ * Vive acá y no en la vista por la misma razón que `tallosDelRamo()`: los
+ * bordes (19:00, 19:30, 21:30) son datos con una verdad fuera del programa,
+ * y un borde corrido un minuto es exactamente lo que nadie ve leyendo un
+ * template. Devuelve `null` ante un `ahora` inválido: la vista entonces no
+ * pinta el reloj, en vez de escribir "NaN h".
+ *
+ *   dias     antes del día           → { dias }
+ *   antes    el día, hasta puertas   → { horas, minutos } hasta el inicio
+ *   puertas  puertas → inicio
+ *   durante  inicio → fin (con margen)
+ *   despues  desde fin
+ */
+export function estadoNoche(ahora, horario = NOCHE_HORARIO) {
+  if (!INSTANTE.test(String(ahora ?? ''))) return null;
+  const { fecha, puertas, inicio, fin } = horario;
+  const dia = ahora.slice(0, 10);
+  if (dia < fecha) {
+    const dias = Math.round((minutosDe(`${fecha}T00:00`) - minutosDe(`${dia}T00:00`)) / 1440);
+    return { estado: 'dias', dias };
+  }
+  if (ahora >= `${fecha}T${fin}` || dia > fecha) return { estado: 'despues' };
+  if (ahora >= `${fecha}T${inicio}`) return { estado: 'durante' };
+  if (ahora >= `${fecha}T${puertas}`) return { estado: 'puertas' };
+  const faltan = minutosDe(`${fecha}T${inicio}`) - minutosDe(ahora);
+  return { estado: 'antes', horas: Math.floor(faltan / 60), minutos: faltan % 60 };
+}
+
+/**
  * La confianza mostrada se CALCULA, no se lee del JSON.
  *
  * Guardar `verificado_el` y después nunca mirarlo produce confianza
