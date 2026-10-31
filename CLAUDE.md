@@ -7,7 +7,7 @@ Proyecto en español: código, comentarios y datos van en español.
 ## Comandos
 
 ```bash
-npm test                          # Vitest, 113 pruebas: 92 de logica.js + 21 de cielo.js
+npm test                          # Vitest, 123 pruebas: 102 de logica.js + 21 de cielo.js
 npx vitest run -t "confianza"     # un solo grupo de pruebas por nombre
 npm run test:watch                # reejecuta al guardar
 
@@ -47,6 +47,7 @@ escala.js   DOM de la escala astronómica     ← estático, no pide datos      
 pregunta.js DOM de la invitación             ← SVG del ramo + celebración   [existe]
 flores.js   canvas del cielo de flores       ← único bucle de rAF del repo  [existe]
 primer-mes.js DOM del recuerdo del 26.09    ← ruta medida + reloj          [existe]
+noche-criolla.js DOM de la noche del 31.10  ← reloj de seis estados       [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
@@ -59,9 +60,9 @@ reemplazan todo `#app`. De paso es el único `<h1>` de la página, así que ning
 sin encabezado de primer nivel. Que la navegación viva ahí tiene su propio motivo: **ninguna
 de las otras vistas puede depender de que la cartelera logre cargar.**
 
-## Las cinco vistas
+## Las seis vistas
 
-La app dejó de ser una sola pantalla. `app.js` despacha por hash a cinco vistas que **no
+La app dejó de ser una sola pantalla. `app.js` despacha por hash a seis vistas que **no
 comparten datos ni estados de error**:
 
 | Ruta | Módulo | Qué es |
@@ -71,6 +72,7 @@ comparten datos ni estados de error**:
 | `#una-pregunta` | `pregunta.js` | La invitación: el ramo en SVG y la celebración. |
 | `#flores-amarillas` | `flores.js` | El cielo: galaxia, girasoles y corazón en `<canvas>`. |
 | `#primer-mes` | `primer-mes.js` | El recuerdo del primer mes: el mapa sorpresa, fotos y scrapbook. |
+| `#noche-criolla` | `noche-criolla.js` | La invitación a Brujería Criolla del 31.10: reloj, obra, programa y cómo llegar. |
 
 **`RUTAS` ganó una columna, `desmontar`, y ese es el cambio de fondo que trajo la cuarta
 vista.** Antes era una llamada suelta a `desmontarCartelera()` en `pintarRuta()`, porque la
@@ -114,6 +116,27 @@ aplicada a un recuerdo: no se rellena con algo plausible.
 - **Las 4:00 siguen con `lugar: null`**: nadie dio el nombre de ese lugar. Las 5:00 son "El
   cafecito", con las palabras de Oscar y no la marca de los vasos.
 - El mapa ilustrado original (`data/mes01/`) **no se usa** a propósito: la ruta es código.
+
+### La noche criolla: un solo estado decide todo
+
+`#noche-criolla` es la invitación a *Brujería Criolla* (La Estación de Barranco, 31.10.2026,
+19:30). Lo editable vive en el objeto `NOCHE` al comienzo de `js/noche-criolla.js`, igual que
+`RECUERDO` en primer-mes.
+
+- **El reloj, la línea útil, el punto del programa y el tiempo verbal salen de UN dato:**
+  `estadoNoche(ahora)` en `logica.js`, con 10 pruebas de borde. Seis estados: `dias`, `antes`
+  (cuenta hasta las 19:30; con menos de una hora escribe "25 min", nunca "0 h"), `puertas`
+  (19:00–19:30), `durante`, `despues` y `null` (sin reloj).
+- **El final va a las 21:30 y no a las 21:00, y no es un error.** Teleticket da 1 h 30 min como
+  duración *aproximada*: el recuerdo no puede llegar mientras sigue la música.
+- **Después del show la página es un recuerdo:** sale "Cómo llegar" y el programa pasa a pasado.
+- **"Cómo llegar" va a Google Maps y no a OSM.** En el teléfono la web de OSM no arma la ruta.
+- **La nota "Para ti" con `texto: null` NO se pinta**, al revés que las tarjetas de primer-mes:
+  en una invitación del mismo día, un "Por escribir" firmado se lee como un olvido.
+- **La foto es el banner de Teleticket** en `assets/noche-criolla/evento.jpg`, con su crédito.
+  Si falla, se retira el `<figure>` entero. Su CSS necesita `height:auto`: con los atributos
+  `width`/`height` de la `<img>`, el alto presentacional le gana al `aspect-ratio`.
+- **El reloj no lleva `aria-live`** (DESIGN.md): anunciaría cada minuto sin que nadie lo pida.
 
 ### El paper vive en `data/paper_cientifico/`
 
@@ -445,11 +468,13 @@ obras equivocadas y el `git diff` sería ilegible.
   lado esperando ese dato. Cada carga vuelve a preguntar.
 - **`styles.css` se pide con `?v=…` y hay que moverlo al cambiar el CSS.** GitHub Pages cachea
   agresivo y un layout nuevo servido con el CSS viejo se ve roto, no desactualizado. El valor
-  actual es `20260927-fotos`; la convención es fecha más una palabra de qué cambió.
+  actual es `20261031-noche`; la convención es fecha más una palabra de qué cambió.
 - **Las entradas reales están en `.gitignore` y no pueden entrar nunca.**
   `docs/bodas_figaro_entradas.pdf` y `docs/entrada_valeria.png` llevan DNI, número de compra y
   los QR de acceso. Este repo es público y cada push despliega: un commit descuidado las
-  publica y el historial de git no las olvida.
+  publica y el historial de git no las olvida. La carpeta `data/entradas_estacion_barranco/`
+  (los e-tickets de Brujería Criolla, con QR) está ignorada por el mismo motivo, y por eso
+  `#noche-criolla` dice "las llevo yo" en vez de mostrar una entrada.
 
 ## Diseño
 
@@ -486,7 +511,7 @@ Y encima de todo eso, lo último: la app **dejó de ser una sola pantalla**. `ap
 por hash a cuatro vistas —`#cartelera`, `#escala-astronomica`, `#una-pregunta` y
 `#flores-amarillas`— y la cabecera lleva la navegación. La cartelera es la única que pide
 datos; las otras tres son autosuficientes a propósito, así que siguen en pie aunque los JSON
-estén caídos o la cartelera vencida. Ver "Las cinco vistas".
+estén caídos o la cartelera vencida. Ver "Las seis vistas".
 
 La cuarta en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
 vista: un cielo en `<canvas>` con una galaxia, seis girasoles y un corazón de partículas. Es

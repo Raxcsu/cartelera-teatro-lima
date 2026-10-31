@@ -384,6 +384,18 @@ mariposa que se posa) vive en `prefers-reduced-motion: no-preference`. Apagada, 
 entera desde el principio y todo se ve quieto. Los "Descubrir" son `.btn` de 44px con
 `aria-expanded`.
 
+**La noche criolla es una invitación, no un álbum, y eso decide su jerarquía.** Mismo papel
+claro, kicker y serif que el primer mes, en una columna de 560px como `.app.pregunta`. El
+orden es el de quien la abre en la calle: título, el dibujo (guitarra y cajón en trazo
+`--flor-3`, con dos flores del ramo), **el reloj** en serif de 56px y `--accent`, y
+enseguida la línea útil "Mesa 17 · La Estación de Barranco" con "Cómo llegar". Recién después
+vienen la obra con la foto del evento, el programa, los datos y la nota. **El reloj no va en
+tarjeta**: forma parte del hero y lo separa solo un filete de 60px en `--hair`. La única
+animación es el trazo del dibujo, que se hace una sola vez al entrar (~600 ms); con el
+movimiento reducido aparece entero. El punto relleno del programa marca dónde están (puertas o
+concierto) y nunca usa el verde del semáforo. Mockups y decisiones en
+`~/.gstack/projects/Raxcsu-cartelera-teatro-lima/designs/noche-criolla-20261031/`.
+
 ## Accesibilidad, verificada no supuesta
 
 - Todo texto sobre `--bg` mide **4.5:1 o más**. Comprobado por cálculo, no a ojo.
