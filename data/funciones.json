@@ -1972,6 +1972,22 @@
       "verificado_el": "2026-08-16",
       "confianza": "sin_verificar",
       "_nota": "Funciones dominicales 4pm publicadas por Correo. Precio no publicado."
+    },
+    {
+      "id": "brujeria-criolla-2026-la-estacion-de-barranco-2026-10-31-1930",
+      "obra_id": "brujeria-criolla-2026",
+      "teatro_id": "la-estacion-de-barranco",
+      "fecha": "2026-10-31",
+      "hora": "19:30",
+      "precio_min": 69,
+      "precio_max": 69,
+      "precio_referencial": false,
+      "estado": "disponible",
+      "url_entradas": "https://teleticket.com.pe/evento/brujeria-criolla-marco-polo-campos-y-tefi-valenzuela-la-estacion-de-barranco",
+      "fuente_url": "https://teleticket.com.pe/evento/brujeria-criolla-marco-polo-campos-y-tefi-valenzuela-la-estacion-de-barranco",
+      "verificado_el": "2026-10-31",
+      "confianza": "confirmado",
+      "_nota": "General y Barra a S/ 69.00 con cargo incluido (CONADIS S/ 55.20, solo con carné). Ingreso desde las 19:00; 'el concierto se iniciará a la hora exacta'. Consumo mínimo de S/ 45 por persona en el local (según el e-ticket)."
     }
   ]
 }

@@ -398,6 +398,26 @@
       "fuente_url": "https://diariocorreo.pe/cultura/obra-teatral-nosotros-lo-hicimos-bien-se-estrena-en-lima-fechas-horario-y-entradas-noticia/",
       "verificado_el": "2026-08-16",
       "_nota": "Funciones dominicales. Género no etiquetado por la fuente."
+    },
+    {
+      "id": "brujeria-criolla-2026",
+      "titulo": "Brujería Criolla",
+      "sinopsis": "Marco Polo Campos y Tefi Valenzuela presentan un show cortavenas y jaranero. Un concierto muy especial de música criolla para celebrar el Día de la Canción Criolla, en el que podrás escuchar y cantar lo mejor de nuestra música.",
+      "tipo": "otro",
+      "elenco": [
+        "Marco Polo Campos",
+        "Tefi Valenzuela"
+      ],
+      "idioma": "español",
+      "duracion_min": 90,
+      "clasificacion": "+14",
+      "temporada_inicio": "2026-10-31",
+      "temporada_fin": "2026-10-31",
+      "imagen_local": null,
+      "imagen_credito": null,
+      "fuente_url": "https://teleticket.com.pe/evento/brujeria-criolla-marco-polo-campos-y-tefi-valenzuela-la-estacion-de-barranco",
+      "verificado_el": "2026-10-31",
+      "_nota": "Sinopsis: la reseña de Teleticket, literal salvo la puntuación. Tipo 'otro' a propósito: es un concierto de música criolla y Teleticket lo pone en la categoría 'Música', que no es ninguno de los géneros del esquema ('musical' es teatro musical, no un concierto). Clasificación: Teleticket recomienda mayores de 14; desde 10 años con un adulto. Duración aproximada según Teleticket. Única fecha: Día de la Canción Criolla."
     }
   ]
 }

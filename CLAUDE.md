@@ -537,10 +537,10 @@ aquel día dibujado en SVG, con lugares que se descubren conforme llega su hora,
 un scrapbook por completar. Es tan autosuficiente como las otras personales. Ver "El primer
 mes: el contenido vive en `RECUERDO`".
 
-En los datos hay 18 teatros, 20 obras, 122 funciones repartidas en agosto y septiembre, y 53
-lugares para cenar. **94 de las 122 funciones tienen `url_entradas`**, así que el botón "Comprar
-entradas" sale en esas y no en el resto. Cobertura de la obra: **13/20 con sinopsis, 12/20 con
-género real, 9/20 con elenco**. Casi todos los huecos son de las 7 obras que trajo el último
+En los datos hay 18 teatros, 21 obras, 123 funciones repartidas en agosto, septiembre y la del 31.10, y 53
+lugares para cenar. **95 de las 123 funciones tienen `url_entradas`**, así que el botón "Comprar
+entradas" sale en esas y no en el resto. Cobertura de la obra: **14/21 con sinopsis, 12/21 con
+género real, 10/21 con elenco**. Casi todos los huecos son de las 7 obras que trajo el último
 refresco y que todavía no pasaron por investigación; el resto son huecos declarados —ninguna
 fuente los publica— y así tienen que quedarse hasta que alguna lo haga.
 
@@ -562,7 +562,7 @@ en pie y se acaba de repetir con la sinopsis: **esto es un proyecto de datos dis
 proyecto de interfaz**. La tarjeta nueva no valía nada mientras 9 de 12 obras no tuvieran de
 qué hablar; lo que la hizo funcionar fue la investigación, no el CSS.
 
-**25 de las 122 funciones están `confirmado`** (20%), 52 `probable` y 45 `sin_verificar`. El
+**26 de las 123 funciones están `confirmado`** (21%), 52 `probable` y 45 `sin_verificar`. El
 porcentaje cayó respecto del 43% anterior y no es que los datos hayan empeorado: el último
 refresco casi triplicó el total, y lo que entra nuevo entra sin confirmar. Ojo también con la
 comparación más vieja: hasta el reenfoque ninguna llegaba a `confirmado` porque el semáforo
