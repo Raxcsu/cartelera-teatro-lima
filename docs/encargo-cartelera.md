@@ -7,9 +7,13 @@ leer el resto del código: todo lo que hace falta está acá.
 de qué género es y quién actúa**; cada función con su fecha y hora reales y el link para comprar
 entradas.
 
-**Lo que hay hoy:** 20 obras, 18 teatros y 122 funciones en agosto y septiembre, 94 con link de
-compra y 25 en `confirmado`. Cobertura de la obra: 13/20 con sinopsis, 12/20 con género, 9/20
-con elenco.
+**Lo que hay hoy (refresco del 01.11.2026):** 118 obras, 47 teatros y 625 funciones de agosto a
+diciembre (400 en noviembre, 102 en diciembre), 585 con link de compra y 512 en `confirmado`.
+Cobertura de la obra: 110/118 con sinopsis, 63/118 con género, 67/118 con elenco.
+
+**Ojo con Joinnus:** arma la página en el navegador. WebFetch y curl la ven vacía; el calendario
+de cada ficha se lee abriéndola en Chrome. En Teleticket, las fichas tipo landing cargan el
+calendario aparte (`/CalendarioEvento/GetFuncionesPorFechas`).
 
 **Lo que falta:** solo 7 de los 18 teatros tienen `web`. Las coordenadas ya están completas en
 los 18. Los huecos de obra se concentran en las 7 obras que trajo el último refresco y que

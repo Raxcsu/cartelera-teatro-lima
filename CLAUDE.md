@@ -537,19 +537,28 @@ aquel día dibujado en SVG, con lugares que se descubren conforme llega su hora,
 un scrapbook por completar. Es tan autosuficiente como las otras personales. Ver "El primer
 mes: el contenido vive en `RECUERDO`".
 
-En los datos hay 18 teatros, 21 obras, 123 funciones repartidas en agosto, septiembre y la del 31.10, y 53
-lugares para cenar. **95 de las 123 funciones tienen `url_entradas`**, así que el botón "Comprar
-entradas" sale en esas y no en el resto. Cobertura de la obra: **14/21 con sinopsis, 12/21 con
-género real, 10/21 con elenco**. Casi todos los huecos son de las 7 obras que trajo el último
-refresco y que todavía no pasaron por investigación; el resto son huecos declarados —ninguna
-fuente los publica— y así tienen que quedarse hasta que alguna lo haga.
+**El refresco del 01.11.2026 cubrió noviembre y diciembre.** Hoy los datos tienen 47 teatros,
+118 obras, 625 funciones (400 en noviembre y 102 en diciembre, hasta el 27.12) y 53 lugares para
+cenar. **585 de las 625 funciones tienen `url_entradas`**, así que el botón "Comprar entradas"
+sale en esas y no en el resto. Cobertura de la obra: **110/118 con sinopsis, 63/118 con género
+real, 67/118 con elenco**. Los huecos son declarados: la ficha dice "tragicomedia" o "terror"
+(que no están en el esquema), o es un show en vivo de YouTube o un podcast, o no nombra a nadie.
 
-**Los 18 teatros tienen coordenadas**, así que todas las funciones aparecen
-en el mapa y `npm run validar` sale con **cero avisos**. De paso se corrigió la dirección del
-Británico y se resolvió el conflicto de sede de *Noche de enredos*, que Teleticket titula
-"Centro Cultural Ricardo Palma" pero se da en el Teatro Auditorio Miraflores.
+El refresco lo hicieron cuatro agentes en paralelo: Teleticket, Joinnus, salas directas y
+agregadores. **Joinnus arma sus páginas en el navegador:** WebFetch y curl devuelven páginas
+vacías, así que su calendario salió de Chrome. Entraron los shows en vivo de YouTube y podcasts
+(*Hablando Huevadas*, *Nadie dice nada*…) porque Oscar lo decidió así, con tipo `otro`.
+Diciembre está poco publicado todavía: es un resultado correcto, no un hueco a rellenar.
 
-Lo que sigue faltando: solo 7 de los 18 teatros tienen `web`.
+**42 de los 47 teatros tienen coordenadas.** Los 5 que faltan (Teatro Barranco, Campo
+Abierto, Cocodrilo Verde, La Cúpula del Jockey y Duomo Costa 21) son los 5 avisos del
+validador: Nominatim no los ubicó o los ubicaba mal, y se dejaron en `null` antes que poner una
+coordenada de memoria. Sus funciones salen en la lista pero no en el mapa. Cinco más están
+geocodificados **a nivel de calle** y su `_nota` lo dice. **El Teatro Británico (Bellavista
+527) y el Auditorio del Británico (Bellavista 531) son dos salas:** *La mujer de negro* va en
+la primera y *Blanca* en la segunda.
+
+Lo que sigue faltando: solo 10 de los 47 teatros tienen `web`.
 
 **Se retiró el ranking.** `PESOS`, `puntuarFuncion()`, `proponerPlanes()` y `motivoDelPrimero()`
 ya no existen: en un calendario el orden lo manda la fecha, y buscar "qué hay el viernes 28" es
@@ -562,9 +571,9 @@ en pie y se acaba de repetir con la sinopsis: **esto es un proyecto de datos dis
 proyecto de interfaz**. La tarjeta nueva no valía nada mientras 9 de 12 obras no tuvieran de
 qué hablar; lo que la hizo funcionar fue la investigación, no el CSS.
 
-**26 de las 123 funciones están `confirmado`** (21%), 52 `probable` y 45 `sin_verificar`. El
-porcentaje cayó respecto del 43% anterior y no es que los datos hayan empeorado: el último
-refresco casi triplicó el total, y lo que entra nuevo entra sin confirmar. Ojo también con la
+**512 de las 625 funciones están `confirmado`** (82%), 68 `probable` y 45 `sin_verificar`. El
+salto desde el 21% se explica porque el refresco de noviembre salió casi entero de las
+ticketeras, que dan el link de compra. Los 45 `sin_verificar` son de agosto y septiembre. Ojo también con la
 comparación más vieja: hasta el reenfoque ninguna llegaba a `confirmado` porque el semáforo
 certificaba el precio y los precios salían de agregadores editoriales. Ahora certifica que la
 función existe y la prueba es `url_entradas`, que es un criterio distinto — no es que los datos
