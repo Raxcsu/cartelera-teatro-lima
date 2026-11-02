@@ -545,11 +545,12 @@ de seis estados que decide `estadoNoche()`, la foto del evento y lo práctico pa
 entradas, que llevan el QR, quedaron fuera del repo. Ver "La noche criolla: un solo estado
 decide todo".
 
-**El refresco del 01.11.2026 cubrió noviembre y diciembre.** Hoy los datos tienen 47 teatros,
-118 obras, 625 funciones (400 en noviembre y 102 en diciembre, hasta el 27.12) y 53 lugares para
-cenar. **585 de las 625 funciones tienen `url_entradas`**, así que el botón "Comprar entradas"
-sale en esas y no en el resto. Cobertura de la obra: **110/118 con sinopsis, 63/118 con género
-real, 67/118 con elenco**. Los huecos son declarados: la ficha dice "tragicomedia" o "terror"
+**El refresco del 01.11.2026 cubrió noviembre y diciembre**, y una segunda ronda de Joinnus el
+02.11 sumó las 60 fichas que la primera no alcanzó. Hoy los datos tienen 63 teatros, 164 obras,
+879 funciones (595 en noviembre y 161 en diciembre, hasta el 27.12) y 53 lugares para cenar.
+**839 de las 879 funciones tienen `url_entradas`**, así que el botón "Comprar entradas" sale en
+esas y no en el resto. Cobertura de la obra: **156/164 con sinopsis, 85/164 con género real,
+90/164 con elenco**. Los huecos son declarados: la ficha dice "tragicomedia" o "terror"
 (que no están en el esquema), o es un show en vivo de YouTube o un podcast, o no nombra a nadie.
 
 El refresco lo hicieron cuatro agentes en paralelo: Teleticket, Joinnus, salas directas y
@@ -558,15 +559,17 @@ vacías, así que su calendario salió de Chrome. Entraron los shows en vivo de 
 (*Hablando Huevadas*, *Nadie dice nada*…) porque Oscar lo decidió así, con tipo `otro`.
 Diciembre está poco publicado todavía: es un resultado correcto, no un hueco a rellenar.
 
-**42 de los 47 teatros tienen coordenadas.** Los 5 que faltan (Teatro Barranco, Campo
-Abierto, Cocodrilo Verde, La Cúpula del Jockey y Duomo Costa 21) son los 5 avisos del
-validador: Nominatim no los ubicó o los ubicaba mal, y se dejaron en `null` antes que poner una
-coordenada de memoria. Sus funciones salen en la lista pero no en el mapa. Cinco más están
-geocodificados **a nivel de calle** y su `_nota` lo dice. **El Teatro Británico (Bellavista
+**53 de los 63 teatros tienen coordenadas.** Los 10 que faltan son los 10 avisos del
+validador: Nominatim no los encontró, los ubicaba en otro distrito, o solo ubicaba una avenida
+larga (Arequipa, La Molina, del Ejército) cuyo centro puede caer a kilómetros. Se dejaron en
+`null` antes que poner una coordenada de memoria: sus funciones salen en la lista pero no en el
+mapa. Diez más están geocodificados **a nivel de calle** y su `_nota` lo dice. **Un género
+sacado de un hashtag de Joinnus no cuenta:** es la misma trampa que la categoría "Teatro" de
+Teleticket, y esas obras van con `otro`. **El Teatro Británico (Bellavista
 527) y el Auditorio del Británico (Bellavista 531) son dos salas:** *La mujer de negro* va en
 la primera y *Blanca* en la segunda.
 
-Lo que sigue faltando: solo 10 de los 47 teatros tienen `web`.
+Lo que sigue faltando: solo 10 de los 63 teatros tienen `web`, y 10 no tienen coordenadas.
 
 **Se retiró el ranking.** `PESOS`, `puntuarFuncion()`, `proponerPlanes()` y `motivoDelPrimero()`
 ya no existen: en un calendario el orden lo manda la fecha, y buscar "qué hay el viernes 28" es
@@ -579,7 +582,7 @@ en pie y se acaba de repetir con la sinopsis: **esto es un proyecto de datos dis
 proyecto de interfaz**. La tarjeta nueva no valía nada mientras 9 de 12 obras no tuvieran de
 qué hablar; lo que la hizo funcionar fue la investigación, no el CSS.
 
-**512 de las 625 funciones están `confirmado`** (82%), 68 `probable` y 45 `sin_verificar`. El
+**766 de las 879 funciones están `confirmado`** (87%), 68 `probable` y 45 `sin_verificar`. El
 salto desde el 21% se explica porque el refresco de noviembre salió casi entero de las
 ticketeras, que dan el link de compra. Los 45 `sin_verificar` son de agosto y septiembre. Ojo también con la
 comparación más vieja: hasta el reenfoque ninguna llegaba a `confirmado` porque el semáforo

@@ -91,7 +91,7 @@ función va a ocurrir**: fecha, hora y teatro. Para llegar a `confirmado`, una f
 fuente, fecha de verificación y link de compra; sin dónde comprarla se queda en `probable`, que
 en pantalla se lee "verificar antes de ir".
 
-Hoy 512 de las 625 funciones están `confirmado` (82%), 68 `probable` y 45 `sin_verificar`. El
+Hoy 766 de las 879 funciones están `confirmado` (87%), 68 `probable` y 45 `sin_verificar`. El
 refresco de noviembre salió casi entero de las ticketeras, que dan el link de compra; los
 `sin_verificar` son de agosto y septiembre.
 
@@ -108,7 +108,7 @@ elenco queda vacío aunque la información exista en alguna parte.
 ### De dónde vienen los datos
 
 - **Teatros:** coordenadas de [Nominatim](https://nominatim.openstreetmap.org/), contrastadas
-  contra la dirección publicada. **42 de los 47 la tienen.** Los otros 5 no se pudieron ubicar
+  contra la dirección publicada. **53 de los 63 la tienen.** Los otros 10 no se pudieron ubicar
   sin dudas y quedan sin coordenada antes que con una inventada: sus funciones salen en la
   lista pero no en el mapa.
 - **Cartelera, sinopsis, género y elenco:** Teleticket, Joinnus y agregadores editoriales de
@@ -123,7 +123,7 @@ muestran en pantalla. Lo mismo con el gasto estimado de los restaurantes.
 
 **Hoy el repo contiene una sola imagen de terceros:** `assets/noche-criolla/evento.jpg`, el
 banner promocional de *Brujería Criolla* publicado por Teleticket, que la vista `#noche-criolla`
-muestra con el crédito "Imagen: Teleticket". El campo `imagen_local` sigue vacío en las 118
+muestra con el crédito "Imagen: Teleticket". El campo `imagen_local` sigue vacío en las 164
 obras y no existe un directorio `img/`.
 
 Cuando se agreguen afiches, esta es la política: son material promocional propiedad de cada
@@ -140,20 +140,20 @@ Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en s
 - Lógica pura con 123 pruebas, validador y esquemas de datos.
 - Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,
   hora, teatro y link de compra.
-- Cartelera real de Lima: 47 teatros, 118 obras y 625 funciones de agosto a diciembre (400 en
-  noviembre, 102 en diciembre), todas con fuente y 585 con link de compra.
+- Cartelera real de Lima: 63 teatros, 164 obras y 879 funciones de agosto a diciembre (595 en
+  noviembre, 161 en diciembre), todas con fuente y 839 con link de compra.
 - 53 lugares para cenar con horario de cocina, dentro del desplegable de cada función.
 - Navegación por hash entre la cartelera y las cinco vistas personales, que no dependen de
   que los datos carguen.
 
 **El cuello de botella son los datos, no la pantalla**, y se comprobó otra vez con la sinopsis:
 la tarjeta nueva no servía de nada mientras las obras no tuvieran de qué hablar. Lo que la hizo
-funcionar fue la investigación. Cobertura actual: **110/118 con sinopsis, 63/118 con género,
-67/118 con elenco**. Los huecos son declarados: géneros fuera del esquema ("tragicomedia",
+funcionar fue la investigación. Cobertura actual: **156/164 con sinopsis, 85/164 con género,
+90/164 con elenco**. Los huecos son declarados: géneros fuera del esquema ("tragicomedia",
 "terror"), shows en vivo de YouTube y podcasts, o fichas que no nombran a nadie.
 
-`npm run validar` sale con **5 avisos**, uno por cada teatro sin coordenada. Lo que falta en los
-datos: esas 5 coordenadas, y que solo 10 de los 47 teatros tienen `web`. Después: filtros (por género
+`npm run validar` sale con **10 avisos**, uno por cada teatro sin coordenada. Lo que falta en los
+datos: esas 10 coordenadas, y que solo 10 de los 63 teatros tienen `web`. Después: filtros (por género
 y distrito) y tarjeta compartible, ya diseñados en `DESIGN.md` y sin implementar.
 
 ## Dónde seguir leyendo

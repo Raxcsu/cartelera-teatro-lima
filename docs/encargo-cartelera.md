@@ -7,19 +7,19 @@ leer el resto del código: todo lo que hace falta está acá.
 de qué género es y quién actúa**; cada función con su fecha y hora reales y el link para comprar
 entradas.
 
-**Lo que hay hoy (refresco del 01.11.2026):** 118 obras, 47 teatros y 625 funciones de agosto a
-diciembre (400 en noviembre, 102 en diciembre), 585 con link de compra y 512 en `confirmado`.
-Cobertura de la obra: 110/118 con sinopsis, 63/118 con género, 67/118 con elenco.
+**Lo que hay hoy (refresco del 01.11.2026 y segunda ronda de Joinnus del 02.11):** 164 obras,
+63 teatros y 879 funciones de agosto a diciembre (595 en noviembre, 161 en diciembre), 839 con
+link de compra y 766 en `confirmado`. Cobertura de la obra: 156/164 con sinopsis, 85/164 con
+género, 90/164 con elenco.
 
 **Ojo con Joinnus:** arma la página en el navegador. WebFetch y curl la ven vacía; el calendario
 de cada ficha se lee abriéndola en Chrome. En Teleticket, las fichas tipo landing cargan el
 calendario aparte (`/CalendarioEvento/GetFuncionesPorFechas`).
 
-**Lo que falta:** solo 10 de los 47 teatros tienen `web`, y 5 no tienen coordenadas (Teatro
-Barranco, Campo Abierto, Cocodrilo Verde, La Cúpula del Jockey y Duomo Costa 21). Joinnus
-publica fechas solo mientras están a la venta: varias temporadas siguen más allá de lo cargado,
-y unas 60 obras de Joinnus quedaron sin revisar por el tope. Y en diciembre hay que volver a
-correr todo esto.
+**Lo que falta:** solo 10 de los 63 teatros tienen `web`, y 10 no tienen coordenadas (ver las
+`_nota` de cada uno). Joinnus publica fechas solo mientras están a la venta: varias temporadas
+siguen más allá de lo cargado. Y en diciembre hay que volver a correr todo esto. **Un género
+que sale de un hashtag de Joinnus no vale:** solo cuenta si lo dice el texto de la ficha.
 
 > **Ojo si venís de una versión anterior de este documento.** El precio dejó de mostrarse en
 > pantalla. Se sigue cargando, con su fuente y su fecha, y el validador lo sigue revisando —
@@ -149,7 +149,7 @@ referencia canónica; esto es la versión legible.
 }
 ```
 
-- `web` — **hoy lo tienen 10 de 47 teatros.** Llenarlo es parte del encargo.
+- `web` — **hoy lo tienen 10 de 63 teatros.** Llenarlo es parte del encargo.
 - `lat` / `lng` — geocodificar con Nominatim y **verificar contra la dirección**. Una coordenada
   fuera de la caja de Lima (lat −12.60 a −11.60, lng −77.35 a −76.60) hace fallar el validador.
 - Ojo con las sedes múltiples: "el Británico" tiene varias en Miraflores y no todas tienen
@@ -226,7 +226,7 @@ hora, que no alcanza para decidir si ir. Conseguirlos es lo que hace que la pant
 - **Una función por fecha y hora.** Si una obra va jueves a domingo durante tres semanas y lo
   verificaste, son ~12 registros, no uno. Esto es lo que llena la vista de mes.
 - `hora` — `HH:MM` en 24h, hora de Lima.
-- `url_entradas` — **hoy lo tienen 585 de las 625.** Es el link directo a comprar, y desde el cambio del
+- `url_entradas` — **hoy lo tienen 839 de las 879.** Es el link directo a comprar, y desde el cambio del
   semáforo es además **requisito de `confirmado`**: sin él, la función se queda en `probable`.
 - `precio_min` / `precio_max` — **ya no se ven en pantalla**, pero se siguen cargando con las
   mismas reglas de siempre: el rango publicado tal cual, `precio_max: null` cuando la fuente
@@ -303,13 +303,13 @@ tablas de cobertura, que son las métricas reales del encargo. Así queda hoy:
 ```
   COBERTURA DE CONFIANZA          COBERTURA DE LA OBRA
   ------------------------        ------------------------
-  confirmado    512   82%         sin sinopsis    8    7%
-  probable       68   11%         sin genero     55   47%
-  sin_verificar  45    7%         sin elenco     51   43%
-  TOTAL         625               TOTAL         118
+  confirmado    766   87%         sin sinopsis    8    5%
+  probable       68    8%         sin genero     79   48%
+  sin_verificar  45    5%         sin elenco     74   45%
+  TOTAL         879               TOTAL         164
 ```
 
-El `confirmado` subió del 21% al 82% porque el refresco de noviembre salió casi entero de las
+El `confirmado` subió del 21% al 87% porque el refresco de noviembre salió casi entero de las
 ticketeras, que dan el link de compra. Los 45 `sin_verificar` son de agosto y septiembre. El
 hueco grande que queda es el género (47%): muchas fichas dicen "tragicomedia" o "terror", que
 no están en el esquema, y los shows de YouTube y podcasts no nombran ninguno.
