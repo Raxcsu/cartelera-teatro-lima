@@ -120,8 +120,11 @@ aplicada a un recuerdo: no se rellena con algo plausible.
 ### La noche criolla: un solo estado decide todo
 
 `#noche-criolla` es la invitación a *Brujería Criolla* (La Estación de Barranco, 31.10.2026,
-19:30). Lo editable vive en el objeto `NOCHE` al comienzo de `js/noche-criolla.js`, igual que
-`RECUERDO` en primer-mes.
+19:30). Los textos editables viven en el objeto `NOCHE` al comienzo de `js/noche-criolla.js`,
+igual que `RECUERDO` en primer-mes. **Pero el horario no:** la fecha y los bordes del reloj
+(puertas 19:00, inicio 19:30, fin 21:30) están en `NOCHE_HORARIO`, en `js/logica.js`, junto a
+`estadoNoche()` y sus pruebas. Si cambia la hora del evento hay que tocar los dos: cambiar solo
+`NOCHE` deja el reloj con el horario viejo y la pantalla diciendo otra cosa.
 
 - **El reloj, la línea útil, el punto del programa y el tiempo verbal salen de UN dato:**
   `estadoNoche(ahora)` en `logica.js`, con 10 pruebas de borde. Seis estados: `dias`, `antes`
@@ -161,7 +164,7 @@ alcanzaba un ternario; con tres, esas cadenas crecen en cada pantalla nueva y el
 de estar en un solo sitio.
 
 **Solo la cartelera devuelve una promesa.** Sus JSON tardan y el encabezado al que va el foco no
-existe hasta que resuelva; las otras cuatro pintan sincrónicamente. Por eso `pintarRuta()` mira si
+existe hasta que resuelva; las otras cinco pintan sincrónicamente. Por eso `pintarRuta()` mira si
 `pintar()` devolvió algo antes de mover el foco.
 
 **Hay dos layouts, no uno responsive a medias.** Debajo de 900×600 es la columna de 430px de
@@ -536,6 +539,11 @@ Después entró una quinta, **`#primer-mes`**, el recuerdo del 26.09.2026: el ma
 aquel día dibujado en SVG, con lugares que se descubren conforme llega su hora, siete fotos y
 un scrapbook por completar. Es tan autosuficiente como las otras personales. Ver "El primer
 mes: el contenido vive en `RECUERDO`".
+
+La sexta es **`#noche-criolla`**, la invitación a *Brujería Criolla* del 31.10.2026: un reloj
+de seis estados que decide `estadoNoche()`, la foto del evento y lo práctico para llegar. Las
+entradas, que llevan el QR, quedaron fuera del repo. Ver "La noche criolla: un solo estado
+decide todo".
 
 **El refresco del 01.11.2026 cubrió noviembre y diciembre.** Hoy los datos tienen 47 teatros,
 118 obras, 625 funciones (400 en noviembre y 102 en diciembre, hasta el 27.12) y 53 lugares para

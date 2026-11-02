@@ -2,7 +2,7 @@
 
 **En vivo: https://raxcsu.github.io/cartelera-teatro-lima/**
 
-Un sitio personal de cinco pestañas. La principal es la **cartelera**: el teatro de Lima del mes
+Un sitio personal de seis pestañas. La principal es la **cartelera**: el teatro de Lima del mes
 en una pantalla, con mapa de los teatros, tira de días, y por cada función **de qué trata la
 obra, de qué género es y quién actúa**, con su hora, su teatro y el link de compra. Dónde cenar
 cerca queda a un toque de distancia, en segundo plano.
@@ -10,8 +10,9 @@ cerca queda a un toque de distancia, en segundo plano.
 El precio se guarda con su fuente pero no se muestra: la pregunta que contesta la cartelera es
 "¿qué obra es y vale la pena?", no "¿cuánto sale?".
 
-Las otras cuatro pestañas son piezas personales, no producto: una **lectura** con un paper y su
-resumen, una **invitación**, un **cielo de flores amarillas** y el **recuerdo del primer mes**.
+Las otras cinco pestañas son piezas personales, no producto: una **lectura** con un paper y su
+resumen, una **invitación**, un **cielo de flores amarillas**, el **recuerdo del primer mes** y
+la **noche criolla**, la invitación a un concierto con un reloj que cambia con la hora de Lima.
 Ninguna pide datos al servidor, así que siguen en pie aunque la cartelera no pueda cargar.
 
 En el celular va todo apilado; desde 900×600 la cartelera se abre en dos columnas, con el mapa
@@ -32,7 +33,7 @@ Para desarrollo:
 
 ```bash
 npm install                    # solo Vitest, nunca se publica
-npm test                       # 113 pruebas: 92 de logica.js + 21 de cielo.js
+npm test                       # 123 pruebas: 102 de logica.js + 21 de cielo.js
 npm run validar                # valida los JSON y reporta cobertura de confianza y de obra
 ```
 
@@ -40,7 +41,7 @@ npm run validar                # valida los JSON y reporta cobertura de confianz
 
 ```
 index.html   styles.css
-js/  app.js      router por hash — decide cuál de las cinco vistas se pinta
+js/  app.js      router por hash — decide cuál de las seis vistas se pinta
      datos.js    red, localStorage, overrides
      logica.js   100% funciones puras — lógica de negocio, todas sus pruebas viven acá
      cielo.js    geometría pura de la galaxia — puro también, probado aparte
@@ -49,6 +50,7 @@ js/  app.js      router por hash — decide cuál de las cinco vistas se pinta
      escala.js   la lectura estática
      pregunta.js la invitación
      primer-mes.js el recuerdo del primer mes
+     noche-criolla.js la noche del 31.10 — un solo estado del reloj decide todo
      flores.js   el cielo de flores amarillas — el único canvas del proyecto
 data/*.json  fuente de verdad, editable a mano
 data/paper_cientifico/   el paper de la vista de lectura: .tex fuente, .pdf compilado
@@ -56,8 +58,8 @@ docs/        encargo-cartelera.md — el pedido de investigación de datos
 scripts/     validar_datos.py — la única puerta de calidad de los datos
 ```
 
-Las cinco vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`,
-`#flores-amarillas` y `#primer-mes`), y no por rutas reales, porque GitHub Pages sirve archivos estáticos:
+Las seis vistas se despachan por hash (`#cartelera`, `#escala-astronomica`, `#una-pregunta`,
+`#flores-amarillas`, `#primer-mes` y `#noche-criolla`), y no por rutas reales, porque GitHub Pages sirve archivos estáticos:
 `/una-pregunta` daría 404 al recargar. Con hash, entrar directo a cada vista funciona y los
 botones de atrás y adelante del navegador son navegación de verdad.
 
@@ -89,9 +91,9 @@ función va a ocurrir**: fecha, hora y teatro. Para llegar a `confirmado`, una f
 fuente, fecha de verificación y link de compra; sin dónde comprarla se queda en `probable`, que
 en pantalla se lee "verificar antes de ir".
 
-Hoy 25 de las 122 funciones están `confirmado`, 52 `probable` y 45 `sin_verificar`. El
-porcentaje bajó respecto de rondas anteriores y no es que los datos hayan empeorado: el último
-refresco casi triplicó el total, y lo que entra nuevo entra sin confirmar.
+Hoy 512 de las 625 funciones están `confirmado` (82%), 68 `probable` y 45 `sin_verificar`. El
+refresco de noviembre salió casi entero de las ticketeras, que dan el link de compra; los
+`sin_verificar` son de agosto y septiembre.
 
 ### Sobre el elenco: nadie decide acá quién es "conocido"
 
@@ -106,8 +108,9 @@ elenco queda vacío aunque la información exista en alguna parte.
 ### De dónde vienen los datos
 
 - **Teatros:** coordenadas de [Nominatim](https://nominatim.openstreetmap.org/), contrastadas
-  contra la dirección publicada. **Los 18 ya la tienen**, así que todas las funciones aparecen
-  en el mapa.
+  contra la dirección publicada. **42 de los 47 la tienen.** Los otros 5 no se pudieron ubicar
+  sin dudas y quedan sin coordenada antes que con una inventada: sus funciones salen en la
+  lista pero no en el mapa.
 - **Cartelera, sinopsis, género y elenco:** Teleticket, Joinnus y agregadores editoriales de
   Lima (enlima, Infobae), cada dato con su `fuente_url`.
 - **Lugares para cenar:** nombre, coordenada y horario de cierre de cocina salen de
@@ -118,8 +121,10 @@ muestran en pantalla. Lo mismo con el gasto estimado de los restaurantes.
 
 ## Material de terceros
 
-**Hoy el repo no contiene ninguna imagen de terceros.** El campo `imagen_local` está vacío en
-las 20 obras y no existe un directorio `img/`.
+**Hoy el repo contiene una sola imagen de terceros:** `assets/noche-criolla/evento.jpg`, el
+banner promocional de *Brujería Criolla* publicado por Teleticket, que la vista `#noche-criolla`
+muestra con el crédito "Imagen: Teleticket". El campo `imagen_local` sigue vacío en las 118
+obras y no existe un directorio `img/`.
 
 Cuando se agreguen afiches, esta es la política: son material promocional propiedad de cada
 teatro o compañía, se guardan como miniaturas de ~300 px, siempre con crédito visible y enlace
@@ -130,25 +135,25 @@ Si sos titular de alguna y querés que se retire, abrí un issue y se saca.
 
 ## Estado
 
-Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en cinco vistas.
+Publicado en GitHub Pages, con la interfaz reenfocada a la obra y repartida en seis vistas.
 
-- Lógica pura con 113 pruebas, validador y esquemas de datos.
+- Lógica pura con 123 pruebas, validador y esquemas de datos.
 - Mapa de teatros, tira de días con el mes plegable, y por función: género, elenco, sinopsis,
   hora, teatro y link de compra.
-- Cartelera real de Lima: 18 teatros, 20 obras y 122 funciones en agosto y septiembre, todas
-  con fuente y 94 con link de compra.
+- Cartelera real de Lima: 47 teatros, 118 obras y 625 funciones de agosto a diciembre (400 en
+  noviembre, 102 en diciembre), todas con fuente y 585 con link de compra.
 - 53 lugares para cenar con horario de cocina, dentro del desplegable de cada función.
-- Navegación por hash entre la cartelera y las cuatro vistas personales, que no dependen de
+- Navegación por hash entre la cartelera y las cinco vistas personales, que no dependen de
   que los datos carguen.
 
 **El cuello de botella son los datos, no la pantalla**, y se comprobó otra vez con la sinopsis:
 la tarjeta nueva no servía de nada mientras las obras no tuvieran de qué hablar. Lo que la hizo
-funcionar fue la investigación. Cobertura actual: **13/20 con sinopsis, 12/20 con género, 9/20
-con elenco**. Casi todos los huecos son de las 7 obras que trajo el último refresco y que
-todavía no pasaron por investigación; el resto son huecos que ninguna fuente publica.
+funcionar fue la investigación. Cobertura actual: **110/118 con sinopsis, 63/118 con género,
+67/118 con elenco**. Los huecos son declarados: géneros fuera del esquema ("tragicomedia",
+"terror"), shows en vivo de YouTube y podcasts, o fichas que no nombran a nadie.
 
-Los 18 teatros tienen coordenadas, así que `npm run validar` sale con **cero avisos**. Lo que
-falta en los datos es menor: solo 7 de los 18 teatros tienen `web`. Después: filtros (por género
+`npm run validar` sale con **5 avisos**, uno por cada teatro sin coordenada. Lo que falta en los
+datos: esas 5 coordenadas, y que solo 10 de los 47 teatros tienen `web`. Después: filtros (por género
 y distrito) y tarjeta compartible, ya diseñados en `DESIGN.md` y sin implementar.
 
 ## Dónde seguir leyendo

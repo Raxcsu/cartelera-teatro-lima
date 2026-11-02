@@ -15,9 +15,11 @@ Cobertura de la obra: 110/118 con sinopsis, 63/118 con género, 67/118 con elenc
 de cada ficha se lee abriéndola en Chrome. En Teleticket, las fichas tipo landing cargan el
 calendario aparte (`/CalendarioEvento/GetFuncionesPorFechas`).
 
-**Lo que falta:** solo 7 de los 18 teatros tienen `web`. Las coordenadas ya están completas en
-los 18. Los huecos de obra se concentran en las 7 obras que trajo el último refresco y que
-todavía no pasaron por investigación. Y el mes que viene hay que volver a correr todo esto.
+**Lo que falta:** solo 10 de los 47 teatros tienen `web`, y 5 no tienen coordenadas (Teatro
+Barranco, Campo Abierto, Cocodrilo Verde, La Cúpula del Jockey y Duomo Costa 21). Joinnus
+publica fechas solo mientras están a la venta: varias temporadas siguen más allá de lo cargado,
+y unas 60 obras de Joinnus quedaron sin revisar por el tope. Y en diciembre hay que volver a
+correr todo esto.
 
 > **Ojo si venís de una versión anterior de este documento.** El precio dejó de mostrarse en
 > pantalla. Se sigue cargando, con su fuente y su fecha, y el validador lo sigue revisando —
@@ -147,7 +149,7 @@ referencia canónica; esto es la versión legible.
 }
 ```
 
-- `web` — **hoy lo tienen 7 de 18 teatros.** Llenarlo es parte del encargo.
+- `web` — **hoy lo tienen 10 de 47 teatros.** Llenarlo es parte del encargo.
 - `lat` / `lng` — geocodificar con Nominatim y **verificar contra la dirección**. Una coordenada
   fuera de la caja de Lima (lat −12.60 a −11.60, lng −77.35 a −76.60) hace fallar el validador.
 - Ojo con las sedes múltiples: "el Británico" tiene varias en Miraflores y no todas tienen
@@ -224,7 +226,7 @@ hora, que no alcanza para decidir si ir. Conseguirlos es lo que hace que la pant
 - **Una función por fecha y hora.** Si una obra va jueves a domingo durante tres semanas y lo
   verificaste, son ~12 registros, no uno. Esto es lo que llena la vista de mes.
 - `hora` — `HH:MM` en 24h, hora de Lima.
-- `url_entradas` — **hoy lo tienen las 47.** Es el link directo a comprar, y desde el cambio del
+- `url_entradas` — **hoy lo tienen 585 de las 625.** Es el link directo a comprar, y desde el cambio del
   semáforo es además **requisito de `confirmado`**: sin él, la función se queda en `probable`.
 - `precio_min` / `precio_max` — **ya no se ven en pantalla**, pero se siguen cargando con las
   mismas reglas de siempre: el rango publicado tal cual, `precio_max: null` cuando la fuente
@@ -301,15 +303,16 @@ tablas de cobertura, que son las métricas reales del encargo. Así queda hoy:
 ```
   COBERTURA DE CONFIANZA          COBERTURA DE LA OBRA
   ------------------------        ------------------------
-  confirmado     25   20%         sin sinopsis    7   35%
-  probable       52   43%         sin genero      8   40%
-  sin_verificar  45   37%         sin elenco     11   55%
-  TOTAL         122               TOTAL          20
+  confirmado    512   82%         sin sinopsis    8    7%
+  probable       68   11%         sin genero     55   47%
+  sin_verificar  45    7%         sin elenco     51   43%
+  TOTAL         625               TOTAL         118
 ```
 
-El porcentaje de `confirmado` bajó del 43% al 20% y **no es que los datos hayan empeorado**: el
-último refresco casi triplicó el total de funciones, y lo que entra nuevo entra sin confirmar.
-Cerrar esa brecha es el trabajo del próximo encargo.
+El `confirmado` subió del 21% al 82% porque el refresco de noviembre salió casi entero de las
+ticketeras, que dan el link de compra. Los 45 `sin_verificar` son de agosto y septiembre. El
+hueco grande que queda es el género (47%): muchas fichas dicen "tragicomedia" o "terror", que
+no están en el esquema, y los shows de YouTube y podcasts no nombran ninguno.
 
 La segunda tabla es la nueva, y es la que dice si la pantalla tiene algo que mostrar: una obra
 sin sinopsis, sin género y sin elenco produce una tarjeta que solo sabe decir el título y la
