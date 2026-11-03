@@ -113,7 +113,7 @@ function relojTexto(e) {
         ? `Faltan ${e.horas} h ${e.minutos} min para el telón`
         : `Faltan ${e.minutos} min para el telón`;
     case 'puertas':
-      return 'Ya estamos aquí: el telón se abre a las 8:00';
+      return 'Ya estamos aquí';
     case 'durante':
       return 'En escena ahora mismo';
     default:
@@ -285,7 +285,7 @@ export function pintarRomeoJulieta(app, ahora) {
 
         <div class="rj-cartel">
           <h2 id="romeo-julieta-titulo" tabindex="-1">${esc(obra.titulo)}</h2>
-          <p class="rj-cuando"><time datetime="${FUNCION.fecha}T20:00">${esc(FUNCION.cuando)}</time> · ${esc(FUNCION.fila)}</p>
+          <p class="rj-cuando"><time class="rj-junto" datetime="${FUNCION.fecha}T20:00">${esc(FUNCION.cuando)}</time> <span class="rj-junto">· ${esc(FUNCION.fila)}</span></p>
           <p class="rj-teatro">${esc(lugar.nombre)}</p>
           <p class="rj-reloj" data-rj="reloj"></p>
         </div>

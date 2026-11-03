@@ -508,7 +508,7 @@ obras equivocadas y el `git diff` sería ilegible.
   lado esperando ese dato. Cada carga vuelve a preguntar.
 - **`styles.css` se pide con `?v=…` y hay que moverlo al cambiar el CSS.** GitHub Pages cachea
   agresivo y un layout nuevo servido con el CSS viejo se ve roto, no desactualizado. El valor
-  actual es `20261106-telon`; la convención es fecha más una palabra de qué cambió.
+  actual es `20261106-pulido`; la convención es fecha más una palabra de qué cambió.
 - **Las entradas reales están en `.gitignore` y no pueden entrar nunca.**
   `docs/bodas_figaro_entradas.pdf` y `docs/entrada_valeria.png` llevan DNI, número de compra y
   los QR de acceso. Este repo es público y cada push despliega: un commit descuidado las
