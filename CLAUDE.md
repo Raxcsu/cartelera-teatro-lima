@@ -48,7 +48,7 @@ pregunta.js DOM de la invitación             ← SVG del ramo + celebración   
 flores.js   canvas del cielo de flores       ← único bucle de rAF del repo  [existe]
 primer-mes.js DOM del recuerdo del 26.09    ← ruta medida + reloj          [existe]
 noche-criolla.js DOM de la noche del 31.10  ← reloj de seis estados       [existe]
-romeo-julieta.js DOM de la función del 06.11 ← calcada de noche-criolla  [existe]
+romeo-julieta.js DOM de la función del 06.11 ← el telón que se abre     [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
@@ -74,7 +74,7 @@ comparten datos ni estados de error**:
 | `#flores-amarillas` | `flores.js` | El cielo: galaxia, girasoles y corazón en `<canvas>`. |
 | `#primer-mes` | `primer-mes.js` | El recuerdo del primer mes: el mapa sorpresa, fotos y scrapbook. |
 | `#noche-criolla` | `noche-criolla.js` | La invitación a Brujería Criolla del 31.10: reloj, obra, programa y cómo llegar. |
-| `#romeo-y-julieta` | `romeo-julieta.js` | La invitación a Romeo y Julieta (Éxodo Teatro) del 06.11: la misma composición. |
+| `#romeo-y-julieta` | `romeo-julieta.js` | Romeo y Julieta (Éxodo Teatro) del 06.11: un telón que ella abre, y la función detrás. |
 
 **`RUTAS` ganó una columna, `desmontar`, y ese es el cambio de fondo que trajo la cuarta
 vista.** Antes era una llamada suelta a `desmontarCartelera()` en `pintarRuta()`, porque la
@@ -143,25 +143,39 @@ igual que `RECUERDO` en primer-mes. **Pero el horario no:** la fecha y los borde
   `width`/`height` de la `<img>`, el alto presentacional le gana al `aspect-ratio`.
 - **El reloj no lleva `aria-live`** (DESIGN.md): anunciaría cada minuto sin que nadie lo pida.
 
-### Romeo y Julieta: la noche criolla con otro contenido
+### Romeo y Julieta: el telón
 
-`#romeo-y-julieta` es la invitación a *Romeo y Julieta* de Éxodo Teatro (Teatro Municipal de
-Lima, viernes 06.11.2026, 20:00, platea fila 15). **`js/romeo-julieta.js` está calcado de
-`noche-criolla.js` a propósito**, y reusa sus clases `noche-*` de `styles.css`: es la misma
-composición con otro contenido (`FUNCION`), otro dibujo (el balcón) y otros textos del reloj.
-No se factorizó un módulo común porque la noche criolla ya es un recuerdo y no se toca; si
-llega una tercera invitación, ahí sí conviene.
+`#romeo-y-julieta` es la función de *Romeo y Julieta* de Éxodo Teatro (Teatro Municipal de
+Lima, viernes 06.11.2026, 20:00, platea fila 15). **No es una invitación más, a propósito:**
+la primera versión estaba calcada de la noche criolla y se rediseñó con Impeccable. La página
+es la boca del escenario: llega con un **telón cerrado** y ella lo abre arrastrando o con un
+toque; detrás está la escena (la foto de Passline). Debajo, la noche, las butacas, la puesta,
+la nota y cómo llegar, que se leen con el telón abierto o cerrado.
 
-- **El horario es `ROMEO_HORARIO` en `logica.js`**, y el reloj es el mismo `estadoNoche(ahora,
-  horario)` con 4 pruebas propias. Igual que allá: si cambia la hora, hay que tocar los dos.
+- **Todo el telón es una variable, `--abierto` (0 a 1), sobre `.rj-boca`.** `prepararTelon()`
+  la mueve con el dedo (sin transición) y al soltar la fija en 0 o 1 (con transición); pasado
+  `UMBRAL` (30%) abre. Cada paño se recoge con `scaleX` desde su borde exterior, así los
+  pliegues se comprimen como tela. El botón redondo es el camino de teclado y de lector de
+  pantalla (`aria-expanded`), y con el telón abierto pasa a ser "Cerrar el telón".
+- **El cartel (`.rj-cartel`) lleva `pointer-events:none`** y la boca `touch-action:pan-y`: el
+  arrastre horizontal tiene que llegar a la tela y el vertical seguir siendo scroll.
+- **El terciopelo son tres `repeating-linear-gradient`:** pliegues irregulares en un periodo
+  de 173px, una sombra de 67px que no coincide, y una capa inclinada (84° y 96°, una por paño)
+  que junta los pliegues arriba y los abre hacia el ruedo. Con uno solo, el detector de
+  Impeccable lo marcaba como "rayas decorativas" y el revisor lo veía como código de barras.
+- **Los amarres (`.rj-amarre`) miden con la misma `--abierto` que los paños**, así se ciñen a
+  la tela en todo el recorrido; la cuerda del tirador se desvanece al abrir.
+- **El horario es `ROMEO_HORARIO` en `logica.js`**, y el reloj es `estadoNoche(ahora, horario)`
+  con 4 pruebas propias. Si cambia la hora, hay que tocar `FUNCION` y la constante.
 - **`puertas` NO es la apertura de sala** (19:30): ninguna fuente la publica. Es la hora a la
-  que llegamos, porque el ticket dice que una vez iniciada la función no dejan entrar. Por eso
-  el programa dice "Llegamos con tiempo" y no "Abren las puertas". `fin` es 22:30: ~2 h
-  publicadas más 30 min de margen, el mismo criterio que la noche criolla.
-- **La foto es la imagen de la ficha de Passline** (cuadrada, 800×800) en
-  `assets/romeo-julieta/evento.jpg`. El recorte 16:10 va con `object-position` corrido hacia
-  arriba para no cortar las caras.
+  que llegamos, porque el ticket dice que una vez iniciada la función no dejan entrar. `fin` es
+  22:30: ~2 h publicadas más 30 min de margen.
+- **Las butacas se dibujan sueltas, sin plano de la sala:** no sabemos dónde caen el 1 y el 2
+  en la fila 15, y un plano lo afirmaría.
+- **Sin foto, la escena queda en el rosa oscuro del escenario** y el crédito se retira.
 - **La nota "Para ti" es un borrador escrito para que Oscar lo edite**, no una cita.
+- El contrato de diseño, los bocetos y las capturas de revisión viven en `.impeccable/`, que
+  no se publica. `PRODUCT.md` (raíz) es el registro de producto que Impeccable exige.
 
 ### El paper vive en `data/paper_cientifico/`
 
@@ -493,7 +507,7 @@ obras equivocadas y el `git diff` sería ilegible.
   lado esperando ese dato. Cada carga vuelve a preguntar.
 - **`styles.css` se pide con `?v=…` y hay que moverlo al cambiar el CSS.** GitHub Pages cachea
   agresivo y un layout nuevo servido con el CSS viejo se ve roto, no desactualizado. El valor
-  actual es `20261106-romeo`; la convención es fecha más una palabra de qué cambió.
+  actual es `20261106-telon`; la convención es fecha más una palabra de qué cambió.
 - **Las entradas reales están en `.gitignore` y no pueden entrar nunca.**
   `docs/bodas_figaro_entradas.pdf` y `docs/entrada_valeria.png` llevan DNI, número de compra y
   los QR de acceso. Este repo es público y cada push despliega: un commit descuidado las
@@ -574,7 +588,7 @@ Ahora es un **menú lateral** que vive en `index.html` (mismo motivo que la cabe
 de que cargue la cartelera). En el teléfono es un panel con velo que abre el botón de la
 cabecera; en escritorio es la primera columna del grid del `body` y se pliega a íconos
 (`teatro.menu.plegado` en localStorage). Lo gobierna `prepararMenu()` en `app.js`; el detalle
-visual está en `DESIGN.md`. Ver "Romeo y Julieta: la noche criolla con otro contenido".
+visual está en `DESIGN.md`. Ver "Romeo y Julieta: el telón".
 
 **El refresco del 01.11.2026 cubrió noviembre y diciembre**, y una segunda ronda de Joinnus el
 02.11 sumó las 60 fichas que la primera no alcanzó. Hoy los datos tienen 63 teatros, 164 obras,

@@ -22,3 +22,7 @@ docs/bodas_figaro_entradas.pdf
 docs/entrada_valeria.png
 data/entradas_estacion_barranco/
 data/entradas_romeo_julieta/
+
+# Impeccable: bocetos, capturas de revisión y contratos de diseño. Son
+# material de trabajo local, no se publican.
+.impeccable/

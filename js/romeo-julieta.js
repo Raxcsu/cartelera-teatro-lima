@@ -1,13 +1,15 @@
 /**
- * romeo-julieta.js — la invitación a Romeo y Julieta, viernes 06.11.2026.
+ * romeo-julieta.js — la función de Romeo y Julieta, viernes 06.11.2026.
  *
- * Es la hermana de noche-criolla.js y está calcada de ella a propósito: NO
- * pide la cartelera, todo lo editable vive en FUNCION, y todo lo que cambia
- * con la hora sale de UN dato, `estadoNoche(ahora, ROMEO_HORARIO)` en
- * logica.js, con sus pruebas. Acá solo se pinta.
+ * NO es una invitación más: la página es la boca del escenario. Llega con el
+ * telón cerrado y ella lo abre —arrastrando o con un toque—; los paños se
+ * recogen a los costados y detrás está la escena. Abajo, la noche, las
+ * butacas, la obra, la nota y cómo llegar, que se leen con el telón abierto
+ * o cerrado: nada útil queda escondido detrás del gesto.
  *
- * Reusa las clases `noche-*` de styles.css: es la misma composición. Lo que
- * cambia es el contenido, el dibujo del hero y los textos del reloj.
+ * Como noche-criolla.js, NO pide la cartelera, y todo lo que cambia con la
+ * hora sale de `estadoNoche(ahora, ROMEO_HORARIO)` en logica.js, con sus
+ * pruebas. Acá solo se pinta y se mueve la tela.
  *
  * Las entradas NO están en la página y nunca van a estar: llevan el QR de
  * acceso, el número de compra y un correo, y este repo es público. Viven en
@@ -24,23 +26,30 @@ import { ahoraLima } from './datos.js';
    ROMEO_HORARIO en logica.js: el reloj no lee este objeto.
 
    La apertura de sala no la publica nadie: por eso el programa dice
-   "Llegamos" a las 7:30 y no "Abren las puertas". */
+   "Llegamos" a las 7:30 y no "Abren las puertas". Y las butacas se dibujan
+   sueltas, sin plano de la sala: no sabemos dónde caen el 1 y el 2 en la
+   fila, así que no se inventa. */
 const FUNCION = {
   fecha: '2026-11-06',
-  kicker: '06.11.2026 · VIERNES',
-  titulo: 'Una noche en Verona',
-  bajada: ['Este viernes hay función en el Municipal,', 'y los dos asientos de la fila 15 son nuestros.'],
-  asientos: 'Fila 15',
-  entradas: 'Platea · asientos 1 y 2 · las entradas las llevo yo',
+  cuando: 'Viernes 6 · 8:00 p. m.',
+  fila: 'Fila 15',
+  zona: 'Platea',
+  asientos: ['1', '2'],
+  entradas: 'Las entradas las llevo yo.',
   lugar: { nombre: 'Teatro Municipal de Lima', direccion: 'Jr. Ica 377, Cercado de Lima' },
-  duracion: {
-    titulo: 'Unas dos horas',
-    nota: 'Empieza puntual a las 8:00 p. m. Una vez iniciada la función, no dejan entrar.',
-  },
+  duracion: 'Unas dos horas. Empieza puntual: una vez iniciada la función, no dejan entrar.',
   obra: {
     titulo: 'Romeo y Julieta',
-    produccion: 'Éxodo Teatro · dirección de Jean Pierre Gamarra',
-    elenco: 'Óscar Yépez y María Grazia Gamarra',
+    produccion: 'Éxodo Teatro, en coproducción con la Municipalidad de Lima',
+    direccion: 'Jean Pierre Gamarra',
+    reparto: [
+      ['Romeo', 'Óscar Yépez'],
+      ['Julieta', 'María Grazia Gamarra'],
+      ['Mercucio', 'Alonso Cano'],
+      ['Teobaldo', 'Fernando Luque'],
+      ['Cupido', 'Amaranta Kun'],
+      ['Paris', 'Sebastián Rubio'],
+    ],
     cita: '¿El amor es ciego? Romeo y Julieta es la trágica historia de dos jóvenes amantes de familias enemistadas, que se enamoran a primera vista…',
     fuente: 'Passline',
   },
@@ -72,97 +81,54 @@ const FUNCION = {
 
 // Cada cuánto se vuelve a mirar el reloj con la página abierta.
 const PULSO_MS = 30000;
+// Qué fracción del recorrido hay que arrastrar para que, al soltar, el
+// telón termine de abrirse solo. Menos que eso, vuelve a cerrarse.
+const UMBRAL = 0.3;
+// Un arrastre menor a esto, en px, es un toque.
+const TOQUE_PX = 6;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-const CORAZON = '<span class="corazon" aria-hidden="true"></span>';
-
-/* ── dibujos ─────────────────────────────────────────────────
-   El balcón de Verona en trazo, con la luna y dos flores del ramo. Cada
-   trazo lleva pathLength="1" para que el CSS lo dibuje una sola vez. */
-
-function flor(x, y, escala, clase) {
-  const petalos = [0, 72, 144, 216, 288]
-    .map((g) => `<ellipse class="${clase}" rx="5" ry="8" cy="-7" transform="rotate(${g})"/>`).join('');
-  return `<g class="noche-flor" transform="translate(${x} ${y}) scale(${escala})">${petalos}<circle class="noche-centro" r="3"/></g>`;
-}
-
-const BALAUSTRES = [96, 108, 120, 132, 144, 156]
-  .map((x) => `<path class="noche-trazo" pathLength="1" d="M${x} 94v16"/>`).join('');
-
-const ANCLA = `
-  <svg class="noche-ancla" viewBox="0 0 250 120" aria-hidden="true">
-    <path class="noche-suave" d="M101 86V48a25 25 0 0 1 50 0v38z"/>
-    <path class="noche-trazo" pathLength="1" d="M101 86V48a25 25 0 0 1 50 0v38"/>
-    <path class="noche-trazo" pathLength="1" d="M126 23v63M101 56h50"/>
-    <path class="noche-trazo" pathLength="1" d="M86 86h80v8H86z"/>
-    ${BALAUSTRES}
-    <path class="noche-trazo" pathLength="1" d="M84 110h84"/>
-    <path class="noche-trazo" pathLength="1" d="M208 18a12 12 0 1 0 10 19 10 10 0 0 1-10-19z"/>
-    ${flor(204, 76, 1, 'noche-petalo')}
-    ${flor(44, 40, 0.7, 'noche-petalo-2')}
-    <path class="noche-trazo noche-suelo" pathLength="1" d="M20 114c40-6 80-6 210 0"/>
+const BUTACA = `
+  <svg class="rj-butaca-dibujo" viewBox="0 0 48 48" aria-hidden="true">
+    <path d="M12 26V13a5 5 0 0 1 5-5h14a5 5 0 0 1 5 5v13"/>
+    <path d="M7 24h7v10h20V24h7v12a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3z"/>
+    <path d="M12 39v4M36 39v4"/>
   </svg>`;
-
-const ICONOS = {
-  butaca: '<path d="M6.5 11V6.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V11"/><path d="M4.5 11h15v5h-15zM6.5 16v3.5M17.5 16v3.5"/>',
-  lugar: '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
-  reloj: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
-};
-
-const icono = (nombre) => `<svg class="noche-icono" viewBox="0 0 24 24" aria-hidden="true">${ICONOS[nombre]}</svg>`;
 
 /* ── lo que depende de la hora ───────────────────────────────
    Cada pieza recibe el resultado de estadoNoche() y nada más. */
 
-// Sin aria-live, a propósito (DESIGN.md): un reloj que cambia cada 30 s
-// anunciaría cada minuto sin que nadie lo pida.
-function relojHtml(e) {
+// Una sola línea, en el cartel del telón. Sin aria-live, a propósito
+// (DESIGN.md): un reloj que cambia cada 30 s anunciaría cada minuto.
+function relojTexto(e) {
   if (!e) return '';
-  const caja = (clase, etiqueta, cifra, nota) => `
-    <div class="noche-reloj ${clase}">
-      <p class="noche-etiqueta">${etiqueta}</p>
-      <p class="noche-cifra">${cifra}</p>
-      <p class="noche-reloj-nota">${nota}</p>
-    </div>`;
   switch (e.estado) {
     case 'dias':
-      return caja('texto', 'Para nuestra función',
-        e.dias === 1 ? 'Falta 1 día' : `Faltan ${e.dias} días`, 'Viernes 6 a las 8:00 p. m.');
-    case 'antes': {
+      return e.dias === 1 ? 'Falta un día' : `Faltan ${e.dias} días`;
+    case 'antes':
       // Con menos de una hora, solo minutos: nunca "0 h 25 min".
-      const cifra = e.horas > 0
-        ? `${e.horas}<small>h</small>${e.minutos}<small>min</small>`
-        : `${e.minutos}<small>min</small>`;
-      return caja('', 'Para que se abra el telón', cifra, 'Llegamos a las 7:30 p. m.: no dejan entrar tarde.');
-    }
+      return e.horas > 0
+        ? `Faltan ${e.horas} h ${e.minutos} min para el telón`
+        : `Faltan ${e.minutos} min para el telón`;
     case 'puertas':
-      return caja('texto', 'Ya estamos aquí', esc(FUNCION.asientos), 'El telón se abre a las 8:00 p. m.');
+      return 'Ya estamos aquí: el telón se abre a las 8:00';
     case 'durante':
-      return caja('texto', 'Ahora mismo', 'En escena', 'Fin estimado: alrededor de las 10:00 p. m.');
+      return 'En escena ahora mismo';
     default:
-      return caja('recuerdo', esc(FUNCION.kicker.slice(0, 10)), 'Fue nuestra noche en Verona', 'Ya es un recuerdo.');
+      return 'Fue nuestra noche en Verona';
   }
 }
 
 const esRecuerdo = (e) => e?.estado === 'despues';
 
-// La línea útil vive en la primera pantalla mientras sirve para llegar.
-function utilHtml(e) {
-  if (esRecuerdo(e)) return '';
-  return `
-    <p class="noche-util-linea"><b>${esc(FUNCION.asientos)}</b> · ${esc(FUNCION.lugar.nombre)}</p>
-    <a class="btn primario noche-ruta" href="${esc(FUNCION.urls.ruta)}" target="_blank" rel="noopener">Cómo llegar</a>`;
-}
-
 function programaHtml(e) {
   const pasado = esRecuerdo(e);
   return FUNCION.programa.map((p) => `
     <li class="${p.marca && e?.estado === p.marca ? 'clave' : ''}">
-      <span class="noche-hora">${esc(p.hora)}<small>${esc(p.sub)}</small></span>
-      <span class="noche-punto" aria-hidden="true"></span>
-      <span class="noche-que">${esc(pasado ? p.pasado : p.presente)}</span>
+      <span class="rj-hora">${esc(p.hora)}<small>${esc(p.sub)}</small></span>
+      <span class="rj-que">${esc(pasado ? p.pasado : p.presente)}</span>
     </li>`).join('');
 }
 
@@ -178,14 +144,14 @@ function notaHtml() {
   const { titulo, texto, firma } = FUNCION.nota;
   if (!texto) return '';
   return `
-    <section class="noche-nota" aria-labelledby="romeo-nota-titulo">
-      <h3 id="romeo-nota-titulo">${esc(titulo)}</h3>
+    <section class="rj-nota" aria-labelledby="rj-nota-titulo">
+      <h3 id="rj-nota-titulo">${esc(titulo)}</h3>
       ${String(texto).split(/\n{2,}/).map((p) => `<p>${esc(p)}</p>`).join('')}
-      <p class="noche-firma">${esc(firma)} ${CORAZON}</p>
+      <p class="rj-firma">${esc(firma)}</p>
     </section>`;
 }
 
-/* ── lo vivo: el reloj ───────────────────────────────────────── */
+/* ── lo vivo: el reloj y el telón ─────────────────────────────── */
 
 let vivo = null;
 
@@ -196,17 +162,93 @@ function aplicar(app, e) {
   if (vivo && vivo.clave === clave) return;
   if (vivo) vivo.clave = clave;
   const piezas = {
-    '[data-noche="reloj"]': relojHtml(e),
-    '[data-noche="util"]': utilHtml(e),
-    '[data-noche="programa"]': programaHtml(e),
-    '[data-noche="acciones"]': accionesHtml(e),
+    '[data-rj="reloj"]': esc(relojTexto(e)),
+    '[data-rj="programa"]': programaHtml(e),
+    '[data-rj="acciones"]': accionesHtml(e),
   };
   for (const [sel, html] of Object.entries(piezas)) {
     const nodo = app.querySelector(sel);
     if (nodo) nodo.innerHTML = html;
   }
-  const util = app.querySelector('[data-noche="util"]');
-  if (util) util.hidden = esRecuerdo(e);
+}
+
+/**
+ * El telón es una sola variable, `--abierto` (0 cerrado, 1 abierto), sobre
+ * la boca. El CSS hace el resto: cada paño se recoge con scaleX desde su
+ * borde exterior, así los pliegues se comprimen como en una tela de verdad
+ * en vez de deslizarse enteros fuera de cuadro.
+ *
+ * Arrastrar mueve la variable sin transición (la tela va con el dedo);
+ * soltar o tocar la lleva a 0 o a 1 con la transición del CSS. El botón es
+ * el camino de teclado y del lector de pantalla, con aria-expanded.
+ */
+function prepararTelon(boca) {
+  const tirador = boca.querySelector('.rj-tirador');
+  const etiqueta = tirador.querySelector('.rj-tirador-texto');
+  let abierto = false;
+  let arrastre = null;
+
+  const fijar = (valor) => boca.style.setProperty('--abierto', String(valor));
+
+  const decidir = (abrir) => {
+    abierto = abrir;
+    boca.classList.remove('arrastrando');
+    boca.classList.toggle('abierto', abrir);
+    fijar(abrir ? 1 : 0);
+    tirador.setAttribute('aria-expanded', String(abrir));
+    etiqueta.textContent = abrir ? 'Cerrar el telón' : 'Abrir el telón';
+  };
+
+  tirador.addEventListener('click', (ev) => {
+    // Un arrastre que empezó en el tirador ya decidió en pointerup.
+    if (arrastre?.movio) return;
+    ev.preventDefault();
+    decidir(!abierto);
+  });
+
+  // El gesto vive en la tela, no en toda la boca: con el telón abierto la
+  // escena tiene que dejar seleccionar y hacer scroll sin abrir nada.
+  const alBajar = (ev) => {
+    if (abierto || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
+    arrastre = { x: ev.clientX, ancho: boca.clientWidth || 1, id: ev.pointerId, movio: false };
+  };
+  const alMover = (ev) => {
+    if (!arrastre || ev.pointerId !== arrastre.id) return;
+    const dx = Math.abs(ev.clientX - arrastre.x);
+    if (!arrastre.movio && dx < TOQUE_PX) return;
+    if (!arrastre.movio) {
+      arrastre.movio = true;
+      boca.classList.add('arrastrando');
+      // Lanza si el puntero ya no existe (se levantó en el mismo cuadro):
+      // sin captura el arrastre sigue funcionando dentro de la boca.
+      try { boca.setPointerCapture(ev.pointerId); } catch { /* sin captura */ }
+    }
+    // Abrir desde el centro: medio ancho de recorrido es el telón entero.
+    fijar(Math.min(1, dx / (arrastre.ancho * 0.5)));
+  };
+  const alSoltar = (ev) => {
+    if (!arrastre || ev.pointerId !== arrastre.id) return;
+    const { movio } = arrastre;
+    const avance = parseFloat(boca.style.getPropertyValue('--abierto')) || 0;
+    if (movio) decidir(avance >= UMBRAL);
+    else if (!ev.target.closest('.rj-tirador')) decidir(true);
+    // El click del tirador llega después del pointerup: que vea `movio`.
+    setTimeout(() => { arrastre = null; }, 0);
+  };
+  const alCancelar = () => {
+    if (!arrastre) return;
+    arrastre = null;
+    decidir(false);
+  };
+
+  for (const pano of boca.querySelectorAll('.rj-pano, .rj-tirador')) {
+    pano.addEventListener('pointerdown', alBajar);
+  }
+  boca.addEventListener('pointermove', alMover);
+  boca.addEventListener('pointerup', alSoltar);
+  boca.addEventListener('pointercancel', alCancelar);
+
+  decidir(false);
 }
 
 /**
@@ -217,59 +259,86 @@ function aplicar(app, e) {
 export function pintarRomeoJulieta(app, ahora) {
   desmontar();
   const reloj = ahora ? () => ahora : ahoraLima;
-  const { obra, foto, lugar, duracion } = FUNCION;
+  const { obra, foto, lugar } = FUNCION;
   const estado = () => estadoNoche(reloj(), ROMEO_HORARIO);
 
   app.className = 'app romeo-julieta';
   app.innerHTML = `
-    <article class="noche-articulo" aria-labelledby="romeo-julieta-titulo">
-      <header class="noche-hero">
-        <p class="noche-kicker"><time datetime="${FUNCION.fecha}T20:00">${esc(FUNCION.kicker)}</time></p>
-        <h2 id="romeo-julieta-titulo" tabindex="-1">${esc(FUNCION.titulo)} ${CORAZON}</h2>
-        <p class="noche-bajada">${FUNCION.bajada.map(esc).join('<br>')}</p>
-        ${ANCLA}
-        <div data-noche="reloj"></div>
-        <div class="noche-util" data-noche="util"></div>
-      </header>
-
-      <section class="noche-obra" aria-labelledby="romeo-obra-titulo">
-        <p class="noche-etiqueta">Lo que vamos a ver</p>
-        <figure class="noche-foto">
+    <article class="rj" aria-labelledby="romeo-julieta-titulo">
+      <section class="rj-boca">
+        <div class="rj-escena" id="rj-escena">
           <img src="${esc(foto.archivo)}" width="800" height="800" decoding="async" alt="${esc(foto.alt)}">
-          <figcaption>${esc(foto.credito)}</figcaption>
-        </figure>
-        <h3 id="romeo-obra-titulo">${esc(obra.titulo)}</h3>
-        <p class="noche-elenco">${esc(obra.elenco)}</p>
-        <p class="noche-produccion">${esc(obra.produccion)}</p>
-        <blockquote>"${esc(obra.cita)}"<cite>${esc(obra.fuente)}</cite></blockquote>
+          <p class="rj-credito">${esc(foto.credito)}</p>
+        </div>
+        <div class="rj-pano rj-pano-izq" aria-hidden="true"></div>
+        <div class="rj-pano rj-pano-der" aria-hidden="true"></div>
+        <div class="rj-amarre rj-amarre-izq" aria-hidden="true"></div>
+        <div class="rj-amarre rj-amarre-der" aria-hidden="true"></div>
+        <div class="rj-cuerda" aria-hidden="true"></div>
+        <div class="rj-bambalina" aria-hidden="true"></div>
+
+        <button class="rj-tirador" type="button" aria-controls="rj-escena" aria-expanded="false">
+          <span class="rj-tirador-marca" aria-hidden="true"></span>
+          <span class="rj-tirador-texto">Abrir el telón</span>
+        </button>
+        <p class="rj-pista" aria-hidden="true">Desliza o toca para abrir el telón</p>
+
+        <div class="rj-cartel">
+          <h2 id="romeo-julieta-titulo" tabindex="-1">${esc(obra.titulo)}</h2>
+          <p class="rj-cuando"><time datetime="${FUNCION.fecha}T20:00">${esc(FUNCION.cuando)}</time> · ${esc(FUNCION.fila)}</p>
+          <p class="rj-teatro">${esc(lugar.nombre)}</p>
+          <p class="rj-reloj" data-rj="reloj"></p>
+        </div>
       </section>
 
-      <section aria-labelledby="romeo-programa-titulo">
-        <h3 id="romeo-programa-titulo" class="noche-titulo-seccion">El programa</h3>
-        <ol class="noche-programa" data-noche="programa"></ol>
-      </section>
+      <div class="rj-cuerpo">
+        <section class="rj-noche" aria-labelledby="rj-noche-titulo">
+          <h3 id="rj-noche-titulo">Esa noche</h3>
+          <ol class="rj-programa" data-rj="programa"></ol>
+        </section>
 
-      <section aria-labelledby="romeo-saber-titulo">
-        <h3 id="romeo-saber-titulo" class="noche-titulo-seccion">Lo que hay que saber</h3>
-        <ul class="noche-datos">
-          <li class="noche-mesa">${icono('butaca')}<div><b>${esc(FUNCION.asientos)}</b><span>${esc(FUNCION.entradas)}</span></div></li>
-          <li>${icono('lugar')}<div><b>${esc(lugar.nombre)}</b><span>${esc(lugar.direccion)}</span></div></li>
-          <li>${icono('reloj')}<div><b>${esc(duracion.titulo)}</b><span>${esc(duracion.nota)}</span></div></li>
-        </ul>
-        <div class="noche-acciones" data-noche="acciones"></div>
-      </section>
+        <section class="rj-butacas" aria-labelledby="rj-butacas-titulo">
+          <h3 id="rj-butacas-titulo">${esc(FUNCION.zona)}, ${esc(FUNCION.fila.toLowerCase())}</h3>
+          <ul class="rj-asientos">
+            ${FUNCION.asientos.map((n) => `<li>${BUTACA}<span>Asiento ${esc(n)}</span></li>`).join('')}
+          </ul>
+          <p class="rj-entradas">${esc(FUNCION.entradas)}</p>
+        </section>
 
-      ${notaHtml()}
+        <section class="rj-obra" aria-labelledby="rj-obra-titulo">
+          <h3 id="rj-obra-titulo">La puesta</h3>
+          <p class="rj-produccion">${esc(obra.produccion)}. Dirige ${esc(obra.direccion)}.</p>
+          <dl class="rj-reparto">
+            ${obra.reparto.map(([papel, nombre]) => `<div><dt>${esc(papel)}</dt><dd>${esc(nombre)}</dd></div>`).join('')}
+          </dl>
+          <blockquote>${esc(obra.cita)}<cite>${esc(obra.fuente)}</cite></blockquote>
+        </section>
+
+        ${notaHtml()}
+
+        <section class="rj-llegar" aria-labelledby="rj-llegar-titulo">
+          <h3 id="rj-llegar-titulo">${esc(lugar.nombre)}</h3>
+          <p>${esc(lugar.direccion)}</p>
+          <p>${esc(FUNCION.duracion)}</p>
+          <div class="rj-acciones" data-rj="acciones"></div>
+        </section>
+      </div>
     </article>`;
 
-  // Sin foto no queda ni el marco ni el crédito. `complete` cubre un fallo
-  // ya resuelto en caché.
-  const img = app.querySelector('.noche-foto img');
+  // Sin foto, la escena queda en el rosa oscuro del fondo del escenario y
+  // sin crédito: el telón se sigue abriendo sobre algo, no sobre un ícono
+  // de imagen rota. `complete` cubre un fallo ya resuelto en caché.
+  const img = app.querySelector('.rj-escena img');
   if (img) {
-    const quitar = () => img.closest('figure')?.remove();
+    const quitar = () => {
+      img.remove();
+      app.querySelector('.rj-credito')?.remove();
+    };
     if (img.complete && !img.naturalWidth) quitar();
     else img.addEventListener('error', quitar, { once: true });
   }
+
+  prepararTelon(app.querySelector('.rj-boca'));
 
   vivo = { clave: null, pulso: 0 };
   aplicar(app, estado());

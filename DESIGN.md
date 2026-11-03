@@ -237,6 +237,18 @@ presupuesto vertical. Una columna no tiene ese techo.
   lo muestra al ratón. La elección se recuerda por navegador. Como la columna es fija, **las
   vistas scrollean dentro de `.app`** y no en el documento: si no, el menú se iría con la página.
 
+**Romeo y Julieta es un telón, no una tarjeta.** La primera pantalla es la boca del escenario
+a todo el alto: bambalina arriba con ribete `--flor-1`, dos paños de terciopelo hechos con la
+familia del acento (`--flor-4`, `--accent`, `--flor-2`) y sombra de `--ink` con alfa, un
+tirador redondo de 64px al centro y, abajo, el cartel con "Romeo y Julieta" en serif hasta
+104px, el día, el teatro y una píldora con el reloj. Abierto, los paños quedan recogidos a los
+costados enmarcando la foto, y un degradado de `--ink` desde abajo sostiene la lectura del
+cartel sobre una foto casi blanca. **No hay rótulo encima del título** (regla de Impeccable):
+la fecha va debajo. Debajo del telón la página vuelve al papel claro y a la tipografía de
+siempre, en una columna en el teléfono y en dos en escritorio. El único movimiento es el del
+telón (y el respirar de los chevrones mientras está cerrado), todo dentro de
+`prefers-reduced-motion: no-preference`; con el movimiento apagado se abre de golpe.
+
 **La escala astronómica** es una lectura, así que compone como una lectura: una cifra por
 bloque en `<dl>`, el kicker de sección en 10px con `letter-spacing`, y la fórmula en serif
 grande (`clamp(44px,7vw,58px)`) porque es el remate visual del argumento. En escritorio se

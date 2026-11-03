@@ -35,6 +35,192 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .corazon::before{top:-4.5px;left:0}
 .corazon::after{top:0;right:-4.5px}
 
+/* ── romeo y julieta: el telón ─────────────────────────────
+   No es otra invitación: la página es la boca del escenario. Un telón
+   cerrado que ella abre, y detrás la escena. Todo el movimiento sale de
+   UNA variable, --abierto (0 a 1), que js/romeo-julieta.js mueve con el
+   dedo o fija al soltar. Cada paño se recoge con scaleX desde su borde
+   exterior: los pliegues se comprimen como tela, no se deslizan enteros.
+
+   Los colores son los de la paleta: el terciopelo es --flor-4, --accent y
+   --flor-2 en pliegues, el ribete es --flor-1, la sombra es --ink con
+   alfa. El escenario detrás de la foto es --ink, que solo se ve si la foto
+   no carga: el telón se abre sobre algo, no sobre un ícono roto. */
+.app.romeo-julieta{--papel:#fffdf8;max-width:none;padding:0 0 64px;overflow-x:clip}
+.app.romeo-julieta ::selection{background:#e3b9c1;color:#3a2a2e}
+
+.rj-boca{--abierto:0;position:relative;overflow:hidden;isolation:isolate;
+  height:clamp(540px,calc(100svh - 96px),860px);background:#3a2a2e;
+  touch-action:pan-y;-webkit-user-select:none;user-select:none}
+
+.rj-escena{position:absolute;inset:0;z-index:0;
+  background:radial-gradient(120% 80% at 50% 30%,#854052,#3a2a2e 70%)}
+.rj-escena img{display:block;width:100%;height:100%;object-fit:cover;object-position:44% 30%;
+  transform:scale(calc(1.08 - .08 * var(--abierto)))}
+/* Lo que sostiene la lectura del cartel sobre una foto casi blanca. */
+.rj-escena::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(58,42,46,.86) 0,rgba(58,42,46,.5) 30%,rgba(58,42,46,0) 56%)}
+.rj-credito{position:absolute;z-index:1;right:calc(8% + 8px);bottom:10px;font-size:11px;color:#f7e9ea;
+  opacity:var(--abierto)}
+
+.rj-pano{position:absolute;z-index:1;top:0;bottom:0;width:50.5%;
+  transform:scaleX(calc(1 - .86 * var(--abierto)));
+  /* Pliegues de ancho distinto en un periodo largo (173px), y encima una
+     sombra de otro periodo (67px) que no coincide: el paño cae irregular,
+     como tela, y no como una franja repetida. Los tonos intermedios son
+     mezclas de --flor-4, --accent y --flor-2, sin color nuevo. */
+  background:
+    repeating-linear-gradient(90deg,rgba(58,42,46,0) 0,rgba(58,42,46,.2) 29px,rgba(58,42,46,0) 67px),
+    repeating-linear-gradient(90deg,#854052 0,#a35267 14px,#b8687c 21px,#a35267 30px,#854052 44px,
+      #7a3a4b 50px,#9a4c60 63px,#b0637a 70px,#93485c 84px,#854052 101px,#a35267 118px,
+      #bb6c80 124px,#a35267 133px,#7a3a4b 152px,#8e4458 163px,#854052 173px)}
+.rj-pano::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(58,42,46,.38),rgba(58,42,46,0) 26%,rgba(58,42,46,0) 72%,rgba(58,42,46,.32))}
+/* El ruedo: una franja más oscura con el ribete encima. */
+.rj-pano::after{content:'';position:absolute;left:0;right:0;bottom:0;height:16px;
+  background:#854052;border-top:2px solid #e3b9c1}
+/* El abanico: una sombra más de pliegues, inclinada, que hace que la tela
+   se junte arriba bajo la bambalina y se abra hacia el ruedo. Cada paño se
+   inclina hacia el centro de la boca. */
+.rj-pano-izq,.rj-pano-der{background-blend-mode:multiply,normal,normal}
+.rj-pano-izq{background-image:
+    repeating-linear-gradient(84deg,rgba(58,42,46,0) 0,rgba(58,42,46,.16) 23px,rgba(58,42,46,0) 52px),
+    repeating-linear-gradient(90deg,rgba(58,42,46,0) 0,rgba(58,42,46,.2) 29px,rgba(58,42,46,0) 67px),
+    repeating-linear-gradient(90deg,#854052 0,#a35267 14px,#b8687c 21px,#a35267 30px,#854052 44px,
+      #7a3a4b 50px,#9a4c60 63px,#b0637a 70px,#93485c 84px,#854052 101px,#a35267 118px,
+      #bb6c80 124px,#a35267 133px,#7a3a4b 152px,#8e4458 163px,#854052 173px)}
+.rj-pano-der{background-image:
+    repeating-linear-gradient(96deg,rgba(58,42,46,0) 0,rgba(58,42,46,.16) 23px,rgba(58,42,46,0) 52px),
+    repeating-linear-gradient(90deg,rgba(58,42,46,0) 0,rgba(58,42,46,.2) 29px,rgba(58,42,46,0) 67px),
+    repeating-linear-gradient(90deg,#854052 0,#a35267 14px,#b8687c 21px,#a35267 30px,#854052 44px,
+      #7a3a4b 50px,#9a4c60 63px,#b0637a 70px,#93485c 84px,#854052 101px,#a35267 118px,
+      #bb6c80 124px,#a35267 133px,#7a3a4b 152px,#8e4458 163px,#854052 173px)}
+.rj-pano-izq{left:0;transform-origin:left center;
+  box-shadow:inset -30px 0 32px -20px rgba(58,42,46,.75),inset -2px 0 0 rgba(58,42,46,.5)}
+.rj-pano-der{right:0;transform-origin:right center;
+  box-shadow:inset 30px 0 32px -20px rgba(58,42,46,.75),inset 2px 0 0 rgba(58,42,46,.5)}
+/* Los amarres: la cinta que recoge cada paño abierto. Su ancho sigue al del
+   paño con la misma variable, así se ciñe a la tela en todo el recorrido. */
+.rj-amarre{position:absolute;z-index:1;top:57%;height:9px;border-radius:5px;
+  width:calc(50.5% * (1 - .86 * var(--abierto)) + 8px);opacity:var(--abierto);
+  background:#e3b9c1;box-shadow:0 3px 7px -1px rgba(58,42,46,.45)}
+.rj-amarre::before,.rj-amarre::after{content:'';position:absolute;left:0;right:0;height:46px;pointer-events:none}
+.rj-amarre::before{bottom:100%;
+  background:radial-gradient(60% 100% at 50% 100%,rgba(58,42,46,.42),rgba(58,42,46,0) 72%)}
+.rj-amarre::after{top:100%;
+  background:radial-gradient(60% 100% at 50% 0,rgba(58,42,46,.42),rgba(58,42,46,0) 72%)}
+.rj-amarre-izq{left:-4px}
+.rj-amarre-der{right:-4px}
+/* La cuerda de la que cuelga el tirador mientras el telón está cerrado. */
+.rj-cuerda{position:absolute;z-index:1;left:50%;top:0;width:2px;height:40%;margin-left:-1px;
+  background:#e3b9c1;box-shadow:1px 0 2px rgba(58,42,46,.35);opacity:calc(1 - 3 * var(--abierto))}
+/* Las candilejas: luz que sube desde el borde del escenario, sobre la tela
+   y la escena por igual. Es lo que le da volumen al terciopelo. */
+.rj-boca::after{content:'';position:absolute;z-index:2;inset:0;pointer-events:none;
+  background:radial-gradient(70% 45% at 50% 104%,rgba(247,233,234,.22),rgba(247,233,234,0) 70%),
+    radial-gradient(60% 40% at 50% -6%,rgba(58,42,46,.35),rgba(58,42,46,0) 70%)}
+
+.rj-bambalina{position:absolute;z-index:2;top:0;left:0;right:0;height:52px;
+  background:repeating-linear-gradient(90deg,#854052 0,#a35267 9px,#b8687c 13px,#a35267 18px,#854052 27px,#93485c 33px,#854052 39px)}
+/* El festón: medias lunas colgando con su ribete, que es lo que hace de una
+   franja una bambalina. */
+.rj-bambalina::after{content:'';position:absolute;left:0;right:0;top:100%;height:16px;
+  background:radial-gradient(circle at 50% 0,#a35267 0 10px,#e3b9c1 10px 12px,rgba(227,185,193,0) 12.5px) 0 0/32px 16px repeat-x;
+  filter:drop-shadow(0 5px 5px rgba(58,42,46,.4))}
+
+.rj-tirador{position:absolute;z-index:4;left:50%;top:40%;width:64px;height:64px;
+  transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;
+  background:#fdf8f7;border:1.5px solid #e3b9c1;color:#a35267;cursor:grab;
+  box-shadow:0 12px 28px -8px rgba(58,42,46,.6);font:600 11px var(--sans);
+  letter-spacing:.12em;text-transform:uppercase}
+.rj-tirador:hover{background:#f7e9ea}
+.rj-tirador::before{content:'';position:absolute;top:-10px;left:50%;width:10px;height:12px;margin-left:-5px;
+  border-radius:3px;background:#e3b9c1}
+.rj-boca.abierto .rj-tirador::before{display:none}
+.rj-tirador:focus-visible{outline:2px solid #fdf8f7;outline-offset:4px}
+/* Dos chevrones hacia afuera: el gesto es separar desde el centro. */
+.rj-tirador-marca{position:relative;width:26px;height:12px}
+.rj-tirador-marca::before,.rj-tirador-marca::after{content:'';position:absolute;top:2px;width:8px;height:8px;
+  border:solid currentColor;border-width:0 0 1.5px 1.5px}
+.rj-tirador-marca::before{left:1px;transform:rotate(45deg)}
+.rj-tirador-marca::after{right:1px;transform:rotate(-135deg)}
+.rj-tirador-texto{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.rj-boca.abierto .rj-tirador{top:76px;width:auto;height:var(--tap);padding:0 18px;border-radius:22px;
+  transform:translate(-50%,0);cursor:pointer;background:rgba(253,248,247,.92)}
+.rj-boca.abierto .rj-tirador-marca{display:none}
+.rj-boca.abierto .rj-tirador-texto{position:static;width:auto;height:auto;clip-path:none}
+
+.rj-pista{position:absolute;z-index:3;left:50%;top:calc(40% + 50px);transform:translateX(-50%);
+  width:max-content;max-width:calc(100% - 32px);padding:7px 13px;border-radius:999px;text-align:center;
+  background:rgba(58,42,46,.5);font:600 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;
+  color:#fdf8f7;opacity:calc(1 - 3 * var(--abierto));pointer-events:none}
+
+/* El cartel no recibe el dedo: el arrastre tiene que llegar a la tela. */
+.rj-cartel{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:0 24px 40px;
+  text-align:center;color:#fdf8f7;pointer-events:none}
+.rj-cartel h2{font:400 clamp(46px,13vw,104px)/.95 var(--serif);letter-spacing:-.035em;
+  text-wrap:balance;text-shadow:0 2px 18px rgba(58,42,46,.45)}
+.rj-cartel h2:focus{outline:none}
+.rj-cuando{margin-top:14px;font:400 20px/1.3 var(--serif);text-shadow:0 1px 10px rgba(58,42,46,.75)}
+.rj-teatro{margin-top:4px;font:600 14px/1.4 var(--sans);color:#fdf8f7;text-shadow:0 1px 10px rgba(58,42,46,.8)}
+.rj-reloj{display:inline-block;margin-top:16px;padding:7px 13px;border-radius:999px;
+  background:#f7e9ea;color:#3a2a2e;font:600 11px/1.3 var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.rj-reloj:empty{display:none}
+
+@media (prefers-reduced-motion:no-preference){
+  .rj-pano{transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+  .rj-escena img{transition:transform 1.6s cubic-bezier(.16,1,.3,1)}
+  .rj-credito,.rj-pista,.rj-cuerda{transition:opacity .4s ease}
+  .rj-amarre{transition:width 1.1s cubic-bezier(.16,1,.3,1),opacity .6s ease .3s}
+  .rj-tirador{transition:top .5s cubic-bezier(.16,1,.3,1),background .15s ease}
+  .rj-boca.arrastrando .rj-pano,.rj-boca.arrastrando .rj-escena img,
+  .rj-boca.arrastrando .rj-amarre{transition:none}
+  /* La invitación a tocar: los chevrones respiran mientras está cerrado. */
+  .rj-boca:not(.abierto) .rj-tirador-marca{animation:rj-respira 2.4s ease-in-out infinite}
+}
+@keyframes rj-respira{50%{transform:scaleX(1.25)}}
+.rj-boca.arrastrando .rj-tirador{cursor:grabbing}
+
+/* debajo del telón */
+.rj-cuerpo{max-width:560px;margin:0 auto;padding:52px 22px 0;display:flex;flex-direction:column;gap:60px}
+.rj-cuerpo h3{font:400 clamp(26px,7vw,32px)/1.1 var(--serif);letter-spacing:-.02em;color:var(--ink);margin-bottom:18px}
+.rj-programa{list-style:none}
+.rj-programa li{display:grid;grid-template-columns:76px 1fr;align-items:baseline;gap:12px;
+  padding:14px 0;border-top:1px solid var(--line)}
+.rj-programa li:last-child{border-bottom:1px solid var(--line)}
+.rj-hora{font:400 24px/1 var(--serif);color:var(--ink)}
+.rj-hora small{display:block;margin-top:4px;font:400 11px var(--sans);color:var(--ink3)}
+.rj-que{font-size:14.5px;color:var(--ink2)}
+.rj-programa li.clave .rj-hora,.rj-programa li.clave .rj-que{color:var(--accent)}
+.rj-programa li.clave .rj-que{font-weight:600}
+
+.rj-asientos{list-style:none;display:flex;gap:22px}
+.rj-asientos li{display:flex;flex-direction:column;align-items:center;gap:8px}
+.rj-butaca-dibujo{width:76px;height:76px;fill:var(--accent-bg);stroke:var(--accent);
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.rj-asientos span{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.rj-entradas{margin-top:16px;font-size:14px;color:var(--ink2)}
+
+.rj-produccion{font-size:14.5px;line-height:1.6;color:var(--ink2)}
+.rj-reparto{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;margin-top:18px}
+.rj-reparto div{padding:11px 0;border-top:1px solid var(--line)}
+.rj-reparto dt{font:600 11px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+.rj-reparto dd{margin-top:3px;font:400 17px/1.25 var(--serif);color:var(--ink)}
+.rj-obra blockquote{max-width:62ch;margin-top:22px;font-size:14.5px;line-height:1.65;font-style:italic;color:var(--ink2)}
+.rj-obra cite{display:block;margin-top:8px;font:600 11px var(--sans);font-style:normal;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+
+.rj-nota{padding:26px 24px 22px;background:var(--papel);border:1px solid var(--line);border-radius:4px;
+  transform:rotate(-.6deg);box-shadow:0 14px 30px -12px rgba(58,42,46,.16)}
+.rj-nota h3{font-size:25px;margin-bottom:6px}
+.rj-nota p{margin-top:10px;font-size:14.5px;line-height:1.7;color:var(--ink2)}
+.rj-nota .rj-firma{margin-top:16px;text-align:right;font:400 18px var(--serif);color:var(--accent)}
+
+.rj-llegar p{font-size:14px;line-height:1.6;color:var(--ink2)}
+.rj-llegar p+p{margin-top:6px}
+.rj-acciones{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px;margin-top:20px}
+@media (max-width:359px){.rj-acciones{grid-template-columns:1fr}}
+
 /* ── el menú ───────────────────────────────────────────────
    Con siete destinos la barra de pestañas dejó de ser una barra: scrolleaba
    escondiendo más de la mitad, y los degradados que lo avisaban no
@@ -699,17 +885,16 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
    como el primer mes; --papel es el mismo valor que allá. El reloj NO va en
    tarjeta: es parte del hero, y la cifra en serif ya tiene peso de sobra.
    560px como .app.pregunta: a 720 el texto centrado queda con líneas largas. */
-.app.noche-criolla,
-.app.romeo-julieta{--papel:#fffdf8;
+.app.noche-criolla{--papel:#fffdf8;
   max-width:560px;padding:18px 20px 44px;overflow-x:clip}
 .noche-articulo{display:flex;flex-direction:column;gap:52px}
 .noche-articulo .corazon{display:inline-block;vertical-align:middle}
 
 .noche-hero{text-align:center;padding-top:22px}
 .noche-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.24em;color:var(--ink3)}
-.noche-criolla h2,.romeo-julieta h2{margin-top:12px;font-family:var(--serif);font-weight:400;
+.noche-criolla h2{margin-top:12px;font-family:var(--serif);font-weight:400;
   font-size:clamp(34px,10vw,46px);line-height:1.04;letter-spacing:-.035em;color:var(--ink)}
-.noche-criolla h2 .corazon,.romeo-julieta h2 .corazon{transform:rotate(-45deg) scale(1.35);margin:0 0 6px 10px}
+.noche-criolla h2 .corazon{transform:rotate(-45deg) scale(1.35);margin:0 0 6px 10px}
 .noche-bajada{margin-top:14px;font-size:14.5px;line-height:1.62;color:var(--ink2)}
 
 /* el dibujo: guitarra y cajón. Se traza UNA vez al entrar; es el único
@@ -760,9 +945,6 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 .noche-obra h3{margin-top:14px;font:400 30px/1.1 var(--serif);letter-spacing:-.02em;color:var(--ink)}
 .noche-elenco{margin-top:8px;font-size:13.5px;color:var(--ink)}
 .noche-produccion{margin-top:4px;font-size:12.5px;color:var(--ink2)}
-/* La imagen de Passline es cuadrada y las caras viven en la mitad de
-   arriba: el recorte 16:10 se corre hacia arriba para no cortarlas. */
-.romeo-julieta .noche-foto img{object-position:50% 22%}
 .noche-obra blockquote{margin:16px auto 0;max-width:30ch;font-size:13.5px;line-height:1.6;
   color:var(--ink2);font-style:italic}
 .noche-obra cite{display:block;margin-top:6px;font:600 10px/1.4 var(--sans);letter-spacing:.11em;
@@ -1096,8 +1278,24 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   /* Las dos invitaciones scrollean en .app, que mide todo el ancho: con el
      max-width de 560px la barra de scroll quedaba pegada a la columna, en
      medio de la pantalla. La columna de lectura se hace con el padding. */
-  .app.noche-criolla,.app.romeo-julieta{max-width:none;
+  .app.noche-criolla{max-width:none;
     padding:6px max(28px,calc(50% - 280px)) 44px}
+
+  /* El telón: la boca del escenario como un marco acotado, con las esquinas
+     de arriba redondeadas, y debajo dos columnas en vez de una fila larga. */
+  .app.romeo-julieta{padding:14px clamp(24px,3vw,42px) 64px}
+  .rj-boca{max-width:1180px;margin:0 auto;border-radius:18px 18px 0 0;
+    height:clamp(520px,calc(100dvh - 116px),900px)}
+  .rj-escena img{object-position:50% 28%}
+  .rj-cuerpo{max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-top:64px;
+    align-items:start}
+  /* El título de la llegada a la altura del de la nota, que va dentro del papel. */
+  .rj-llegar{padding-top:27px}
+  .rj-butacas{align-self:stretch;display:flex;flex-direction:column}
+  .rj-butaca-dibujo{width:104px;height:104px}
+  .rj-asientos{gap:30px;margin-top:8px}
+  .rj-entradas{margin-top:auto;padding-top:16px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .rj-obra{grid-column:1 / -1}
 
   /* El cielo ya ocupa lo que queda bajo la cabecera, porque flores.js lo
      mide en los dos layouts. Acá solo se suelta el ancho —un cosmos
