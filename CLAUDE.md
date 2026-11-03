@@ -173,7 +173,8 @@ la nota y cómo llegar, que se leen con el telón abierto o cerrado.
 - **Las butacas se dibujan sueltas, sin plano de la sala:** no sabemos dónde caen el 1 y el 2
   en la fila 15, y un plano lo afirmaría.
 - **Sin foto, la escena queda en el rosa oscuro del escenario** y el crédito se retira.
-- **La nota "Para ti" es un borrador escrito para que Oscar lo edite**, no una cita.
+- **La nota "Para ti" son palabras de Oscar**, pulidas con su visto bueno; no es una cita.
+- **El programa cierra con "Continuará…"** y no con una hora de salida: es a propósito.
 - El contrato de diseño, los bocetos y las capturas de revisión viven en `.impeccable/`, que
   no se publica. `PRODUCT.md` (raíz) es el registro de producto que Impeccable exige.
 

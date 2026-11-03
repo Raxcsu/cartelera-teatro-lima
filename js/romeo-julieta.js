@@ -62,7 +62,7 @@ const FUNCION = {
   programa: [
     { hora: '7:30', sub: 'p. m.', presente: 'Llegamos con tiempo', pasado: 'Llegamos con tiempo', marca: 'puertas' },
     { hora: '8:00', sub: 'p. m.', presente: 'Se abre el telón', pasado: 'Se abrió el telón', marca: 'durante' },
-    { hora: '10:00', sub: 'aprox.', presente: 'Termina, y la noche sigue', pasado: 'Terminó, y la noche siguió', marca: null },
+    { hora: '10:00', sub: 'aprox.', presente: 'Continuará…', pasado: 'Continuará…', marca: null },
   ],
   // URLs fijas escritas acá, no datos de afuera: no pasan por urlSegura()
   // porque nadie más las llena. La ruta va a Google Maps, igual que en la
@@ -71,10 +71,10 @@ const FUNCION = {
     ruta: 'https://www.google.com/maps/dir/?api=1&destination=Teatro%20Municipal%20de%20Lima%2C%20Jr.%20Ica%20377%2C%20Lima',
     passline: 'https://www.passline.com/eventos-ficha-dvm/romeo-y-julieta-461128',
   },
-  // Un borrador de Oscar para editar. Con `texto: null` la nota no se pinta.
+  // Las palabras son de Oscar. Con `texto: null` la nota no se pinta.
   nota: {
     titulo: 'Para ti',
-    texto: 'Hay obras que se ven y obras que se cuentan después, de camino a casa. Esta quiero contarla contigo.\n\nShakespeare la escribió como tragedia; la nuestra viene con final feliz incluido: salir del teatro tomados de la mano.',
+    texto: 'Me gustan las historias. Me gustan más cuando eres tú quien me las cuenta, y mucho más cuando las vivimos juntos.\n\nQuiero que seas mi historia de vida: la que algún día les contaré a nuestros nietos, con la voz ronca y gastada por los años, sin olvidar una sola escena.',
     firma: 'Oscar',
   },
 };
