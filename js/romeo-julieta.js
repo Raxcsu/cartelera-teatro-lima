@@ -53,10 +53,13 @@ const FUNCION = {
     cita: '¿El amor es ciego? Romeo y Julieta es la trágica historia de dos jóvenes amantes de familias enemistadas, que se enamoran a primera vista…',
     fuente: 'Passline',
   },
+  // La misma foto oficial que usa Passline, pero en 1500×1086: la de la
+  // ficha es una miniatura de 800×800 y se pixelaba a pantalla completa.
+  // Viene de la nota de Mano Alzada (2026-11-03), y el crédito la nombra.
   foto: {
-    archivo: 'assets/romeo-julieta/evento.jpg',
+    archivo: 'assets/romeo-julieta/funcion.jpg',
     alt: 'Julieta y Romeo frente a frente, a contraluz',
-    credito: 'Imagen: Passline',
+    credito: 'Imagen: Mano Alzada',
   },
   // `marca`: en qué estado del reloj esta parada lleva el punto relleno.
   programa: [
@@ -267,7 +270,7 @@ export function pintarRomeoJulieta(app, ahora) {
     <article class="rj" aria-labelledby="romeo-julieta-titulo">
       <section class="rj-boca">
         <div class="rj-escena" id="rj-escena">
-          <img src="${esc(foto.archivo)}" width="800" height="800" decoding="async" alt="${esc(foto.alt)}">
+          <img src="${esc(foto.archivo)}" width="1500" height="1086" decoding="async" alt="${esc(foto.alt)}">
           <p class="rj-credito">${esc(foto.credito)}</p>
         </div>
         <div class="rj-pano rj-pano-izq" aria-hidden="true"></div>

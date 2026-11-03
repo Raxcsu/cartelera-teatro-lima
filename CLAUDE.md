@@ -149,7 +149,7 @@ igual que `RECUERDO` en primer-mes. **Pero el horario no:** la fecha y los borde
 Lima, viernes 06.11.2026, 20:00, platea fila 15). **No es una invitación más, a propósito:**
 la primera versión estaba calcada de la noche criolla y se rediseñó con Impeccable. La página
 es la boca del escenario: llega con un **telón cerrado** y ella lo abre arrastrando o con un
-toque; detrás está la escena (la foto de Passline). Debajo, primero la nota "Para ti" (a propósito: es lo primero que ella lee al bajar), y
+toque; detrás está la escena (la foto oficial de la obra, en 1500×1086, de la nota de Mano Alzada: la miniatura de Passline se pixelaba). Debajo, primero la nota "Para ti" (a propósito: es lo primero que ella lee al bajar), y
 después la noche, las butacas, la puesta y cómo llegar, que se leen con el telón abierto o cerrado.
 
 - **Todo el telón es una variable, `--abierto` (0 a 1), sobre `.rj-boca`.** `prepararTelon()`

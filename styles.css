@@ -55,7 +55,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 
 .rj-escena{position:absolute;inset:0;z-index:0;
   background:radial-gradient(120% 80% at 50% 30%,#854052,#3a2a2e 70%)}
-.rj-escena img{display:block;width:100%;height:100%;object-fit:cover;object-position:44% 30%;
+.rj-escena img{display:block;width:100%;height:100%;object-fit:cover;object-position:16% 40%;
   transform:scale(calc(1.08 - .08 * var(--abierto)))}
 /* Lo que sostiene la lectura del cartel sobre una foto casi blanca. */
 .rj-escena::after{content:'';position:absolute;inset:0;
@@ -1299,7 +1299,7 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .app.romeo-julieta{padding:14px clamp(24px,3vw,42px) 64px}
   .rj-boca{max-width:1180px;margin:0 auto;border-radius:18px 18px 0 0;
     height:clamp(520px,calc(100dvh - 116px),900px)}
-  .rj-escena img{object-position:50% 28%}
+  .rj-escena img{object-position:46% 32%}
   .rj-cuerpo{max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-top:64px;
     align-items:start}
   /* La nota es lo primero que se lee al bajar del telón: va sola, centrada
