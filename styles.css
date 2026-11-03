@@ -35,59 +35,66 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);
 .corazon::before{top:-4.5px;left:0}
 .corazon::after{top:0;right:-4.5px}
 
-/* Cuatro destinos, no cuatro versiones de la misma pantalla. La barra se
-   queda arriba aun cuando la cartelera falle: ninguna de las otras tres
-   vistas depende de que los JSON carguen.
+/* ── el menú ───────────────────────────────────────────────
+   Con siete destinos la barra de pestañas dejó de ser una barra: scrolleaba
+   escondiendo más de la mitad, y los degradados que lo avisaban no
+   alcanzaban. Ahora es una columna, con dos formas según el layout:
 
-   El `font` decía `10.5px/var(--sans)`: eso pone la familia en la posición
-   de line-height y deja el shorthand sin font-family, que es obligatoria,
-   así que la declaración entera se descartaba y las pestañas salían a 16px.
-   Con dos entraban raspando; la tercera desbordaba la barra.
+   - Teléfono: un panel que entra desde la izquierda sobre un velo. Cerrado
+     lleva visibility:hidden, que además de esconderlo lo saca del orden del
+     tabulador y del árbol de accesibilidad: un panel fuera de cuadro pero
+     enfocable es un foco que se pierde en ninguna parte.
+   - Escritorio: una columna fija del grid del body, que se pliega a una
+     franja de íconos. Plegada, el nombre NO se borra: se recorta a 1px, así
+     el enlace sigue teniendo nombre accesible.
 
-   Con la cuarta ya no entran de ninguna manera sin romper algo: bajar de los
-   44px táctiles está prohibido y partir en dos filas engorda la cabecera
-   justo donde el proyecto peleó por 180px. Así que la barra scrollea. El
-   costo conocido es que esconde destinos, y los degradados laterales son lo
-   único que lo dice: por eso no son adorno. Las clases `desborda-antes` y
-   `desborda-despues` las pone app.js según lo que quede a cada lado, y
-   `safe center` mantiene la barra
-   centrada mientras todo entra; si un navegador no lo soporta descarta la
-   declaración y quedan a la izquierda, que es una diferencia cosmética y no
-   un layout roto. Esa es la prueba que hay que pasar antes de usar algo
-   reciente. */
-.pestanas-caja{position:relative;max-width:520px;margin:16px auto 0;
-  border-bottom:1px solid var(--line)}
-.pestanas-caja::before,.pestanas-caja::after{content:'';position:absolute;z-index:2;
-  top:0;bottom:0;
-  width:28px;pointer-events:none;opacity:0;transition:opacity .15s ease;
-  /* var(--bg) a var(--bg) transparente. En hexadecimal de 8 dígitos porque
-     un degradado a `transparent` pasa por negro en algunos motores. */
-  background:linear-gradient(90deg,#fdf8f700,#fdf8f7)}
-.pestanas-caja::before{left:0;transform:scaleX(-1)}
-.pestanas-caja::after{right:0}
-.pestanas-caja.desborda-antes::before,
-.pestanas-caja.desborda-despues::after{opacity:1}
-.pestanas{display:flex;justify-content:safe center;gap:3px;
-  overflow-x:auto;scrollbar-width:none}
-.pestanas::-webkit-scrollbar{display:none}
-.pestana{display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap);
-  padding:0 13px;border-bottom:2px solid transparent;margin-bottom:-1px;
+   La tipografía es la de las pestañas (DESIGN.md): sans 10.5px en
+   mayúsculas, --ink3, la activa en --accent. El borde inferior de 2px pasa
+   a ser una barra de 2px a la izquierda, que es donde mira una columna. */
+.sitio{position:relative;display:flex;align-items:center;justify-content:center;
+  min-height:64px;padding:10px 64px;border-bottom:1px solid var(--line)}
+.menu-boton{position:absolute;left:10px;top:50%;margin-top:calc(var(--tap) / -2);
+  width:var(--tap);height:var(--tap);display:grid;place-items:center;
+  border:0;border-radius:10px;background:none;color:var(--accent);cursor:pointer}
+.menu-boton:hover{background:var(--accent-bg)}
+/* Las tres rayas son una sola caja y sus dos pseudoelementos. */
+.menu-rayas,.menu-rayas::before,.menu-rayas::after{display:block;width:18px;height:1.5px;
+  border-radius:1px;background:currentColor}
+.menu-rayas{position:relative}
+.menu-rayas::before,.menu-rayas::after{content:'';position:absolute;left:0}
+.menu-rayas::before{top:-6px}
+.menu-rayas::after{top:6px}
+
+.menu-velo{position:fixed;inset:0;z-index:1050;background:rgba(58,42,46,.32)}
+/* z-index por encima de Leaflet, cuyos controles llegan a 1000. */
+.menu{position:fixed;z-index:1100;top:0;bottom:0;left:0;width:min(280px,84vw);
+  display:flex;flex-direction:column;gap:10px;padding:20px 12px 16px;overflow-y:auto;
+  background:var(--surface);border-right:1px solid var(--line);
+  box-shadow:0 0 40px rgba(58,42,46,.16);
+  transform:translateX(-100%);visibility:hidden}
+body.menu-abierto .menu{transform:none;visibility:visible}
+.menu-lista{list-style:none;display:flex;flex-direction:column;gap:2px}
+.menu-item,.menu-plegar{position:relative;display:flex;align-items:center;gap:12px;
+  width:100%;min-height:var(--tap);padding:0 12px;border:0;border-radius:10px;background:none;
   color:var(--ink3);font:600 10.5px var(--sans);letter-spacing:.08em;
-  text-decoration:none;text-transform:uppercase;white-space:nowrap}
-.pestana:hover{color:var(--accent);background:var(--accent-bg)}
-.pestana[aria-current="page"]{border-bottom-color:var(--accent);color:var(--accent)}
-/* El anillo de foco va hacia adentro SOLO acá: la barra es un contenedor con
-   scroll y recorta en su caja de relleno, así que el outline-offset:2px de
-   uso general se comería el anillo por arriba y por abajo. Adentro se ve
-   entero y no hace falta inflar el alto de la barra. */
-.pestana:focus-visible{outline-offset:-2px}
-/* En un teléfono angosto las cuatro no entran con el aire pensado para dos.
-   Cede el padding lateral y el tracking; el alto táctil de 44px no. */
-@media (max-width:400px){
-  .pestana{padding:0 8px;letter-spacing:.05em}
-}
-@media (max-width:340px){
-  .pestana{padding:0 5px}
+  text-decoration:none;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.menu-item:hover,.menu-plegar:hover{color:var(--accent);background:var(--accent-bg)}
+.menu-item[aria-current="page"]{color:var(--accent);background:var(--accent-bg)}
+.menu-item[aria-current="page"]::before{content:'';position:absolute;left:0;top:11px;bottom:11px;
+  width:2px;border-radius:2px;background:var(--accent)}
+.menu-icono{flex:0 0 20px;width:20px;height:20px;fill:none;stroke:currentColor;
+  stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.menu-nombre{overflow:hidden;text-overflow:ellipsis}
+.menu-grupo{margin:12px 12px 4px;padding-top:14px;border-top:1px solid var(--line);
+  font:600 9.5px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.menu-plegar{display:none}
+
+@media (prefers-reduced-motion:no-preference){
+  /* Al cerrar, visibility espera a que termine el deslizamiento; al abrir
+     cambia en el acto. Es lo que deja ver la salida sin dejar el panel
+     enfocable mientras tanto. */
+  .menu{transition:transform .24s cubic-bezier(.16,1,.3,1),visibility 0s linear .24s}
+  body.menu-abierto .menu{transition:transform .24s cubic-bezier(.16,1,.3,1)}
 }
 
 .cargando{color:var(--ink2);font-size:14px;padding:40px 0;text-align:center}
@@ -380,6 +387,7 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 .app.pregunta,
 .app.primer-mes,
 .app.noche-criolla,
+.app.romeo-julieta,
 .petalos{
   --flor-1:#e3b9c1; --flor-2:#c77e90; --flor-3:#a35267; --flor-4:#854052;
 }
@@ -691,16 +699,17 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
    como el primer mes; --papel es el mismo valor que allá. El reloj NO va en
    tarjeta: es parte del hero, y la cifra en serif ya tiene peso de sobra.
    560px como .app.pregunta: a 720 el texto centrado queda con líneas largas. */
-.app.noche-criolla{--papel:#fffdf8;
+.app.noche-criolla,
+.app.romeo-julieta{--papel:#fffdf8;
   max-width:560px;padding:18px 20px 44px;overflow-x:clip}
 .noche-articulo{display:flex;flex-direction:column;gap:52px}
 .noche-articulo .corazon{display:inline-block;vertical-align:middle}
 
 .noche-hero{text-align:center;padding-top:22px}
 .noche-kicker{font:600 10px/1.4 var(--sans);letter-spacing:.24em;color:var(--ink3)}
-.noche-criolla h2{margin-top:12px;font-family:var(--serif);font-weight:400;
+.noche-criolla h2,.romeo-julieta h2{margin-top:12px;font-family:var(--serif);font-weight:400;
   font-size:clamp(34px,10vw,46px);line-height:1.04;letter-spacing:-.035em;color:var(--ink)}
-.noche-criolla h2 .corazon{transform:rotate(-45deg) scale(1.35);margin:0 0 6px 10px}
+.noche-criolla h2 .corazon,.romeo-julieta h2 .corazon{transform:rotate(-45deg) scale(1.35);margin:0 0 6px 10px}
 .noche-bajada{margin-top:14px;font-size:14.5px;line-height:1.62;color:var(--ink2)}
 
 /* el dibujo: guitarra y cajón. Se traza UNA vez al entrar; es el único
@@ -750,6 +759,10 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 .noche-foto figcaption{margin-top:6px;text-align:right;font-size:10.5px;color:var(--ink3)}
 .noche-obra h3{margin-top:14px;font:400 30px/1.1 var(--serif);letter-spacing:-.02em;color:var(--ink)}
 .noche-elenco{margin-top:8px;font-size:13.5px;color:var(--ink)}
+.noche-produccion{margin-top:4px;font-size:12.5px;color:var(--ink2)}
+/* La imagen de Passline es cuadrada y las caras viven en la mitad de
+   arriba: el recorte 16:10 se corre hacia arriba para no cortarlas. */
+.romeo-julieta .noche-foto img{object-position:50% 22%}
 .noche-obra blockquote{margin:16px auto 0;max-width:30ch;font-size:13.5px;line-height:1.6;
   color:var(--ink2);font-style:italic}
 .noche-obra cite{display:block;margin-top:6px;font:600 10px/1.4 var(--sans);letter-spacing:.11em;
@@ -1008,6 +1021,9 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
 @media (prefers-reduced-motion:reduce){
   html,.lista{scroll-behavior:auto}
 }
+@media (min-width:900px) and (min-height:600px) and (prefers-reduced-motion:no-preference){
+  body{transition:grid-template-columns .2s ease}
+}
 
 /* ── escritorio ────────────────────────────────────────────
    A partir de acá la pantalla deja de ser una columna de 430px: mapa a la
@@ -1018,10 +1034,28 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
    (900x500, un portátil con la consola abierta) un layout de 100dvh deja
    la lista sin sitio, y ahí la columna de siempre es mejor respuesta. */
 @media (min-width:900px) and (min-height:600px){
-  body{height:100vh;height:100dvh;display:flex;flex-direction:column}
-  .sitio{padding:20px 28px 14px}
-  .app{max-width:1320px;width:100%;flex:1;min-height:0;padding:0 28px 24px}
-  .pestanas-caja{margin-top:16px}
+  /* El menú es la primera columna del body y ocupa todo el alto; la
+     cabecera y la vista comparten la segunda. La vista scrollea por dentro
+     (.app) para que el menú no se vaya con ella. La cartelera no se entera:
+     su .lista sigue siendo lo único que scrollea, porque cabe en su caja. */
+  body{height:100vh;height:100dvh;display:grid;
+    grid-template-columns:var(--menu-ancho,228px) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr);grid-template-areas:"menu sitio" "menu app"}
+  body.menu-plegado{--menu-ancho:68px}
+  .sitio{grid-area:sitio;min-height:0;padding:20px 28px 14px;border-bottom:0}
+  .menu-boton,.menu-velo{display:none}
+  .menu{grid-area:menu;position:relative;z-index:auto;width:auto;transform:none;
+    visibility:visible;box-shadow:none;background:var(--bg);padding:18px 10px 14px}
+  .menu-plegar{display:flex;margin-top:auto}
+  .menu-plegar .menu-icono{transition:transform .2s ease}
+  body.menu-plegado .menu-plegar .menu-icono{transform:rotate(180deg)}
+  body.menu-plegado .menu-item,body.menu-plegado .menu-plegar{justify-content:center;padding:0}
+  body.menu-plegado .menu-nombre{position:absolute;width:1px;height:1px;overflow:hidden;
+    clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  body.menu-plegado .menu-grupo{margin:12px 6px 4px;padding-top:0;height:1px;
+    overflow:hidden;color:transparent}
+  .app{grid-area:app;max-width:1320px;width:100%;min-height:0;overflow-y:auto;
+    padding:0 28px 24px}
   /* Una sola pantalla: el resumen y el documento comparten el alto que
      queda bajo la cabecera. No hay scroll en la vista exterior. */
   .app.escala{max-width:none;overflow:hidden;padding:0 clamp(24px,3vw,42px) 22px}
@@ -1058,6 +1092,12 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
      porque en este layout el body mide 100dvh. js/primer-mes.js escucha el
      scroll en captura sobre document para servir a los dos casos. */
   .app.primer-mes{max-width:900px;overflow-y:auto;padding:6px 36px 0}
+
+  /* Las dos invitaciones scrollean en .app, que mide todo el ancho: con el
+     max-width de 560px la barra de scroll quedaba pegada a la columna, en
+     medio de la pantalla. La columna de lectura se hace con el padding. */
+  .app.noche-criolla,.app.romeo-julieta{max-width:none;
+    padding:6px max(28px,calc(50% - 280px)) 44px}
 
   /* El cielo ya ocupa lo que queda bajo la cabecera, porque flores.js lo
      mide en los dos layouts. Acá solo se suelta el ancho —un cosmos

@@ -1,7 +1,7 @@
 /**
  * app.js — navegación de primer nivel.
  *
- * Las seis vistas no comparten datos ni estados de error. El hash permite
+ * Las siete vistas no comparten datos ni estados de error. El hash permite
  * entrar directamente a cada una y hace que atrás y adelante del navegador
  * sean navegación real, no una imitación con botones.
  */
@@ -12,9 +12,16 @@ import { pintarPregunta } from './pregunta.js';
 import { pintarFlores, desmontar as desmontarFlores } from './flores.js';
 import { pintarPrimerMes, desmontar as desmontarPrimerMes } from './primer-mes.js';
 import { pintarNocheCriolla, desmontar as desmontarNocheCriolla } from './noche-criolla.js';
+import { pintarRomeoJulieta, desmontar as desmontarRomeoJulieta } from './romeo-julieta.js';
 
 // Marca de que la invitación ya se abrió sola alguna vez.
 const CLAVE_VISTA = 'teatro.pregunta.vista';
+// Si el menú de escritorio quedó plegado. Es una comodidad por navegador y
+// nada más: sin localStorage el menú arranca abierto y funciona igual.
+const CLAVE_PLEGADO = 'teatro.menu.plegado';
+// El mismo corte que el layout de dos columnas de styles.css. Si cambia
+// allá, cambia acá: de esto depende si el menú es panel o columna.
+const ESCRITORIO = '(min-width:900px) and (min-height:600px)';
 
 function pintarCartelera(nodo) {
   nodo.className = 'app';
@@ -80,6 +87,14 @@ const RUTAS = {
     pintar: pintarNocheCriolla,
     desmontar: desmontarNocheCriolla,
   },
+  // Tiene qué apagar: el mismo reloj, con el horario de la función.
+  'romeo-y-julieta': {
+    titulo: 'Romeo y Julieta — Theater with her',
+    hash: '#romeo-y-julieta',
+    foco: '#romeo-julieta-titulo',
+    pintar: pintarRomeoJulieta,
+    desmontar: desmontarRomeoJulieta,
+  },
 };
 
 let app = null;
@@ -91,45 +106,110 @@ function rutaDesdeHash(hash = window.location.hash) {
   return RUTAS[nombre] ? nombre : 'cartelera';
 }
 
-function actualizarPestanas(ruta) {
+function actualizarMenu(ruta) {
   for (const enlace of document.querySelectorAll('[data-ruta]')) {
-    const activa = enlace.dataset.ruta === ruta;
-    if (activa) {
-      enlace.setAttribute('aria-current', 'page');
-      acercarPestana(enlace);
-    } else {
-      enlace.removeAttribute('aria-current');
-    }
+    if (enlace.dataset.ruta === ruta) enlace.setAttribute('aria-current', 'page');
+    else enlace.removeAttribute('aria-current');
   }
-  marcarDesborde();
+}
+
+/* ── el menú ─────────────────────────────────────────────────
+   En el teléfono es un panel: se abre con el botón y se cierra con Escape,
+   con el velo o al elegir un destino. Mientras está abierto, la cabecera y
+   la vista quedan `inert`, que es lo que impide tabular detrás del velo.
+   En escritorio es una columna que se pliega; ahí no hay nada que cerrar. */
+
+let menu = null;
+
+function abrirMenu() {
+  const { boton, velo, nav } = menu;
+  document.body.classList.add('menu-abierto');
+  boton.setAttribute('aria-expanded', 'true');
+  boton.setAttribute('aria-label', 'Cerrar el menú');
+  velo.hidden = false;
+  app.inert = true;
+  // El destino actual primero: es el que se busca para orientarse.
+  (nav.querySelector('[aria-current="page"]') ?? nav.querySelector('a'))?.focus();
+}
+
+function cerrarMenu({ devolverFoco = true } = {}) {
+  const { boton, velo } = menu;
+  if (!document.body.classList.contains('menu-abierto')) return;
+  document.body.classList.remove('menu-abierto');
+  boton.setAttribute('aria-expanded', 'false');
+  boton.setAttribute('aria-label', 'Abrir el menú');
+  velo.hidden = true;
+  app.inert = false;
+  if (devolverFoco) boton.focus();
 }
 
 /**
- * Con cuatro o más destinos las etiquetas completas ya no entran en un teléfono
- * angosto y la barra scrollea. La pestaña activa tiene que estar a la vista,
- * y eso se hace con scrollLeft y NUNCA con scrollIntoView: sobre un hijo de
- * un contenedor con scroll horizontal, scrollIntoView desplaza además el
- * ancestro vertical. Es el mismo motivo por el que la tira de días no lo usa.
+ * Plegado, el nombre de cada destino se recorta a 1px pero sigue ahí, así
+ * que el lector de pantalla lo lee igual; el `title` es para el ratón.
+ *
+ * El cielo de flores mide su lienzo solo cuando cambia la ventana, y plegar
+ * el menú cambia el ancho de la vista sin cambiar la ventana. Por eso se
+ * avisa con un `resize` sintético al terminar la transición (y al instante,
+ * por si no la hay). El mapa y el primer mes ya tienen su ResizeObserver.
  */
-function acercarPestana(enlace) {
-  const barra = enlace.parentElement;
-  if (!barra || barra.scrollWidth <= barra.clientWidth) return;
-  const centro = (enlace.offsetLeft - barra.offsetLeft)
-    - (barra.clientWidth - enlace.offsetWidth) / 2;
-  barra.scrollLeft = Math.max(0, centro);
+function aplicarPlegado(plegado) {
+  document.body.classList.toggle('menu-plegado', plegado);
+  menu.plegar.setAttribute('aria-expanded', String(!plegado));
+  menu.plegar.querySelector('.menu-nombre').textContent = plegado ? 'Desplegar el menú' : 'Plegar el menú';
+  for (const enlace of menu.nav.querySelectorAll('.menu-item')) {
+    if (plegado) enlace.title = enlace.textContent.trim();
+    else enlace.removeAttribute('title');
+  }
+  menu.plegar.title = plegado ? 'Desplegar el menú' : '';
+  window.dispatchEvent(new Event('resize'));
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 260);
 }
 
-/**
- * Enciende un degradado en cada borde donde queden pestañas por recorrer.
- * Una barra que scrollea sin decirlo esconde destinos enteros, y este
- * proyecto ya carga con un afordance escondido (la barra de la escala).
- */
-function marcarDesborde() {
-  const barra = document.querySelector('.pestanas');
-  if (!barra || !barra.parentElement) return;
-  const resto = barra.scrollWidth - barra.clientWidth - barra.scrollLeft;
-  barra.parentElement.classList.toggle('desborda-antes', barra.scrollLeft > 2);
-  barra.parentElement.classList.toggle('desborda-despues', resto > 2);
+function leerPlegado() {
+  try { return localStorage.getItem(CLAVE_PLEGADO) === '1'; } catch { return false; }
+}
+
+function guardarPlegado(plegado) {
+  try {
+    if (plegado) localStorage.setItem(CLAVE_PLEGADO, '1');
+    else localStorage.removeItem(CLAVE_PLEGADO);
+  } catch { /* sin storage, el plegado dura lo que dure la página */ }
+}
+
+function prepararMenu() {
+  const boton = document.querySelector('.menu-boton');
+  const velo = document.querySelector('.menu-velo');
+  const nav = document.getElementById('menu');
+  const plegar = nav?.querySelector('.menu-plegar');
+  if (!boton || !velo || !nav || !plegar) return;
+  menu = { boton, velo, nav, plegar };
+
+  boton.addEventListener('click', () => {
+    if (document.body.classList.contains('menu-abierto')) cerrarMenu();
+    else abrirMenu();
+  });
+  velo.addEventListener('click', () => cerrarMenu());
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') cerrarMenu();
+  });
+  // Elegir un destino cierra el panel. El foco NO vuelve al botón: lo
+  // mueve pintarRuta() al encabezado de la vista nueva. Y si se elige la
+  // vista en la que ya se está no hay hashchange, por eso se cierra acá.
+  nav.addEventListener('click', (ev) => {
+    if (ev.target.closest('a')) cerrarMenu({ devolverFoco: false });
+  });
+  plegar.addEventListener('click', () => {
+    const plegado = !document.body.classList.contains('menu-plegado');
+    aplicarPlegado(plegado);
+    guardarPlegado(plegado);
+  });
+  // Al pasar de teléfono a escritorio con el panel abierto (girar una
+  // tableta, agrandar la ventana) el velo y el inert no tienen sentido.
+  window.matchMedia(ESCRITORIO).addEventListener?.('change', (ev) => {
+    if (ev.matches) cerrarMenu({ devolverFoco: false });
+  });
+
+  if (leerPlegado()) aplicarPlegado(true);
 }
 
 function moverFoco(ruta) {
@@ -153,12 +233,14 @@ function pintarRuta() {
   // La vista que se va apaga lo suyo antes de que la siguiente pinte.
   RUTAS[rutaActual]?.desmontar?.();
   rutaActual = ruta;
-  actualizarPestanas(ruta);
+  actualizarMenu(ruta);
+  // Atrás del navegador también cambia de ruta con el panel abierto.
+  if (menu) cerrarMenu({ devolverFoco: false });
   document.title = destino.titulo;
 
   // Solo la cartelera devuelve una promesa: sus JSON tardan y el encabezado
   // al que debe llegar el foco no existe hasta que esa promesa resuelva.
-  // Las otras cinco pintan sincrónicamente y no devuelven nada.
+  // Las otras seis pintan sincrónicamente y no devuelven nada.
   const pintado = destino.pintar(app);
   if (debeMoverFoco) {
     if (pintado) pintado.then(() => { if (rutaDesdeHash() === ruta) moverFoco(ruta); });
@@ -195,10 +277,6 @@ export function arrancarApp(nodoApp) {
     window.history.replaceState(null, '', RUTAS['una-pregunta'].hash);
   }
   window.addEventListener('hashchange', pintarRuta);
-  // La barra de pestañas puede desbordar sin que cambie la ruta: al girar el
-  // teléfono, o al recorrerla con el dedo.
-  const barra = document.querySelector('.pestanas');
-  if (barra) barra.addEventListener('scroll', marcarDesborde, { passive: true });
-  window.addEventListener('resize', marcarDesborde, { passive: true });
+  prepararMenu();
   pintarRuta();
 }

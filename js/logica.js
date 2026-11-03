@@ -111,6 +111,18 @@ export const NOCHE_HORARIO = Object.freeze({
   fecha: '2026-10-31', puertas: '19:00', inicio: '19:30', fin: '21:30',
 });
 
+/**
+ * Romeo y Julieta (Éxodo Teatro), Teatro Municipal de Lima, viernes 06.11.2026.
+ * La función es a las 20:00 según las entradas y la prensa. OJO con `puertas`:
+ * ninguna fuente publica la apertura de sala, así que acá NO es eso — es la
+ * hora a la que nosotros llegamos (19:30), porque "una vez iniciada la
+ * función no se permitirá el ingreso". `fin` va con 30 min de margen sobre
+ * las ~2 h publicadas, el mismo criterio que la noche criolla.
+ */
+export const ROMEO_HORARIO = Object.freeze({
+  fecha: '2026-11-06', puertas: '19:30', inicio: '20:00', fin: '22:30',
+});
+
 // Minutos desde una fecha base fija, sin pasar por Date local: así la
 // cuenta no depende de la zona horaria de la máquina que corre la prueba.
 function minutosDe(instante) {

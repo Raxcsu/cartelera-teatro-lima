@@ -59,7 +59,7 @@ el reenfoque a la obra.
 | Uso | Regla |
 |---|---|
 | Nombre de la app | sans 12.5px, `letter-spacing:.24em`, mayúsculas, `--accent` |
-| Pestaña de sección | sans 10.5px, `letter-spacing:.08em`, mayúsculas, `--ink3`; la activa en `--accent` con borde inferior de 2px |
+| Destino del menú lateral | sans 10.5px, `letter-spacing:.08em`, mayúsculas, `--ink3`; la activa en `--accent` sobre `--accent-bg` con barra izquierda de 2px |
 | Nombre del mes | serif 22px / 1.1, capitalizado |
 | Título de obra | serif 20px / 1.18 |
 | Elenco | sans 12.5px / 1.5, color `--ink`; el "y N más" en `--ink3` |
@@ -209,28 +209,33 @@ su fallo no toca el resto de la pantalla.
 
 ## Las otras vistas
 
-La app dejó de ser una sola pantalla: la cabecera lleva seis pestañas y `app.js` despacha por
-hash. Las cinco vistas que no son la cartelera son personales y no producto, pero se rigen por la misma paleta y
-las mismas reglas de área táctil.
+La app dejó de ser una sola pantalla: un menú lateral lleva siete destinos y `app.js` despacha
+por hash. Las seis vistas que no son la cartelera son personales y no producto, pero se rigen
+por la misma paleta y las mismas reglas de área táctil.
 
-**Las pestañas.** Sans en mayúsculas, en la familia del nombre de la app pero un escalón por
-debajo: `10.5px` con `letter-spacing:.08em` contra los `12.5px` / `.24em` del `<h1>`, para que
-la navegación no compita con el nombre. Alto `44px` por la regla de área táctil. La activa
-lleva `aria-current="page"`, el acento y un borde inferior de 2px; las otras van en `--ink3`.
-Por debajo de 400px y de 340px el padding se reduce en dos escalones, en vez de achicar la
-letra o envolver a dos líneas.
+**El menú lateral reemplazó a las pestañas con la séptima vista.** La barra horizontal ya
+scrolleaba desde la cuarta, y con siete escondía más de la mitad de los destinos; los
+degradados que lo avisaban no alcanzaban. Partirla en dos filas seguía prohibido por el
+presupuesto vertical. Una columna no tiene ese techo.
 
-**Con la cuarta pestaña la barra pasó a scrollear, y las dos alternativas se descartaron por
-motivos que conviene dejar escritos.** Bajar la celda táctil está prohibido por la regla de
-44px. Partir en dos filas engorda la cabecera unos 44px, justo donde el calendario peleó por
-ganar 180px. Queda el scroll horizontal, cuyo costo es real: esconde destinos enteros sin
-decirlo. Lo compensan los degradados de ambos bordes —`.desborda-antes` y
-`.desborda-despues`, puestos desde `app.js`—, que aparecen solo si queda contenido oculto en
-ese lado. La barra se centra con
-`justify-content:safe center`; sin soporte, las pestañas quedan a la izquierda, que es una
-diferencia cosmética y no un layout roto. El anillo de foco de las pestañas va con
-`outline-offset:-2px` porque un contenedor con scroll recorta en su caja de relleno y el
-anillo de 2px hacia afuera se perdía.
+- **Tipografía, la de las pestañas:** sans `10.5px`, `letter-spacing:.08em`, mayúsculas,
+  `--ink3`, un escalón por debajo del `<h1>` para no competir con el nombre. Cada destino lleva
+  un ícono en trazo de 1,4 (el mismo trazo de los dibujos de las invitaciones), dibujado en SVG:
+  cero emoji.
+- **La activa** lleva `aria-current="page"`, el acento, fondo `--accent-bg` y una barra de 2px a
+  la izquierda: el borde inferior de la pestaña pasó al lado que mira una columna.
+- **Agrupado:** la cartelera arriba, sola, y bajo la etiqueta "Para ti" las seis personales, de
+  la más nueva a la más vieja.
+- **Ítems de `44px` de alto**, por la regla de área táctil, también plegado.
+- **Teléfono (debajo de 900×600):** botón de tres rayas a la izquierda de la cabecera, y un panel
+  de `min(280px, 84vw)` que entra desde la izquierda sobre un velo de `--ink` al 32%. Cerrado
+  lleva `visibility:hidden`, que lo saca del tabulador. Abierto, la vista queda `inert`. Escape,
+  el velo o elegir un destino lo cierran. El deslizamiento vive en
+  `prefers-reduced-motion: no-preference`.
+- **Escritorio:** la primera columna del grid del `body`, de 228px, que se pliega a 68px de
+  íconos. Plegado, el nombre se recorta a 1px (sigue siendo el nombre accesible) y el `title`
+  lo muestra al ratón. La elección se recuerda por navegador. Como la columna es fija, **las
+  vistas scrollean dentro de `.app`** y no en el documento: si no, el menú se iría con la página.
 
 **La escala astronómica** es una lectura, así que compone como una lectura: una cifra por
 bloque en `<dl>`, el kicker de sección en 10px con `letter-spacing`, y la fórmula en serif
@@ -417,8 +422,8 @@ concierto) y nunca usa el verde del semáforo. Mockups y decisiones en
   propósito: pedirlo desde JS no desplaza nada con las animaciones del sistema apagadas. Con
   la invitación la regla se puso a prueba de verdad: **toda** su animación vive dentro de
   `prefers-reduced-motion: no-preference`, y apagada el ramo se ve entero y quieto.
-- **Al cambiar de pestaña el foco salta al encabezado de la vista nueva**, con `tabIndex = -1`
-  y `preventScroll`. Sin eso, el foco se queda en la pestaña y un lector de pantalla no anuncia
+- **Al cambiar de vista el foco salta al encabezado de la vista nueva**, con `tabIndex = -1`
+  y `preventScroll`. Sin eso, el foco se queda en el menú y un lector de pantalla no anuncia
   que la pantalla cambió entera. En la cartelera el salto espera a que resuelvan los JSON,
   porque hasta entonces el encabezado no existe.
 - **El `aria-label` del ramo describe el dibujo y no cuenta las flores**, a propósito: la cifra
@@ -454,7 +459,7 @@ impresa en la imagen competiría con eso y se gastaría de tanto repetirla.
 | Calendario del mes | **Hecho.** Tira horizontal de los días que quedan del mes; las 42 celdas fijas siguen existiendo, plegadas en "Ver el mes completo". Lunes primero, punto en los días con función. |
 | Sinopsis, género y elenco | **Hecho.** En la tarjeta y en el popup del mapa. Cobertura real: 156/164 con sinopsis, 85/164 con género, 90/164 con elenco; los huecos son huecos declarados y la línea desaparece entera en vez de decir "otro". |
 | Estado "guardado" | **Pendiente, y hay código muerto.** `alternarGuardado()` y `leerGuardados()` existen en `datos.js` pero la interfaz nunca los llama. |
-| Primera vez | **Cambió de forma.** La app se presenta con su nombre y sus seis pestañas en la cabecera, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
+| Primera vez | **Cambió de forma.** La app se presenta con su nombre en la cabecera y sus siete destinos en el menú lateral, y el mapa avisa mientras carga. Pero **una visita limpia a la raíz ya no abre la cartelera**: `app.js` redirige una sola vez a `#una-pregunta` y deja la marca en localStorage. O sea que la primera pantalla de un visitante nuevo no es la cartelera, y sigue sin haber nada que explique qué es. |
 | Marca del reloj | **Pendiente.** La del estado vencido se lee más como una L que como un reloj. |
 | Afiches de obras | **Pendiente, y hoy no hay ninguno.** `imagen_local` está en `null` en las 164 obras, así que la regla "los afiches mandan" no tiene nada que gobernar todavía. Con la sinopsis en pantalla la tarjeta ya no depende de ellos para tener algo que decir, así que bajó de prioridad. |
 | Filtros y tarjeta compartible | **Pendiente.** Diseñados y aprobados en las maquetas, sin implementar. El filtro de presupuesto se cae del plan junto con el precio; quedan **género** (85 obras con dato) y distrito. |

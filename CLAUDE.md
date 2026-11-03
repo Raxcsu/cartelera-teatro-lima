@@ -7,7 +7,7 @@ Proyecto en español: código, comentarios y datos van en español.
 ## Comandos
 
 ```bash
-npm test                          # Vitest, 123 pruebas: 102 de logica.js + 21 de cielo.js
+npm test                          # Vitest, 127 pruebas: 106 de logica.js + 21 de cielo.js
 npx vitest run -t "confianza"     # un solo grupo de pruebas por nombre
 npm run test:watch                # reejecuta al guardar
 
@@ -48,21 +48,22 @@ pregunta.js DOM de la invitación             ← SVG del ramo + celebración   
 flores.js   canvas del cielo de flores       ← único bucle de rAF del repo  [existe]
 primer-mes.js DOM del recuerdo del 26.09    ← ruta medida + reloj          [existe]
 noche-criolla.js DOM de la noche del 31.10  ← reloj de seis estados       [existe]
+romeo-julieta.js DOM de la función del 06.11 ← calcada de noche-criolla  [existe]
 tarjeta.js  Canvas + share                   (Fase 5)                       [NO existe]
 ```
 
 `index.html` es la cabecera y el arranque, nada más. La capa DOM vivía inline ahí hasta que la
 pantalla creció a mapa + calendario + mes; la mudanza no arrastró lógica de negocio porque esa
 ya estaba separada, que era exactamente la apuesta. **La única excepción es el `<header>` con
-el nombre de la app y su `<nav>`**, y está ahí a propósito: es constante y no dato, así se ve
+el nombre de la app y el `<nav id="menu">` del menú lateral**, y están ahí a propósito: es constante y no dato, así se ve
 durante "Cargando cartelera…" y sobrevive a los estados de error y de cartelera vencida, que
 reemplazan todo `#app`. De paso es el único `<h1>` de la página, así que ninguna pantalla queda
 sin encabezado de primer nivel. Que la navegación viva ahí tiene su propio motivo: **ninguna
 de las otras vistas puede depender de que la cartelera logre cargar.**
 
-## Las seis vistas
+## Las siete vistas
 
-La app dejó de ser una sola pantalla. `app.js` despacha por hash a seis vistas que **no
+La app dejó de ser una sola pantalla. `app.js` despacha por hash a siete vistas que **no
 comparten datos ni estados de error**:
 
 | Ruta | Módulo | Qué es |
@@ -73,6 +74,7 @@ comparten datos ni estados de error**:
 | `#flores-amarillas` | `flores.js` | El cielo: galaxia, girasoles y corazón en `<canvas>`. |
 | `#primer-mes` | `primer-mes.js` | El recuerdo del primer mes: el mapa sorpresa, fotos y scrapbook. |
 | `#noche-criolla` | `noche-criolla.js` | La invitación a Brujería Criolla del 31.10: reloj, obra, programa y cómo llegar. |
+| `#romeo-y-julieta` | `romeo-julieta.js` | La invitación a Romeo y Julieta (Éxodo Teatro) del 06.11: la misma composición. |
 
 **`RUTAS` ganó una columna, `desmontar`, y ese es el cambio de fondo que trajo la cuarta
 vista.** Antes era una llamada suelta a `desmontarCartelera()` en `pintarRuta()`, porque la
@@ -141,6 +143,26 @@ igual que `RECUERDO` en primer-mes. **Pero el horario no:** la fecha y los borde
   `width`/`height` de la `<img>`, el alto presentacional le gana al `aspect-ratio`.
 - **El reloj no lleva `aria-live`** (DESIGN.md): anunciaría cada minuto sin que nadie lo pida.
 
+### Romeo y Julieta: la noche criolla con otro contenido
+
+`#romeo-y-julieta` es la invitación a *Romeo y Julieta* de Éxodo Teatro (Teatro Municipal de
+Lima, viernes 06.11.2026, 20:00, platea fila 15). **`js/romeo-julieta.js` está calcado de
+`noche-criolla.js` a propósito**, y reusa sus clases `noche-*` de `styles.css`: es la misma
+composición con otro contenido (`FUNCION`), otro dibujo (el balcón) y otros textos del reloj.
+No se factorizó un módulo común porque la noche criolla ya es un recuerdo y no se toca; si
+llega una tercera invitación, ahí sí conviene.
+
+- **El horario es `ROMEO_HORARIO` en `logica.js`**, y el reloj es el mismo `estadoNoche(ahora,
+  horario)` con 4 pruebas propias. Igual que allá: si cambia la hora, hay que tocar los dos.
+- **`puertas` NO es la apertura de sala** (19:30): ninguna fuente la publica. Es la hora a la
+  que llegamos, porque el ticket dice que una vez iniciada la función no dejan entrar. Por eso
+  el programa dice "Llegamos con tiempo" y no "Abren las puertas". `fin` es 22:30: ~2 h
+  publicadas más 30 min de margen, el mismo criterio que la noche criolla.
+- **La foto es la imagen de la ficha de Passline** (cuadrada, 800×800) en
+  `assets/romeo-julieta/evento.jpg`. El recorte 16:10 va con `object-position` corrido hacia
+  arriba para no cortar las caras.
+- **La nota "Para ti" es un borrador escrito para que Oscar lo edite**, no una cita.
+
 ### El paper vive en `data/paper_cientifico/`
 
 `paper.pdf` es lo que la vista embebe, con la ruta escrita **tres veces** en `js/escala.js`
@@ -164,7 +186,7 @@ alcanzaba un ternario; con tres, esas cadenas crecen en cada pantalla nueva y el
 de estar en un solo sitio.
 
 **Solo la cartelera devuelve una promesa.** Sus JSON tardan y el encabezado al que va el foco no
-existe hasta que resuelva; las otras cinco pintan sincrónicamente. Por eso `pintarRuta()` mira si
+existe hasta que resuelva; las otras seis pintan sincrónicamente. Por eso `pintarRuta()` mira si
 `pintar()` devolvió algo antes de mover el foco.
 
 **Hay dos layouts, no uno responsive a medias.** Debajo de 900×600 es la columna de 430px de
@@ -471,13 +493,14 @@ obras equivocadas y el `git diff` sería ilegible.
   lado esperando ese dato. Cada carga vuelve a preguntar.
 - **`styles.css` se pide con `?v=…` y hay que moverlo al cambiar el CSS.** GitHub Pages cachea
   agresivo y un layout nuevo servido con el CSS viejo se ve roto, no desactualizado. El valor
-  actual es `20261031-noche`; la convención es fecha más una palabra de qué cambió.
+  actual es `20261106-romeo`; la convención es fecha más una palabra de qué cambió.
 - **Las entradas reales están en `.gitignore` y no pueden entrar nunca.**
   `docs/bodas_figaro_entradas.pdf` y `docs/entrada_valeria.png` llevan DNI, número de compra y
   los QR de acceso. Este repo es público y cada push despliega: un commit descuidado las
   publica y el historial de git no las olvida. La carpeta `data/entradas_estacion_barranco/`
   (los e-tickets de Brujería Criolla, con QR) está ignorada por el mismo motivo, y por eso
-  `#noche-criolla` dice "las llevo yo" en vez de mostrar una entrada.
+  `#noche-criolla` dice "las llevo yo" en vez de mostrar una entrada. Lo mismo
+  `data/entradas_romeo_julieta/`: los PDF de Passline llevan además el correo del comprador.
 
 ## Diseño
 
@@ -514,7 +537,7 @@ Y encima de todo eso, lo último: la app **dejó de ser una sola pantalla**. `ap
 por hash a cuatro vistas —`#cartelera`, `#escala-astronomica`, `#una-pregunta` y
 `#flores-amarillas`— y la cabecera lleva la navegación. La cartelera es la única que pide
 datos; las otras tres son autosuficientes a propósito, así que siguen en pie aunque los JSON
-estén caídos o la cartelera vencida. Ver "Las seis vistas".
+estén caídos o la cartelera vencida. Ver "Las siete vistas".
 
 La cuarta en entrar, **flores amarillas**, era una página suelta en `docs/` y ahora es una
 vista: un cielo en `<canvas>` con una galaxia, seis girasoles y un corazón de partículas. Es
@@ -544,6 +567,14 @@ La sexta es **`#noche-criolla`**, la invitación a *Brujería Criolla* del 31.10
 de seis estados que decide `estadoNoche()`, la foto del evento y lo práctico para llegar. Las
 entradas, que llevan el QR, quedaron fuera del repo. Ver "La noche criolla: un solo estado
 decide todo".
+
+La séptima es **`#romeo-y-julieta`**, la función del 06.11.2026, y con ella **la navegación
+dejó de ser una barra de pestañas**: siete destinos ya no entraban sin esconder más de la mitad.
+Ahora es un **menú lateral** que vive en `index.html` (mismo motivo que la cabecera: no depende
+de que cargue la cartelera). En el teléfono es un panel con velo que abre el botón de la
+cabecera; en escritorio es la primera columna del grid del `body` y se pliega a íconos
+(`teatro.menu.plegado` en localStorage). Lo gobierna `prepararMenu()` en `app.js`; el detalle
+visual está en `DESIGN.md`. Ver "Romeo y Julieta: la noche criolla con otro contenido".
 
 **El refresco del 01.11.2026 cubrió noviembre y diciembre**, y una segunda ronda de Joinnus el
 02.11 sumó las 60 fichas que la primera no alcanzó. Hoy los datos tienen 63 teatros, 164 obras,

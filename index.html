@@ -4,31 +4,43 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Theater with her — cartelera de Lima</title>
-<link rel="stylesheet" href="styles.css?v=20261031-noche">
+<link rel="stylesheet" href="styles.css?v=20261106-romeo">
 </head>
 <body>
 
-<!-- La cabecera es lo único de DOM que NO vive en los módulos de vista, y a propósito:
-     es una constante, no un dato. Puesta acá se ve durante "Cargando
-     cartelera…" y sobrevive a los estados de error y de cartelera vencida,
-     que reemplazan todo #app. La navegación también vive acá: ninguna de las
-     otras vistas depende de que la cartelera pueda cargar. -->
+<!-- La cabecera y el menú son lo único de DOM que NO vive en los módulos de
+     vista, y a propósito: son constantes, no datos. Puestos acá se ven durante
+     "Cargando cartelera…" y sobreviven a los estados de error y de cartelera
+     vencida, que reemplazan todo #app. Ninguna de las otras vistas depende de
+     que la cartelera pueda cargar. -->
 <header class="sitio">
+  <!-- Solo en el teléfono: en escritorio el menú está siempre a la vista. -->
+  <button class="menu-boton" type="button" aria-controls="menu" aria-expanded="false" aria-label="Abrir el menú">
+    <span class="menu-rayas" aria-hidden="true"></span>
+  </button>
   <h1>Theater with her <span class="corazon" aria-hidden="true"></span></h1>
-  <!-- La caja existe para el degradado del borde: un ::after sobre la barra
-       se desplazaría con ella y no marcaría nada. La barra scrollea; la caja
-       se queda quieta y sostiene la línea y el aviso de que hay más. -->
-  <div class="pestanas-caja">
-    <nav class="pestanas" aria-label="Secciones principales">
-      <a class="pestana" href="#cartelera" data-ruta="cartelera">Cartelera</a>
-      <a class="pestana" href="#escala-astronomica" data-ruta="escala-astronomica">Escala astronómica</a>
-      <a class="pestana" href="#una-pregunta" data-ruta="una-pregunta">Una pregunta</a>
-      <a class="pestana" href="#flores-amarillas" data-ruta="flores-amarillas">Flores amarillas</a>
-      <a class="pestana" href="#primer-mes" data-ruta="primer-mes">Primer mes</a>
-      <a class="pestana" href="#noche-criolla" data-ruta="noche-criolla">Noche criolla</a>
-    </nav>
-  </div>
 </header>
+
+<div class="menu-velo" hidden></div>
+<!-- Siete destinos ya no entran en una barra: el menú es una columna. En el
+     teléfono es un panel que se abre desde la izquierda; en escritorio está
+     fijo y se pliega a una franja de íconos. Lo gobierna app.js. -->
+<nav id="menu" class="menu" aria-label="Secciones principales">
+  <ul class="menu-lista">
+    <li><a class="menu-item" href="#cartelera" data-ruta="cartelera"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/></svg><span class="menu-nombre">Cartelera</span></a></li>
+    <li class="menu-grupo" aria-hidden="true">Para ti</li>
+    <li><a class="menu-item" href="#romeo-y-julieta" data-ruta="romeo-y-julieta"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14V11a7 7 0 0 1-14 0z"/><path d="M8.6 9h2.2M13.2 9h2.2M9.5 13.6c1.5 1.2 3.5 1.2 5 0"/></svg><span class="menu-nombre">Romeo y Julieta</span></a></li>
+    <li><a class="menu-item" href="#noche-criolla" data-ruta="noche-criolla"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6.5l10-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span class="menu-nombre">Noche criolla</span></a></li>
+    <li><a class="menu-item" href="#primer-mes" data-ruta="primer-mes"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z"/><path d="M9 4.5v13M15 6.5v13"/></svg><span class="menu-nombre">Primer mes</span></a></li>
+    <li><a class="menu-item" href="#flores-amarillas" data-ruta="flores-amarillas"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="2.4"/><path d="M12 3.4v1.4M12 13.2v1.4M6.4 9h1.4M16.2 9h1.4M8 5l1 1M15 12l1 1M8 13l1-1M15 6l1-1M12 14.6V21M12 18.6c-1.8 0-3.3-1-3.9-2.6"/></svg><span class="menu-nombre">Flores amarillas</span></a></li>
+    <li><a class="menu-item" href="#una-pregunta" data-ruta="una-pregunta"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6" width="17" height="12.5" rx="1.5"/><path d="m4 7 8 6.2L20 7"/></svg><span class="menu-nombre">Una pregunta</span></a></li>
+    <li><a class="menu-item" href="#escala-astronomica" data-ruta="escala-astronomica"><svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><ellipse cx="12" cy="12" rx="9.5" ry="3.2" transform="rotate(-22 12 12)"/></svg><span class="menu-nombre">Escala astronómica</span></a></li>
+  </ul>
+  <button class="menu-plegar" type="button" aria-controls="menu" aria-expanded="true">
+    <svg class="menu-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="m13.5 7-5 5 5 5M18.5 7l-5 5 5 5"/></svg>
+    <span class="menu-nombre">Plegar el menú</span>
+  </button>
+</nav>
 
 <main id="app" class="app">
   <p class="cargando">Cargando cartelera…</p>

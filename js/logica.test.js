@@ -10,7 +10,7 @@ import {
   agruparPorDia, diasDelMes, diasParaTira, mesesConFunciones, desplazarMes,
   mesInicial, rangoNavegable,
   tallosDelRamo, RAMO_DESDE, RAMO_MAX, momentoAbierto,
-  estadoNoche, NOCHE_HORARIO,
+  estadoNoche, NOCHE_HORARIO, ROMEO_HORARIO,
 } from './logica.js';
 
 const HOY = '2026-08-16';
@@ -675,5 +675,28 @@ describe('estadoNoche — el reloj de la noche criolla', () => {
   it('acepta otro horario inyectado', () => {
     const h = { fecha: '2026-12-24', puertas: '20:00', inicio: '20:30', fin: '23:00' };
     expect(estadoNoche('2026-12-24T19:45', h)).toEqual({ estado: 'antes', horas: 0, minutos: 45 });
+  });
+});
+
+describe('estadoNoche con ROMEO_HORARIO — la noche en Verona', () => {
+  const en = (hora) => estadoNoche(`2026-11-06T${hora}`, ROMEO_HORARIO);
+
+  it('la función es a las 20:00; llegamos 19:30 y el final va con margen', () => {
+    expect(ROMEO_HORARIO).toEqual({ fecha: '2026-11-06', puertas: '19:30', inicio: '20:00', fin: '22:30' });
+    expect(Object.isFrozen(ROMEO_HORARIO)).toBe(true);
+  });
+  it('la víspera falta un día', () => {
+    expect(estadoNoche('2026-11-05T21:00', ROMEO_HORARIO)).toEqual({ estado: 'dias', dias: 1 });
+    expect(estadoNoche('2026-11-03T10:00', ROMEO_HORARIO)).toEqual({ estado: 'dias', dias: 3 });
+  });
+  it('19:29 cuenta hasta las 20:00 y 19:30 ya es la llegada', () => {
+    expect(en('19:29')).toEqual({ estado: 'antes', horas: 0, minutos: 31 });
+    expect(en('19:30')).toEqual({ estado: 'puertas' });
+  });
+  it('20:00 empieza, y a las 22:00 —el final aproximado— todavía no es recuerdo', () => {
+    expect(en('19:59').estado).toBe('puertas');
+    expect(en('20:00')).toEqual({ estado: 'durante' });
+    expect(en('22:29').estado).toBe('durante');
+    expect(en('22:30')).toEqual({ estado: 'despues' });
   });
 });
