@@ -3,8 +3,8 @@
  *
  * NO es una invitación más: la página es la boca del escenario. Llega con el
  * telón cerrado y ella lo abre —arrastrando o con un toque—; los paños se
- * recogen a los costados y detrás está la escena. Abajo, la noche, las
- * butacas, la obra, la nota y cómo llegar, que se leen con el telón abierto
+ * recogen a los costados y detrás está la escena. Abajo, primero la nota
+ * "Para ti" y después la noche, las butacas, la obra y cómo llegar, que se leen con el telón abierto
  * o cerrado: nada útil queda escondido detrás del gesto.
  *
  * Como noche-criolla.js, NO pide la cartelera, y todo lo que cambia con la
@@ -292,6 +292,8 @@ export function pintarRomeoJulieta(app, ahora) {
       </section>
 
       <div class="rj-cuerpo">
+        ${notaHtml()}
+
         <section class="rj-noche" aria-labelledby="rj-noche-titulo">
           <h3 id="rj-noche-titulo">Esa noche</h3>
           <ol class="rj-programa" data-rj="programa"></ol>
@@ -313,8 +315,6 @@ export function pintarRomeoJulieta(app, ahora) {
           </dl>
           <blockquote>${esc(obra.cita)}<cite>${esc(obra.fuente)}</cite></blockquote>
         </section>
-
-        ${notaHtml()}
 
         <section class="rj-llegar" aria-labelledby="rj-llegar-titulo">
           <h3 id="rj-llegar-titulo">${esc(lugar.nombre)}</h3>

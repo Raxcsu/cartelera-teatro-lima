@@ -1289,8 +1289,11 @@ html:has(.app.escala)::-webkit-scrollbar{display:none}
   .rj-escena img{object-position:50% 28%}
   .rj-cuerpo{max-width:900px;display:grid;grid-template-columns:1fr 1fr;gap:64px;padding-top:64px;
     align-items:start}
-  /* El título de la llegada a la altura del de la nota, que va dentro del papel. */
-  .rj-llegar{padding-top:27px}
+  /* La nota es lo primero que se lee al bajar del telón: va sola, centrada
+     y a ancho de lectura, sobre las dos columnas. La llegada cierra la
+     página a todo el ancho. */
+  .rj-nota{grid-column:1 / -1;justify-self:center;width:min(100%,560px)}
+  .rj-llegar{grid-column:1 / -1}
   .rj-butacas{align-self:stretch;display:flex;flex-direction:column}
   .rj-butaca-dibujo{width:104px;height:104px}
   .rj-asientos{gap:30px;margin-top:8px}
